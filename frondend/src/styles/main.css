@@ -1,0 +1,79 @@
+/*
+ * Datei: styles/main.css
+ * Diese Datei enthält das Grunddesign der Oberfläche (Layout, Karten, Buttons, Farben). Dadurch
+ * wirkt die Oberfläche sofort sauber und lesbar, ohne dass jede Komponente eigenes CSS braucht.
+ * Verbindung: Wird in src/main.jsx eingebunden.
+ */
+
+:root {
+  font-family: system-ui, Arial, sans-serif;
+  color: #1f2937;
+  background: #f6f7fb;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+nav button {
+  margin-right: 8px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.message {
+  margin-top: 8px;
+  color: #2563eb;
+}
+
+.timer {
+  font-weight: 600;
+  color: #b45309;
+}
+
+.question-list {
+  margin-top: 16px;
+}
+
+.question {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.options, .cloze {
+  display: grid;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,4 +1,5 @@
 # projekt-wissenstest
-Dies ist eine Intelligente Lernplatform mit Datanbank für UML!
-Moin Fred das ist ein Test!
-Test funktioniert dieser commit?
+Dies ist eine intelligente Lernplattform für UML-Fragen mit Java-Backend und React-Frontend.
+
+## Lokaler Start
+Eine ausführliche Schritt-für-Schritt-Anleitung findest du in [docs/wiki/start_local.md](docs/wiki/start_local.md).
