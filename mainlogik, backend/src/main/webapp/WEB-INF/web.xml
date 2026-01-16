@@ -56,4 +56,9 @@
     <servlet-name>HealthServlet</servlet-name>
     <url-pattern>/health</url-pattern>
   </servlet-mapping>
+
+  <!-- Welcome File List: Setzt index.jsp als Startseite -->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
 </web-app>

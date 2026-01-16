@@ -1,0 +1,186 @@
+--- Seite 1 ---
+Prof . Geisel - Softwareprojekt  
+S. 1 
+ Aufgabenstellung "Software projekt " – Projektarbeit  und Präsentation  
+In der Proj ektarbeit sollen Schwerpunkte de s Modul s Softwareprojekt  (Systementwurf, verteilte 
+Systeme und Web -Programmierung ) berücksichtigt werden. Daher ist eine Webanwendung  mit Java  
+(Servlets , JSP oder JSF ) zu implementieren, welche eine Server -Datenbank  zur Ablage der Daten 
+nutzt.  Eine Testklasse muss mindestens einen  automatisierten, funktionalen  Test  (jUnit) ausführen. 
+Der Einsatz weiterer Technologien (AJAX, SOAP, REST, ORM , HTML5 ) ist optional.  Die Anwendung ist 
+lauffähig  in der Studienakademie Bautzen  (1-ssabz -01.dssax.de ) oder auf einem eigenen  Cloud -Server  
+zu installieren . Die Aufgabe ist jeweils nur prinzipiell zu lösen. Details sind zu vernachlässigen. 
+Grenzen Sie hierzu in d er Problembeschreibung die Aufgabe ein.  Im Grundablauf wird ein Nutzer sich 
+bei der Anwendung anmelden, ein Formular ausfüllen  und gesuchte Daten angezeigt bekommen. 
+Mindestens ein schreibender und ein lesender Zugriff auf die Datenbank sind zu implementie ren. Der 
+schreibende Zugriff kann dabei auch eine  Konfiguration sein. 
+Projektarbeit  Umfang : 10-15 Seiten  (3 Studenten 15 -20 S .) und als Anlage Quellcode  mit min. 500 
+LOC (inkl. eigengeschriebenem /-generiertem  HTML, CSS, Konfigurationsdateien)  
+Formatvorsch riften der DHSN  müssen nicht  eingehalten werden!  
+Abgabetermin: 30. Januar 2026, als PDF per E -Mail, Notengewicht: 75% 
+Inhalt:  
+1. Deckblatt  ("Projektarbeit Softwareprojekt", Thema, Namen, SG)  
+2. Problembeschreibung  und Requirements  
+3. Use-Case -Diagramm mit kurzer Beschreibung  
+4. Klassendiagramm  mit kurzer Beschreibung  
+5. ERD (mit Kardinalitäten)  
+6. Relationales Modell  (mit Datentypen , Schlüssel usw.)  
+7. Deployment  Diagramm  
+8. Weitere notwendige Diagramme  z.B. Komponentendiagramm , Activitydiagramm  
+9. Besonderheiten der Implementierun g, GUI  usw.; Hardcopys der GUI  
+10. Testbeschreibung  
+11. Zugangsdaten  (URL, Logindaten) für Zugriff auf installiertes Produkt  
+12. Quellcode  als Anlage, farbige Syntax, weißer Hintergrund  
+Präsentation  Dauer:  min. 10 min (3 Studenten min. 15 min)  
+Inhalt: kurze Übersicht und Vorführung Programm  
+Präsentationstermin: Anfang 4. Semester (März/April),  Notengewicht: 25%  
+  
+--- Seite 2 ---
+Prof . Geisel - Softwareprojekt  
+S. 2 
+  
+Thema  Name n (1-2 Studenten)  Abgabe  Note 75% 
+Car-Sharing -Verleih  Florian Erlinghagen      
+Ticketverkauf für Events       
+Punktekartei Flensburg       
+Urlaubsort -Weltkarte  
+Alberto Barnt  Tom Tempel  Phil 
+Dutschmann    
+Kursanmeldung       
+Wissenstest zu UML  Mika Hanske  Frederik Dehn  Max Richter    
+Anwesenheitsabrechnung       
+Spielerverwaltung  Stefan Wagner  Lennart Schindler  Jorge Osorio    
+Dienstplan       
+Weihnachtsbaumverkauf  Florian Willner  Jacob Kieschnick     
+Adoption  von Haustieren  Jonas Hille  Victoria Schöne     
+Passbildliste Name Prax .p.      
+Bus-Fahrscheinautomat       
+Zeiterfassung       
+Sitzplangenerator  Felizitas Melzer  Friederike Ahlner  Nick Kunath    
+4-Gewinnt Alexander 
+Reifenhäuser      
+      
+      
+ 
+Zugang zu m Windows -Server 1-ssab z-01.dssax .de 
+Eine m it Netbeans und der Datenbank Derby entwickelte Anwendung muss als Serveranwendung 
+verfügbar sein ! Daher muss die Anwendung als war -Datei auf einem Anwendungsserver (Tomcat) 
+laufen. Das Datenbankschema ist in die MS SQL Datenbank zu übernehmen.  
+ Über Virtuellen Desktop  (Horizon Client) mit DHSN -Netzwerk verbinden  mit Ihren DHSN -
+Account -Daten  
+ Von dort  Windows -Server  1-ssabz -01.dssax.de  mit Remoted esktop verbindung (unter 
+Start|Windows -Zubehör) erreichbar; Benutzer dssax \s100X XXX 
+ Tomcat -Server  8.5 mit 1-ssabz -01.dssax.de :8080  Benutzer admin (oder tomcat) , Passwort 
+student  verwaltbar  
+o Tomcat  ist unter C: \XAMPP \ und falls nicht gestartet mit XAMPP -control.exe oder 
+XAMPP_ start. bat starten  
+o Ihre Anwendung kann als war -Datei in der „Manager App“ deployed  werden  
+o Log-Dateien sind im Tomcat -Ordner  \logs zur Fehlersuche einsehbar  
+Tomcat  11 ist unter P ort 8082  erreichbar!  Installiert in C: \Programme \Apache …  
+Gleiche Logindaten.  
+ MS SQL -Server  ist mit Benutzer student , Passwort studen t erreichbar  
+o Verwenden Sie in Ihrem Projekt den JDBC -MS SQL -Treiber (z.B. 
+"H:\Dozenten \Geisel \Java \MS SQL DB Treiber \sqljdbc_3.0 \enu\sqljdbc4.jar" ), 
+--- Seite 3 ---
+Prof . Geisel - Softwareprojekt  
+S. 3 
+ kopieren Sie ihn  und nehmen Sie ihn  in den Libraries -Ordner des Netbeans -Projektes  
+auf (Add JAR/Folder…)  
+o Das Verwaltungsprogramm ist auf dem Server unter Start|Programme|Microsoft 
+SQL Server|Enterprise Manager start bar (vorher mit RemoteDesktop verbinden)  
+  MySQL -Datenbank  läuft und kann mit XAM PP-Panel verwaltet werden  
+ (Glassfish -Server   C:\programme \glassfish -4.1.1 , kann auf einem alternativem Port gestartet 
+(bin\startserv.bat) werden : 
+glassfish -4.1.1\glassfish \doma ins\domain1 \config \domain.xml  ändern  
+    <network -listener port=" 8082 " protocol="http -listener -1 … 
+ (Postgres -Server 1 5 ist installiert, Nutzername postgres, Passwort super postgres, Port 543 2, 
+begrenzte Freigabe im lokalen Netz: ggf. mehr Rechte geben, pgAdmin4 ist installiert ) 
+ (Internet Information Server ist auf Port 80 und 443 installiert und gestartet)  
+ (Apache Web -Server  ist mit XAMPP installiert,  kann auf einem alternativem Port 8081  
+gestartet werden)  
+ Eclipse muss individuell installiert werden!  Installer ist in C: \temp \Eclipse Install  
+ MongoDB 8 ist installiert als Windows Service durch m100009 , MongoDBCompass  für 
+Zugriff , Konfiguration für Zugriff lokales Netzwerk <install directory> \bin\mongod.cfg  
+bindIP: 0.0.0.0  Dienst neu starten nach Änderungen , für Firewall mit PowerShell:  
+netsh advfirewall firewall add rule name="Open mongod port 27017" dir=in action=allow 
+protocol=TCP localport=27017  
+ MongoDB Atlas Cloud -Datenbank Port 27017 ist von diesem Server in unserer Firewall 
+freigegeben (auch  in Eduroa m), in Atlas muss die Adresse des Servers bzw. unseres 
+Netzwerkes hinzugefügt werden  
+ Alternative Software  (z.B. Datenbanken, Application Server) können Sie  als student  
+installier en, da dieser Benutzer Administratorrechte hat ; ggf. mit Herrn Lerch -Baier 
+abstimmen  
+  
+--- Seite 4 ---
+Prof . Geisel - Softwareprojekt  
+S. 4 
+ Variante zum Kopieren der Derby Datenbankstruktur mit Hilfe von Netbeans (auf 1-ssabz -
+01.dssax.de ) auf MS SQL Server : 
+ gesamte n Datenbankdateiordner je nach Version aus C:\Users \ Benutzername  
+\AppData \Roaming \NetBeans \Derby \Datenbankname   oder 
+c:\Benutzer \Benutzername \.netbeans -derby \Datenbankname  auf gleichen Pfad in 
+ssabautzen 3 auf c: kopieren  (mit Benutzernamen student XX) 
+Sie können hierzu P: verbinden! Z.B.  
+o in der Ordnerstruktur auf „Netzwerk“ gehen und mit der rechten Maustaste 
+„Netzwerklau fwerk verbinden“ auswählen  
+o oder Sie können bei einer Remote -Desktop -Verbindung beim Start „Optionen 
+einblenden“, Reiter „Lokale Ressourcen“ wählen, Button „Weitere“ und dort die 
+benötigten Laufwerke anhaken  
+ auf dem 1-ssabz -01.dssax.de  in Netbeans ein beliebiges Java -Projekt öffnen oder anlegen, 
+dann unter Service s|Drivers ggf. Derby -Treiber derby client .jar als „Java DB“ installieren 
+(Kontextmenü: New Driver) bzw. auf korrekte Version konfigurieren ( Kontextmenü: 
+Customize) ; die Treiber sind unter:  C:\Programme \Sun\JavaDB oder … \glassfish -4.0\... oder 
+…\glassfishv3 \... 
+ Unter Service|Drivers ggf. MS SQL Treiber installieren ( Kontextmenü: New Driver)  
+mit den Treibern  
+o kopieren des Ordners von H:\Dozenten \Geisel \Java \MS SQL DB 
+Treiber \sqljdbc_3.0 \enu 
+o oder Treiber direkt von den Webseiten von Microsoft  
+ Datenbankverbindung zu Ihrer JavaDB und MS SQL Server -Datenbank herstellen 
+(Kontextmenü: New Connection)  Driver Name: M icrosoft  SQL Server 2005, host: localhost, 
+Databasename: student X, User Name: student , Passwor d: student, testen mit Button „Test 
+Connection“, im nächsten Fenster : Select Schema: dbo   
+ Wenn Sie eine eigene Datenbank anlegen wollen: Auf der MS -SQL-Datenbank -Connection 
+mit rechter Maustaste „Execute Command…“  anklicken , „create database 
+MeinD atenbankname “ eingeben und ausführen   und ggf. noch einmal „New 
+Connection…“  mit diesem  Datenbank namen  ausführen  
+ Jede Tabelle aus Derby mit Kontextmenü:  „Grab  Structure…“ exportieren und mit „Recreate 
+Table…“ in MS SQL Datenbank importieren  
+ Datenbanktrei ber in Ihrem Java -Programm ändern  
+  
+
+--- Seite 5 ---
+Prof . Geisel - Softwareprojekt  
+S. 5 
+ Installation Docker auf Windows Server 2019  
+- "Normaler" Docker Desktop geht nicht!  
+- Skript von Microsoft in Powershell starten:  
+Invoke -WebRequest -UseBasicParsing  "https://raw.githubusercontent.com/microsoft/Windows -
+Containers/Main/helpful_tools/Install -DockerCE/install -docker -ce.ps1" -o install -docker -ce.ps1  
+.\install -docker -ce.ps1  
+- Für Windows -Container, Linux -Container extra!  
+Hilfe: https://learn.microsoft.com/de -de/virtualization/windowscontainers/quick -start/run -your -
+first-container  
+- Windows Admin Center ist installiert für Verwaltung von C ontai nern, was nicht funktioniert  
+- Für Linux: (Hypervisor lässt sich nicht installieren, da der Rechner schon mit VMWare virtualisiert 
+ist!) 
+1. Hypervisor aktivieren!  
+2. Linux -Distribution installieren  
+3. ? 
+https://3rdman.de/2019/03/docker -in-windows -server -2019 -installieren/  hat geklappt. Windows -
+Docker Container laufen!  Nanoserver zum Testen  installiert. Weitere Infos: docker info, docker image 
+list, docker --version  
+Ubuntu 24 ist installiert Unixuser:student Password:student  
+Aufruf mit wsl funktioniert (als Login m100…), wsl2 erst ab Windows Server 2022  
+https://www.altaro.com/msp -dojo/linux -containers -windows -server -2019/  nur Docker Enterprise 
+Edition kann Linux -Container ausführen! docker info  zeigt in letzter Zeile z.B. nur Community Engine : 
+Docker Community wieder deinstalliert, Docker Enterprise installiert, Neustart noch offen : 
+Restart -computer , weiter mit PowerShell als Administrator:  
+[Environment]::SetEnvironmentVariable("LCOW_SUPPORTED", "1", "Machine")  
+Restart -Service docker  
+Docker pull Debian  
+Docker run -it --name Debian_test Debian  
+Testen: Uname –r 
+Apt-get update  
+Apt-get in stall elinks  
+Then let’s open google in elinks: Elinks https://www.google.com  
+ 

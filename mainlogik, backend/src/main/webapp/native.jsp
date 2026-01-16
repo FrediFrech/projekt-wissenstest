@@ -1,0 +1,70 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% 
+   boolean isLoggedIn = session.getAttribute("user") != null; 
+%>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wissenstest Native</title>
+    <!-- High End CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css_native/style.css">
+    <!-- Google Fonts for High End Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">✨ Wissenstest UML</div>
+            <div class="nav-links">
+                <% if (!isLoggedIn) { %>
+                    <a href="?page=login" class="btn btn-ghost">Login</a>
+                    <a href="?page=register" class="btn btn-primary">Registrieren</a>
+                <% } else { %>
+                    <a href="?page=testList" class="btn btn-ghost">Tests</a>
+                    <a href="?page=learnMode" class="btn btn-ghost">Lernen</a>
+                    <button onclick="logout()" class="btn btn-ghost">Logout</button>
+                <% } %>
+            </div>
+        </nav>
+
+        <!-- Dynamic Content Loading (SPA-like feel via JSP Includes) -->
+        <main id="main-content">
+            <% 
+               String pageParam = request.getParameter("page");
+               if (pageParam == null || pageParam.isEmpty()) {
+                   pageParam = "landingPage";
+               }
+               
+               // Security: Only allow specific pages to prevent arbitrary file inclusion
+               // Mapping: Param -> React-Matched JSP Component
+               if(pageParam.equals("landingPage")) {
+            %>
+                <jsp:include page="jsp_native/LandingPage.jsp" />
+            <% } else if(pageParam.equals("login")) { %>
+                <jsp:include page="jsp_native/Login.jsp" />
+            <% } else if(pageParam.equals("register")) { %>
+                <jsp:include page="jsp_native/Register.jsp" />
+            <% } else if(pageParam.equals("testList")) { %>
+                <jsp:include page="jsp_native/TestList.jsp" />
+            <% } else if(pageParam.equals("testRunner")) { %>
+                <jsp:include page="jsp_native/TestRunner.jsp" />
+            <% } else if(pageParam.equals("adminPanel")) { %>
+                <jsp:include page="jsp_native/AdminPanel.jsp" />
+            <% } else if(pageParam.equals("result")) { %>
+                <jsp:include page="jsp_native/Result.jsp" />
+            <% } else if(pageParam.equals("learnMode")) { %>
+                <jsp:include page="jsp_native/LearnMode.jsp" />
+            <% } else { %>
+                <jsp:include page="jsp_native/LandingPage.jsp" />
+            <% } %>
+        </main>
+    </div>
+
+    <script src="${pageContext.request.contextPath}/js_native/app.js"></script>
+</body>
+</html>
