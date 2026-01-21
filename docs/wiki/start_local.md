@@ -22,9 +22,17 @@ Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal starte
    - Öffne die Datei `db/schema.sql` und führe sie in der Datenbank aus.
 4. Seeds laden:
    - Öffne die Datei `db/seeds.sql` und führe sie aus.
+   - Alternativ: `psql -p 5433 -U student -d wissentest -f db/seeds.sql`
+   - Hinweis: `db/seeds.sql` ist idempotent (ON CONFLICT / WHERE NOT EXISTS), d.h. du kannst es nach Änderungen mehrfach ausführen, ohne bestehende Daten zu duplizieren.
 5. Admin‑User‑Hash setzen:
    - Ersetze in `db/seeds.sql` die Platzhalter für `password_hash` und `password_salt`.
    - Beispiel (Hash per Java oder psql + pgcrypto). Danach erneut ausführen.
+
+**Tipp:** Wenn du `startup/start_project.ps1` benutzt, wird es die Seeds auch anwenden, selbst wenn Postgres bereits läuft; neue Seed‑Einträge werden ergänzt (non‑destructive).
+
+---
+
+VALIDIERUNG: Lokaler UAT abgeschlossen — `start_project.ps1` und manuelles `psql -p 5433 -U student -d wissentest -f db/seeds.sql` haben die neuen Seeds erfolgreich eingetragen; die Änderungen erscheinen im Lernmodus; Seed‑Skript ist idempotent.
 
 ---
 

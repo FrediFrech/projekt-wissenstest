@@ -36,10 +36,22 @@ function Install-Tool {
 
     $ToolPath = Join-Path $ToolsDir $TargetDirName
     $ZipPath = Join-Path $ToolsDir "$Name.zip"
+    $NeedsInstall = $false
 
     Write-Host "Checking for $Name..." -ForegroundColor Cyan
 
     if (!(Test-Path $ToolPath)) {
+        $NeedsInstall = $true
+    } elseif ($TestPath) {
+        $CheckPath = Join-Path $ToolPath $TestPath
+        if (!(Test-Path $CheckPath)) {
+            Write-Host "$Name found but required file missing: $TestPath" -ForegroundColor Yellow
+            $NeedsInstall = $true
+            try { Remove-Item $ToolPath -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+        }
+    }
+
+    if ($NeedsInstall) {
         Write-Host "$Name not found. Downloading..." -ForegroundColor Yellow
         if (!(Test-Path $ToolsDir)) { New-Item -ItemType Directory -Path $ToolsDir | Out-Null }
         
@@ -72,7 +84,7 @@ Write-Host "Repository Root: $RepoRoot"
 # 1. Setup Tools
 $JavaHome = Install-Tool -Name "Java 17" -Url $JavaUrl -TargetDirName $JavaDirName
 $MavenHome = Install-Tool -Name "Maven" -Url $MavenUrl -TargetDirName $MavenDirName
-$TomcatHome = Install-Tool -Name "Tomcat 9" -Url $TomcatUrl -TargetDirName $TomcatDirName
+$TomcatHome = Install-Tool -Name "Tomcat 9" -Url $TomcatUrl -TargetDirName $TomcatDirName -TestPath "bin\startup.bat"
 $NodeHome = Install-Tool -Name "Node.js" -Url $NodeUrl -TargetDirName $NodeDirName
 $PgHome = Install-Tool -Name "PostgreSQL" -Url $PgUrl -TargetDirName $PgDirName
 
@@ -83,6 +95,13 @@ $env:M2_HOME = $MavenHome
 $env:CATALINA_HOME = $TomcatHome
 $env:NODE_HOME = $NodeHome
 $PgBin = Join-Path $PgHome "bin"
+$NodeExe = Join-Path $NodeHome "node.exe"
+$NpmCmd = Join-Path $NodeHome "npm.cmd"
+$PgCtl = Join-Path $PgBin "pg_ctl.exe"
+$InitDb = Join-Path $PgBin "initdb.exe"
+$Psql = Join-Path $PgBin "psql.exe"
+$CreateDb = Join-Path $PgBin "createdb.exe"
+$PostgresExe = Join-Path $PgBin "postgres.exe"
 
 # Add to PATH (temporarily for this process)
 $env:PATH = "$JavaHome\bin;$MavenHome\bin;$NodeHome;$PgBin;$env:PATH"
@@ -90,9 +109,9 @@ $env:PATH = "$JavaHome\bin;$MavenHome\bin;$NodeHome;$PgBin;$env:PATH"
 # Verify Versions
 java -version
 mvn -version
-node -version
-npm -version
-postgres --version
+if (Test-Path $NodeExe) { & $NodeExe --version } else { node --version }
+if (Test-Path $NpmCmd) { & $NpmCmd --version } else { npm --version }
+if (Test-Path $PostgresExe) { & $PostgresExe --version } else { postgres --version }
 
 # --- 2.5 Setup Database ---
 Write-Host "`n=== Setting up Database ===`n" -ForegroundColor Magenta
@@ -101,24 +120,26 @@ $DbPort = 5433
 $DbUser = "student"
 $DbPass = "student"
 $DbName = "wissentest"
+$SchemaSql = Join-Path $RepoRoot "db\schema.sql"
+$SeedsSql = Join-Path $RepoRoot "db\seeds.sql"
 
 # Init DB if not exists
 if (!(Test-Path $DbDataDir)) {
     Write-Host "Initializing Database at $DbDataDir..." -ForegroundColor Yellow
     # Initialize with default user 'student' and authentication method 'trust' (simple for local dev)
-    initdb -D $DbDataDir -U $DbUser --auth=trust -E UTF8 --locale=C
+    & $InitDb -D $DbDataDir -U $DbUser --auth=trust -E UTF8 --locale=C
 }
 
 # Start Postgres
 Write-Host "Starting PostgreSQL on port $DbPort..."
 $LogFile = Join-Path $ScriptDir "postgres.log"
 # Check if running
-if (!(Test-NetConnection -ComputerName localhost -Port $DbPort -InformationLevel Quiet)) {
-    pg_ctl -D $DbDataDir -l $LogFile -o "-p $DbPort" start
+if (!(Test-NetConnection -ComputerName localhost -Port $DbPort -InformationLevel Quiet -WarningAction SilentlyContinue)) {
+    & $PgCtl -D $DbDataDir -l $LogFile -o "-p $DbPort" start
     
     # Wait for startup
     $Retries = 10
-    while (!(Test-NetConnection -ComputerName localhost -Port $DbPort -InformationLevel Quiet) -and $Retries -gt 0) {
+    while (!(Test-NetConnection -ComputerName localhost -Port $DbPort -InformationLevel Quiet -WarningAction SilentlyContinue) -and $Retries -gt 0) {
         Start-Sleep -Seconds 1
         $Retries--
     }
@@ -131,24 +152,39 @@ if (!(Test-NetConnection -ComputerName localhost -Port $DbPort -InformationLevel
     
     # Create DB and Schema (only if just started/initialized)
     # We check if DB exists
-    $DbExists = psql -p $DbPort -U $DbUser -lqt | Select-String $DbName
+    $DbExists = & $Psql -p $DbPort -U $DbUser -lqt | Select-String $DbName
     if (!$DbExists) {
         Write-Host "Creating Database '$DbName'..."
-        createdb -p $DbPort -U $DbUser $DbName
+        & $CreateDb -p $DbPort -U $DbUser $DbName
         
         Write-Host "Importing Schema..."
-        $SchemaSql = Join-Path $RepoRoot "db\schema.sql"
-        $SeedsSql = Join-Path $RepoRoot "db\seeds.sql"
         
         if (Test-Path $SchemaSql) {
-            psql -p $DbPort -U $DbUser -d $DbName -f $SchemaSql
+            & $Psql -p $DbPort -U $DbUser -d $DbName -f $SchemaSql
         }
         if (Test-Path $SeedsSql) {
-            psql -p $DbPort -U $DbUser -d $DbName -f $SeedsSql
+            & $Psql -p $DbPort -U $DbUser -d $DbName -f $SeedsSql
         }
     }
 } else {
     Write-Host "PostgreSQL is already running on port $DbPort." -ForegroundColor Green
+
+    # Ensure DB exists; if not, create and import schema once
+    $DbExists = & $Psql -p $DbPort -U $DbUser -lqt | Select-String $DbName
+    if (!$DbExists) {
+        Write-Host "Creating Database '$DbName'..."
+        & $CreateDb -p $DbPort -U $DbUser $DbName
+        if (Test-Path $SchemaSql) {
+            Write-Host "Importing Schema..."
+            & $Psql -p $DbPort -U $DbUser -d $DbName -f $SchemaSql
+        }
+    }
+
+    # Apply seed updates without deleting existing data
+    if (Test-Path $SeedsSql) {
+        Write-Host "Applying seed updates (non-destructive)..."
+        & $Psql -p $DbPort -U $DbUser -d $DbName -f $SeedsSql
+    }
 }
 
 # 3. Build Frontend (DISABLED - Using JSP Native)
@@ -201,11 +237,16 @@ if ($Processes) {
 $StartupScript = Join-Path $TomcatBin "startup.bat"
 
 Write-Host "Starting Tomcat in a separate window..."
-Start-Process -FilePath $StartupScript -WorkingDirectory $TomcatBin
+if (Test-Path $StartupScript) {
+    Start-Process -FilePath $StartupScript -WorkingDirectory $TomcatBin
+} else {
+    Write-Error "Tomcat startup.bat not found at $StartupScript"
+}
 
 Write-Host "`n=== Setup Complete ===`n" -ForegroundColor Green
 Write-Host "The application is starting up."
 Write-Host "Access it here: http://localhost:8080/wissentest/"
-Write-Host "Demo Login: student / student123"
+Write-Host "Demo Login: student / student"
+Write-Host "Demo Login: lehrer / student"
 Write-Host "`nPress any key to close this installer window (Tomcat will keep running)..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

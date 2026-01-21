@@ -377,7 +377,13 @@ INSERT INTO questions (prompt, type, difficulty) VALUES
 -- ... weitere Daten
 ```
 
-**Daten laden:**
+**Daten laden (empfohlen):**
 ```bash
-psql -U student -d wissentest -p 5433 < db/seeds.sql
+# Port beachten: lokale Start-Skripte verwenden Port 5433 und DB 'wissentest'
+psql -p 5433 -U student -d wissentest -f db/seeds.sql
 ```
+
+Hinweis: Die Seed‑Skripte wurden so angepasst, dass sie **idempotent** sind (z. B. durch `ON CONFLICT` und `WHERE NOT EXISTS`). Du kannst `db/seeds.sql` nach Änderungen erneut ausführen oder `startup/start_project.ps1` starten, ohne vorhandene Daten zu löschen — neue Inhalte werden ergänzt.
+---
+
+VALIDIERUNG: Seed‑Änderungen wurden per `psql -p 5433 -U student -d wissentest -f db/seeds.sql` eingespielt; die Änderung (neue Frage) wurde im UI‑Lernmodus sichtbar. Seed‑Skripte erzeugten keine Duplikate bei wiederholtem Ausführen.
