@@ -214,16 +214,21 @@
         const tbody = document.getElementById('userTableBody');
         tbody.innerHTML = '';
         users.forEach(u => {
-            const row = `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding:0.6rem;">${u.username} ${u.resetRequested ? '' : ''}</td>
-                    <td style="padding:0.6rem;">${u.role}</td>
-                    <td style="padding:0.6rem; text-align:right;">
-                        <button onclick="openEditUser(${u.id}, '${u.username}', '${u.role}', ${u.resetRequested})" class="btn btn-ghost" style="font-size:0.8rem;"></button>
-                        <button onclick="deleteObject('users', ${u.id})" class="btn btn-ghost" style="color:red; font-size:0.8rem;"></button>
-                    </td>
-                </tr>`;
-            tbody.innerHTML += row;
+            const row = document.createElement('tr');
+            row.style.borderBottom = '1px solid #eee';
+            row.innerHTML = `
+                <td style="padding:0.6rem;">\${u.username} \${u.resetRequested ? '🔑' : ''}</td>
+                <td style="padding:0.6rem;">\${u.role}</td>
+                <td style="padding:0.6rem; text-align:right;">
+                    <button class="btn btn-ghost" style="font-size:0.8rem;">✎</button>
+                    <button class="btn btn-ghost" style="color:red; font-size:0.8rem;">🗑</button>
+                </td>
+            `;
+            const editBtn = row.querySelector('button:first-of-type');
+            editBtn.onclick = () => openEditUser(u.id, u.username, u.role, u.resetRequested);
+            const delBtn = row.querySelector('button:last-of-type');
+            delBtn.onclick = () => deleteObject('users', u.id);
+            tbody.appendChild(row);
         });
     }
 
@@ -237,15 +242,18 @@
                 section.style.display = 'block';
                 tbody.innerHTML = '';
                 reqs.forEach(u => {
-                     tbody.innerHTML += `
-                        <tr style="border-bottom:1px solid #fecdd3;">
-                            <td style="padding:0.5rem; font-weight:bold;">${u.username}</td>
-                            <td style="padding:0.5rem;">${u.email || '-'}</td>
-                            <td style="padding:0.5rem;">
-                                <button onclick="openEditUser(${u.id}, '${u.username}', '${u.role}', true)" class="btn btn-primary" style="padding:0.2rem 0.6rem; font-size:0.8rem;">Reset</button>
-                            </td>
-                        </tr>
+                     const row = document.createElement('tr');
+                     row.style.borderBottom = '1px solid #fecdd3';
+                     row.innerHTML = `
+                         <td style="padding:0.5rem; font-weight:bold;">\${u.username}</td>
+                         <td style="padding:0.5rem;">\${u.email || '-'}</td>
+                         <td style="padding:0.5rem;">
+                             <button class="btn btn-primary" style="padding:0.2rem 0.6rem; font-size:0.8rem;">Reset</button>
+                         </td>
                      `;
+                     const resetBtn = row.querySelector('button');
+                     resetBtn.onclick = () => openEditUser(u.id, u.username, u.role, true);
+                     tbody.appendChild(row);
                 });
             } else {
                 section.style.display = 'none';
@@ -305,18 +313,23 @@
         const tbody = document.getElementById('questionTableBody');
         tbody.innerHTML = '';
         qs.forEach(q => {
-             const row = `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding:0.5rem; color:grey;">${q.id}</td>
-                    <td style="padding:0.5rem; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${q.prompt}</td>
-                    <td style="padding:0.5rem;"><small style="background:#e5e7eb; padding:2px 4px; border-radius:4px;">${q.type}</small></td>
-                    <td style="padding:0.5rem;">${q.difficulty}</td>
-                    <td style="padding:0.5rem; text-align:right;">
-                        <button onclick='openQuestionModal(\${JSON.stringify(q).replace(/'/g, "&#39;")})' class="btn btn-ghost" style="font-size:0.8rem;">✎</button>
-                        <button onclick="deleteObject('questions', ${q.id})" class="btn btn-ghost" style="color:red; font-size:0.8rem;"></button>
-                    </td>
-                </tr>`;
-             tbody.innerHTML += row;
+             const row = document.createElement('tr');
+             row.style.borderBottom = '1px solid #eee';
+             row.innerHTML = `
+                 <td style="padding:0.5rem; color:grey;">\${q.id}</td>
+                 <td style="padding:0.5rem; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">\${q.prompt}</td>
+                 <td style="padding:0.5rem;"><small style="background:#e5e7eb; padding:2px 4px; border-radius:4px;">\${q.type}</small></td>
+                 <td style="padding:0.5rem;">\${q.difficulty}</td>
+                 <td style="padding:0.5rem; text-align:right;">
+                     <button class="btn btn-ghost" style="font-size:0.8rem;">✎</button>
+                     <button class="btn btn-ghost" style="color:red; font-size:0.8rem;">🗑</button>
+                 </td>
+             `;
+             const editBtn = row.querySelector('button:first-of-type');
+             editBtn.onclick = () => openQuestionModal(q);
+             const delBtn = row.querySelector('button:last-of-type');
+             delBtn.onclick = () => deleteObject('questions', q.id);
+             tbody.appendChild(row);
         });
         loadAdminStats();
     }

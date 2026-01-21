@@ -28,7 +28,7 @@ VALUES (
   'admin'
 );
 
--- Teacher 2 (teacher2 / teacher)
+-- Teacher 2 (teacher2 / student)
 INSERT INTO users (username, email, password_hash, password_salt, role)
 VALUES (
   'teacher2',
@@ -148,5 +148,30 @@ FROM q,
     ('Verteilungsdiagramm', false, 0.0),
     ('Objektdiagramm', false, 0.0)
   ) AS a(answer_text, is_correct, partial_value);
+
+-- Beispiel 8: Lückentext
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  VALUES ('CLOZE', 'Das UML Klassendiagramm zeigt die ___ zwischen den Klassen.', 2, 3, '{"topic":"uml"}', 'Lückentext')
+  RETURNING id
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q.id, 1, 'Beziehungen', 1.0 FROM q;
+
+-- Beispiel 9: Lückentext - Sequenz Diagramme
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  VALUES ('CLOZE', 'Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt.', 2, 4, '{"topic":"sequence-diagrams"}', 'Lückentext')
+  RETURNING id
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q.id, 1, 'Interaktion', 1.0 FROM q
+UNION ALL
+SELECT q.id, 2, 'Akteure', 1.0 FROM q
+UNION ALL
+SELECT q.id, 3, 'Zeit', 1.0 FROM q
+UNION ALL
+SELECT q.id, 4, 'Nachrichten', 1.0 FROM q;
+
 
 -- End of seed file
