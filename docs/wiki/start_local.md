@@ -1,9 +1,9 @@
-# Lokales Starten (Backend + Frontend)
+# Lokales Starten (Backend + JSP Frontend)
 
-Einfache Erklärung: Diese Anleitung zeigt Schritt für Schritt, wie du die App auf deinem Rechner startest. Sie erklärt die benötigten Programme und die Reihenfolge der Schritte.
+Einfache Erklärung: Diese Anleitung zeigt Schritt für Schritt, wie du die App mit JSP Frontend auf deinem Rechner startest.
 
 ## Kurzüberblick
-Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal startest – zuerst die Datenbank, dann das Java‑Backend (WAR/Tomcat) und zuletzt das React‑Frontend.
+Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal startest – zuerst die Datenbank, dann das Java‑Backend mit JSP‑Frontend (Tomcat).
 
 ---
 
@@ -11,8 +11,7 @@ Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal starte
 1. **Java 17 JDK** (für Maven‑Build und Tomcat)
 2. **Maven 3.8+** (zum Bauen des Backends)
 3. **PostgreSQL 15** (lokale Datenbank)
-4. **Node.js 18+** und **npm** (für das React‑Frontend)
-5. **Tomcat 8.5 oder 11** (für die WAR‑Datei)
+4. **Tomcat 8.5 oder 11** (für die WAR‑Datei mit JSP)
 
 ---
 
@@ -29,12 +28,13 @@ Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal starte
 
 ---
 
-## 2) Backend bauen (WAR)
+## 2) Backend mit JSP bauen (WAR)
 1. In den Ordner `mainlogik, backend` wechseln.
 2. Maven Build ausführen:
    - `mvn clean package`
 3. Ergebnis:
    - Die WAR‑Datei liegt dann unter `mainlogik, backend/target/wissentest.war`.
+   - Die WAR enthält bereits alle JSP-Dateien aus `src/main/webapp/`.
 
 ---
 
@@ -47,30 +47,83 @@ Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal starte
 
 ---
 
-## 4) Frontend starten (React)
-1. In den Ordner `frondend` wechseln.
-2. Abhängigkeiten installieren:
-   - `npm install`
-3. Dev‑Server starten:
-   - `npm run dev`
-4. Öffne im Browser:
-   - `http://localhost:5173`
+## 4) JSP Frontend öffnen
+1. Öffne im Browser:
+   - **`http://localhost:8080/wissentest/`**
+2. Du solltest die Startseite (Landing Page) sehen.
+3. Funktionen:
+   - **Login/Registrierung** – Benutzer-Verwaltung
+   - **Test-Seite** – Quiz durchführen
+   - **Admin-Panel** – Fragen verwalten
+   - **Lernmodus** – Flip-Cards üben
+
+---
+
+## Struktur der JSP-Dateien
+
+Die JSP-Dateien befinden sich im Backend-Projekt:
+
+```
+mainlogik, backend/src/main/webapp/
+├── index.jsp                    # Routing-Hauptseite
+├── native.jsp                   # Navigation
+└── jsp_native/                  # JSP-Komponenten
+    ├── LandingPage.jsp          # Startseite
+    ├── Login.jsp                # Login-Formular
+    ├── Register.jsp             # Registrierungsformular
+    ├── TestList.jsp             # Test-Übersicht
+    ├── TestRunner.jsp           # Quiz-Durchführung
+    ├── Result.jsp               # Ergebnis-Anzeige
+    ├── AdminPanel.jsp           # Admin-Dashboard
+    ├── LearnMode.jsp            # Lernmodus
+    └── FlipCard.jsp             # Flip-Card Fragment
+```
+
+Außerdem CSS und JS:
+```
+src/main/webapp/
+├── css/
+│   ├── main.css                 # Globale Styles
+│   ├── components.css           # Komponenten-Styles
+│   └── animations.css           # Animationen
+└── js/
+    ├── app.js                   # Business Logic
+    ├── apiClient.js             # REST-API Kommunikation
+    └── utils.js                 # Utility-Funktionen
+```
 
 ---
 
 ## Typische Probleme
-- **DB‑Verbindung fehlgeschlagen:** Prüfe `db.properties` (URL, User, Passwort).
-- **CORS‑Fehler:** Stelle sicher, dass der Backend‑Server läuft und `/api/*` erreichbar ist.
+- **DB‑Verbindung fehlgeschlagen:** Prüfe `db.properties` im Backend (URL, User, Passwort).
+- **JSP‑Seiten werden nicht angezeigt:** Stelle sicher, dass Tomcat läuft und die WAR korrekt deployed ist.
+- **API‑Fehler:** Backend muss laufen und Servlets unter `/api/*` erreichbar sein.
 - **401 beim Test‑Submit:** Login muss vorher erfolgen (Session).
 
 ---
 
 ## Was du lokal sehen solltest
-- Frontend zeigt Login/Registrierung/Test/Admin.
-- Health‑Check liefert `{ "status": "ok" }`.
-- Admin kann Fragen sehen und anlegen.
+- ✅ JSP-Startseite unter `http://localhost:8080/wissentest/`
+- ✅ Login/Registrierung/Test/Admin funktional
+- ✅ Health‑Check liefert `{ "status": "ok" }`
+- ✅ Admin kann Fragen sehen und anlegen
+- ✅ Alle Seiten server-seitig gerendert (JSP)
 
 ---
 
-Wenn du möchtest, erstelle ich als nächsten Schritt:
-- Eine genaue Setup‑Anleitung für den Uni‑Server (Tomcat + MS SQL).
+## Schnellstart-Befehl
+
+```bash
+# Terminal 1: Backend bauen & deployen
+cd "mainlogik, backend"
+mvn clean package
+# WAR-Datei nach Tomcat webapps/ kopieren
+# Tomcat starten
+
+# Terminal 2: Im Browser öffnen
+# http://localhost:8080/wissentest/
+```
+
+---
+
+**Hinweis:** Die alte React-Version ist archiviert unter `alte_react_version/`. Das aktuelle Projekt verwendet nur noch JSP als Frontend!

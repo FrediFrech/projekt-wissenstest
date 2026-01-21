@@ -13,13 +13,15 @@
 
 ### Für Entwickler
 1. **[ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)** – Backend Klassen & Pattern
-2. **[FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md)** – React Komponenten & State
+2. **[JSP_NATIVE_GUIDE.md](JSP_NATIVE_GUIDE.md)** – JSP Komponenten & UI-Architektur
 3. **[DATABASE_EXPLORER.md](DATABASE_EXPLORER.md)** – ER-Diagramm & SQL-Schema
 
 ### Für Setup & Testing
-1. **[POSTGRES_SETUP.md](POSTGRES_SETUP.md)** – PostgreSQL lokal installieren
-2. **[wiki/testing_guide.md](wiki/testing_guide.md)** – JUnit Tests schreiben
-3. **[wiki/start_local.md](wiki/start_local.md)** – Backend + Frontend starten
+1. **🎬 [DEMO_MODE.md](DEMO_MODE.md)** – Frontend ohne DB anzeigen (5 Min Quick Demo!)
+2. **[JSP_STARTUP_GUIDE.md](JSP_STARTUP_GUIDE.md)** – 🚀 Detaillierter JSP-Startup (Vollständig)
+3. **[POSTGRES_SETUP.md](POSTGRES_SETUP.md)** – PostgreSQL lokal installieren
+4. **[wiki/testing_guide.md](wiki/testing_guide.md)** – JUnit Tests schreiben
+5. **[wiki/start_local.md](wiki/start_local.md)** – Backend + Frontend starten (Kurzversion)
 
 ---
 
@@ -33,7 +35,9 @@
 | **COMPLIANCE_SCAN.md** | Anforderungen vs. Implementierung | Prüfer |
 | **CONFORMITY_CHECK.md** | Technologie-Whitelist/Blacklist | Prüfer |
 | **ARCHITECTURE_DIAGRAMS.md** | Klassen-, Sequenz-, Abhängigkeits-Diagramme | Entwickler |
-| **FRONTEND_ARCHITECTURE.md** | React-Komponenten, State-Management | Frontend-Dev |
+| **JSP_NATIVE_GUIDE.md** | JSP-Komponenten, Server-seitiges Rendering | Frontend-Dev |
+| **DEMO_MODE.md** | 🎬 Frontend ohne DB in 5 Min anschauen! | Alle |
+| **JSP_STARTUP_GUIDE.md** | 🚀 Detailliertes Setup & Deployment für JSP | Entwickler |
 | **DATABASE_EXPLORER.md** | ER-Diagramm, Tabellen-Schema, SQL | DB-Admin |
 | **POSTGRES_SETUP.md** | PostgreSQL 15 & PgAdmin4 Setup | DevOps/Setup |
 
@@ -86,25 +90,19 @@
 - `util_DbConnectionManager.java.md` – DB-Verbindung (Singleton)
 - `util_PasswordUtils.java.md` – PBKDF2 Passwort-Hashing
 
-#### Frontend Components
-- `frontend_components_Login.jsx.md` – Login-Formular
-- `frontend_components_Register.jsx.md` – Registrierungs-Formular
-- `frontend_components_LandingPage.jsx.md` – Startseite mit Features (Neu!)
-- `frontend_components_TestList.jsx.md` – Test-Übersicht
-- `frontend_components_TestRunner.jsx.md` – Quiz-Durchführung
-- `frontend_components_AdminPanel.jsx.md` – Admin-Dashboard
-- `frontend_components_LearnMode.jsx.md` – Lernmodus (Neu!)
-- `frontend_components_FlipCard.jsx.md` – Flip-Card Komponente (Neu!)
-- `frontend_components_Result.jsx.md` – Ergebnis-Anzeige
+#### JSP Frontend Components
+- `jsp_native_LandingPage.md` – Startseite (JSP)
+- `jsp_native_Login.md` – Login-Formular (JSP)
+- `jsp_native_Register.md` – Registrierungs-Formular (JSP)
+- `jsp_native_TestList.md` – Test-Dashboard (JSP)
+- `jsp_native_TestRunner.md` – Quiz-Durchführung (JSP)
+- `jsp_native_Result.md` – Ergebnis-Anzeige (JSP)
+- `jsp_native_AdminPanel.md` – Admin-Dashboard (JSP)
+- `jsp_native_FlipCard.md` – Flip-Card Komponente (JSP Fragment)
 
-#### Frontend Services & Config
-- `frontend_services_apiClient.js.md` – REST-API Client
-- `frontend_src_App.jsx.md` – React Root Component
-- `frontend_src_main.jsx.md` – React Entry Point
-- `frontend_index.html.md` – HTML Template
-- `frontend_package.json.md` – npm Dependencies
-- `frontend_vite.config.js.md` – Vite Build Config
-- `frontend_styles_main.css.md` – Global Styles
+#### JSP Native Frontend (Komplette Dokumentation)
+- `JSP_NATIVE_COMPONENTS.md` – Komplette Komponenten-Übersicht ⭐ START HERE
+- `jsp_native_app.md` – Vanilla JS Business-Logic
 
 #### Datenbank
 - `db_schema.sql.md` – Tabellen-Definitionen
@@ -114,20 +112,6 @@
 - `start_local.md` – Schnellstart-Anleitung
 - `testing_guide.md` – JUnit Integration Test Guide
 - `verbindungen_uebersicht.md` – Verbindungs-Übersicht
-
-#### JSP Native Frontend (Safe Alternative - Neu!)
-- `JSP_NATIVE_COMPONENTS.md` – Komplette Komponenten-Übersicht ⭐ START HERE
-- `JAVASCRIPT_ERLAUBNIS.md` – JavaScript ist erlaubt? (WICHTIG!)
-- `jsp_native_LandingPage.md` – Startseite (JSP)
-- `jsp_native_Login.md` – Login-Formular (JSP)
-- `jsp_native_Register.md` – Registrierungs-Formular (JSP)
-- `jsp_native_TestList.md` – Test-Dashboard (JSP)
-- `jsp_native_TestRunner.md` – Quiz-Durchführung (JSP)
-- `jsp_native_Result.md` – Ergebnis-Anzeige (JSP)
-- `jsp_native_AdminPanel.md` – Admin-Dashboard (JSP)
-- `jsp_native_LearnMode.md` – Lernmodus mit Flip-Cards (JSP)
-- `jsp_native_FlipCard.md` – Flip-Card Komponente (JSP Fragment)
-- `jsp_native_app.md` – Vanilla JS Business-Logic
 
 ---
 

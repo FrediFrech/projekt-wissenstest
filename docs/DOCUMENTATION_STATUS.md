@@ -25,22 +25,35 @@
 
 ---
 
-### 2. ✅ Wiki auf Aktualität geprüft & aktualisiert
+### 2. ✅ Wiki auf Aktualität geprüft & aktualisiert - VOLLSTÄNDIG JSP
 **Neue/Aktualisierte Dokumente:**
 
-#### Neu hinzugefügt:
-- `frontend_components_LandingPage.jsx.md` – Startseite mit Feature-Präsentation
-- `test_util_TestUtils.java.md` – Test-Hilfsmittel Dokumentation
-- `ARCHITECTURE_DIAGRAMS.md` – Klassendiagramme & Abhängigkeitsgraf (Neu!)
-- `FRONTEND_ARCHITECTURE.md` – React Komponenten-Baum (Neu!)
-- `DATABASE_EXPLORER.md` – ER-Diagramm & SQL-Schema (Neu!)
-- `PROJECT_OVERVIEW.md` – Komplette Projekt-Übersicht (Neu!)
-- `INDEX.md` – Dokumentations-Index & Navigation (Neu!)
+#### JSP Frontend-Dokumentation (Aktuelle Version):
+- `JSP_NATIVE_COMPONENTS.md` – Alle JSP-Komponenten komplett dokumentiert
+- `jsp_native_LandingPage.md` – Startseite mit Features (JSP)
+- `jsp_native_Login.md` – Login-Formular (JSP)
+- `jsp_native_Register.md` – Registrierungsformular (JSP)
+- `jsp_native_TestList.md` – Test-Übersicht (JSP)
+- `jsp_native_TestRunner.md` – Quiz-Durchführung (JSP)
+- `jsp_native_Result.md` – Ergebnis-Anzeige (JSP)
+- `jsp_native_AdminPanel.md` – Admin-Dashboard (JSP)
+- `jsp_native_LearnMode.md` – Lernmodus (JSP)
+- `jsp_native_FlipCard.md` – Flip-Card Fragment (JSP)
+- `jsp_native_app.md` – Vanilla JS Business-Logic
 
-#### Status (68 Markdown-Dateien gesamt):
-- ✅ 45 Wiki-Komponenten dokumentiert (Backend/Frontend/Datenbank)
+#### Backend-Dokumentation (unverändert):
+- ✅ 45 Wiki-Komponenten dokumentiert (Backend/Datenbank)
+
+#### Archivierte React-Dokumentation:
+- Alle React-bezogenen Dateien wurden in `alte_react_version/frontend_docs/` verschoben
+- `FRONTEND_ARCHITECTURE.md` – Alte React-Architektur (archiviert)
+- Alle `frontend_*.md` Dateien (archiviert)
+
+#### Status (68+ Markdown-Dateien):
+- ✅ 45+ Wiki-Komponenten dokumentiert (Backend + JSP Frontend)
 - ✅ 8 Hauptdokumente (Architektur, Compliance, Setup, Testing)
-- ✅ 15 Sonstige (Überblicke, Guides, Index)
+- ✅ 15+ Sonstige (Überblicke, Guides, Index)
+- ✅ Alte React-Dokumentation archiviert
 
 ---
 

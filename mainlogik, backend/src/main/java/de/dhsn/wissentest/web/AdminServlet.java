@@ -12,7 +12,9 @@ import de.dhsn.wissentest.model.AnswerOption;
 import de.dhsn.wissentest.model.ClozeToken;
 import de.dhsn.wissentest.model.Question;
 import de.dhsn.wissentest.model.QuestionType;
+import de.dhsn.wissentest.model.User;
 import de.dhsn.wissentest.service.AdminService;
+import de.dhsn.wissentest.util.PasswordUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,12 +23,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class AdminServlet extends HttpServlet {
     private final UserDao userDao = new JdbcUserDao();
     private final QuestionRepository questionDao = new JdbcQuestionRepository();
     private final AnswerDao answerDao = new JdbcAnswerDao();
     private final ClozeTokenDao clozeTokenDao = new JdbcClozeTokenDao();
+    private final AttemptDao attemptDao = new JdbcAttemptDao();
     private final AdminService adminService = new AdminService(questionDao, answerDao, clozeTokenDao);
 
     @Override
@@ -46,6 +50,18 @@ public class AdminServlet extends HttpServlet {
             ServletUtils.writeJson(resp, userDao.findAll());
             return;
         }
+        if (path.equals("/users/requests")) {
+            ServletUtils.writeJson(resp, userDao.findPasswordResetRequests());
+            return;
+        }
+        if (path.equals("/stats")) {
+            java.util.Map<String, Integer> stats = new java.util.HashMap<>();
+            stats.put("users", userDao.findAll().size());
+            stats.put("questions", questionDao.findAll().size());
+            stats.put("attempts", attemptDao.countAll());
+            ServletUtils.writeJson(resp, stats);
+            return;
+        }
         ServletUtils.writeError(resp, 404, "Unknown admin endpoint");
     }
 
@@ -59,13 +75,27 @@ public class AdminServlet extends HttpServlet {
         if (path.equals("/questions")) {
             String body = ServletUtils.readBody(req);
             QuestionPayload payload = JsonUtil.gson().fromJson(body, QuestionPayload.class);
-            Question question = new Question(0, QuestionType.valueOf(payload.type), payload.prompt, payload.difficulty, payload.points, payload.metaJson);
+            Question question = new Question(0, QuestionType.valueOf(payload.type), payload.prompt, payload.difficulty, payload.points, payload.metaJson, payload.imageUrl, payload.category);
             int id;
-            if (question.getType() == QuestionType.MC) {
-                id = adminService.createMultipleChoiceQuestion(question, payload.answers);
-            } else {
+            if (question.getType() == QuestionType.CLOZE) {
                 id = adminService.createClozeQuestion(question, payload.tokens);
+            } else {
+                id = adminService.createMultipleChoiceQuestion(question, payload.answers);
             }
+            ServletUtils.writeJson(resp, new IdResponse(id));
+            return;
+        }
+        if (path.equals("/users")) {
+            String body = ServletUtils.readBody(req);
+            UserPayload p = JsonUtil.gson().fromJson(body, UserPayload.class);
+            if (userDao.findByUsername(p.username).isPresent()) {
+                 ServletUtils.writeError(resp, 400, "Username already exists");
+                 return;
+            }
+            String salt = PasswordUtils.generateSaltHex();
+            String hash = PasswordUtils.hashPassword(p.password, salt);
+            User u = new User(0, p.username, p.email, hash, salt, p.role != null ? p.role : "student");
+            int id = userDao.create(u);
             ServletUtils.writeJson(resp, new IdResponse(id));
             return;
         }
@@ -82,14 +112,52 @@ public class AdminServlet extends HttpServlet {
         if (path.equals("/questions")) {
             String body = ServletUtils.readBody(req);
             QuestionPayload payload = JsonUtil.gson().fromJson(body, QuestionPayload.class);
-            Question question = new Question(payload.id, QuestionType.valueOf(payload.type), payload.prompt, payload.difficulty, payload.points, payload.metaJson);
-            if (question.getType() == QuestionType.MC) {
-                adminService.updateMultipleChoiceQuestion(question, payload.answers);
-            } else {
+            Question question = new Question(payload.id, QuestionType.valueOf(payload.type), payload.prompt, payload.difficulty, payload.points, payload.metaJson, payload.imageUrl, payload.category);
+            if (question.getType() == QuestionType.CLOZE) {
                 adminService.updateClozeQuestion(question, payload.tokens);
+            } else {
+                adminService.updateMultipleChoiceQuestion(question, payload.answers);
             }
             ServletUtils.writeJson(resp, new Message("ok"));
             return;
+        }
+        if (path.equals("/users")) {
+            // Handle both role toggle (via query params) AND full editing (via JSON body)
+            String idStr = req.getParameter("id");
+            String roleParam = req.getParameter("role");
+            if (idStr != null && roleParam != null) {
+                // Quick role toggle
+                User u = userDao.findById(Integer.parseInt(idStr))
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                u.setRole(roleParam);
+                userDao.update(u);
+                ServletUtils.writeJson(resp, new Message("ok"));
+                return;
+            }
+            
+            // Full update via Body
+            String body = ServletUtils.readBody(req);
+            if (body != null && !body.isEmpty()) {
+                UserPayload p = JsonUtil.gson().fromJson(body, UserPayload.class);
+                User u = userDao.findById(p.id)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                
+                if (p.username != null && !p.username.isEmpty()) u.setUsername(p.username);
+                if (p.email != null) u.setEmail(p.email); // allow empty?
+                if (p.role != null && !p.role.isEmpty()) u.setRole(p.role);
+                if (p.password != null && !p.password.isEmpty()) {
+                    String salt = PasswordUtils.generateSaltHex();
+                    String hash = PasswordUtils.hashPassword(p.password, salt);
+                    u.setPasswordSalt(salt);
+                    u.setPasswordHash(hash);
+                }
+                if (p.resetComplete) {
+                    u.setResetRequested(false);
+                }
+                userDao.update(u);
+                ServletUtils.writeJson(resp, new Message("ok"));
+                return;
+            }
         }
         ServletUtils.writeError(resp, 404, "Unknown admin endpoint");
     }
@@ -127,6 +195,15 @@ public class AdminServlet extends HttpServlet {
         return role != null && role.toString().equalsIgnoreCase("admin");
     }
 
+    private static class UserPayload {
+        int id;
+        String username;
+        String email;
+        String password;
+        String role;
+        boolean resetComplete;
+    }
+
     private static class QuestionPayload {
         int id;
         String type;
@@ -134,6 +211,8 @@ public class AdminServlet extends HttpServlet {
         int difficulty;
         int points;
         String metaJson;
+        String imageUrl;
+        String category;
         List<AnswerOption> answers;
         List<ClozeToken> tokens;
     }
@@ -147,11 +226,12 @@ public class AdminServlet extends HttpServlet {
             v.prompt = q.getPrompt();
             v.difficulty = q.getDifficulty();
             v.points = q.getPoints();
-            v.metaJson = q.getMetaJson();
-            if (q.getType() == QuestionType.MC) {
-                v.options = answerDao.findByQuestion(q.getId());
-            } else {
+            v.imageUrl = q.getImageUrl();
+            v.category = q.getCategory();
+            if (q.getType() == QuestionType.CLOZE) {
                 v.tokens = clozeTokenDao.findByQuestion(q.getId());
+            } else {
+                v.options = answerDao.findByQuestion(q.getId());
             }
             view.add(v);
         }
@@ -165,6 +245,8 @@ public class AdminServlet extends HttpServlet {
         int difficulty;
         int points;
         String metaJson;
+        String imageUrl;
+        String category;
         java.util.List<AnswerOption> options;
         java.util.List<ClozeToken> tokens;
     }

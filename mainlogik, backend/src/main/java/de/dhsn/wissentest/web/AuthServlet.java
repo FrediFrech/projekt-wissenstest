@@ -47,6 +47,12 @@ public class AuthServlet extends HttpServlet {
                 ServletUtils.writeJson(resp, new Message("ok"));
                 return;
             }
+            if (path.equals("/reset-request")) {
+                ResetRequest r = JsonUtil.gson().fromJson(body, ResetRequest.class);
+                authService.requestPasswordReset(r.username);
+                ServletUtils.writeJson(resp, new Message("ok"));
+                return;
+            }
             ServletUtils.writeError(resp, 404, "Unknown auth endpoint");
         } catch (IllegalArgumentException ex) {
             ServletUtils.writeError(resp, 400, ex.getMessage());
@@ -56,6 +62,7 @@ public class AuthServlet extends HttpServlet {
     private void setSession(HttpSession session, User user) {
         session.setAttribute("userId", user.getId());
         session.setAttribute("role", user.getRole());
+        session.setAttribute("user", user);
     }
 
     private static class LoginRequest {
@@ -67,6 +74,10 @@ public class AuthServlet extends HttpServlet {
         String username;
         String email;
         String password;
+    }
+
+    private static class ResetRequest {
+        String username;
     }
 
     private static class UserResponse {

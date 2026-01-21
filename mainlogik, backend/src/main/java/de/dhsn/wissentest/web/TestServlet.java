@@ -8,6 +8,7 @@ package de.dhsn.wissentest.web;
 
 import de.dhsn.wissentest.dao.*;
 import de.dhsn.wissentest.model.Attempt;
+import de.dhsn.wissentest.model.AttemptResult;
 import de.dhsn.wissentest.model.Question;
 import de.dhsn.wissentest.service.TestService;
 
@@ -25,10 +26,47 @@ public class TestServlet extends HttpServlet {
             new JdbcQuestionRepository(),
             new JdbcAnswerDao(),
             new JdbcClozeTokenDao(),
-            new JdbcAttemptDao()
+            new JdbcAttemptDao(),
+            new JdbcUserDao()
     );
     private final AnswerDao answerDao = new JdbcAnswerDao();
     private final ClozeTokenDao clozeTokenDao = new JdbcClozeTokenDao();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = req.getPathInfo() == null ? "" : req.getPathInfo();
+        try {
+            if (path.equals("/history")) {
+                int userId = getUserId(req);
+                List<Attempt> history = testService.getHistory(userId);
+                ServletUtils.writeJson(resp, history);
+                return;
+            }
+            if (path.equals("/categories")) {
+                List<String> categories = testService.getAvailableCategories();
+                ServletUtils.writeJson(resp, categories);
+                return;
+            }
+            if (path.equals("/questions/all")) {
+                List<Question> all = testService.getAllQuestions();
+                List<LearnCard> cards = new java.util.ArrayList<>();
+                for(Question q : all) {
+                   cards.add(new LearnCard(q.getId(), q.getPrompt(), getCorrectAnswerText(q)));
+                }
+                ServletUtils.writeJson(resp, cards);
+                return;
+            }
+             if (path.equals("/admin/stats")) {
+                // Return simple stats map
+                Map<String, Integer> stats = testService.getAdminStats();
+                ServletUtils.writeJson(resp, stats);
+                return;
+            }
+            ServletUtils.writeError(resp, 404, "Unknown test endpoint (GET)");
+        } catch (IllegalArgumentException ex) {
+            ServletUtils.writeError(resp, 400, ex.getMessage());
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -38,7 +76,7 @@ public class TestServlet extends HttpServlet {
         try {
             if (path.equals("/start")) {
                 StartRequest r = JsonUtil.gson().fromJson(body, StartRequest.class);
-                List<Question> questions = testService.startTest(r.difficulty, r.limit);
+                List<Question> questions = testService.startTest(r.difficulty, r.limit, r.category);
                 List<QuestionView> view = buildQuestionView(questions);
                 ServletUtils.writeJson(resp, view);
                 return;
@@ -48,8 +86,8 @@ public class TestServlet extends HttpServlet {
                 SubmitRequest r = JsonUtil.gson().fromJson(body, SubmitRequest.class);
                 int userId = getUserId(req);
                 java.util.Map<Integer, Object> normalized = normalizeAnswerKeys(r.answers);
-                Attempt attempt = testService.submitAttempt(userId, r.difficulty, r.questionIds, normalized);
-                ServletUtils.writeJson(resp, attempt);
+                AttemptResult result = testService.submitAttempt(userId, r.difficulty, r.questionIds, normalized, r.durationSeconds);
+                ServletUtils.writeJson(resp, result);
                 return;
             }
 
@@ -70,12 +108,14 @@ public class TestServlet extends HttpServlet {
     private static class StartRequest {
         int difficulty;
         int limit;
+        String category;
     }
 
     private static class SubmitRequest {
         int difficulty;
         List<Integer> questionIds;
         Map<String, Object> answers;
+        int durationSeconds;
     }
 
     private java.util.Map<Integer, Object> normalizeAnswerKeys(Map<String, Object> raw) {
@@ -102,9 +142,10 @@ public class TestServlet extends HttpServlet {
             v.prompt = q.getPrompt();
             v.difficulty = q.getDifficulty();
             v.points = q.getPoints();
-            if (q.getType().name().equals("MC")) {
+            v.imageUrl = q.getImageUrl();
+            if (q.getType().name().equals("MC") || q.getType().name().equals("IMAGE")) {
                 v.options = answerDao.findByQuestion(q.getId());
-            } else {
+            } else if (q.getType().name().equals("CLOZE")) {
                 v.tokens = clozeTokenDao.findByQuestion(q.getId());
             }
             view.add(v);
@@ -118,7 +159,28 @@ public class TestServlet extends HttpServlet {
         String prompt;
         int difficulty;
         int points;
+        String imageUrl;
         List<de.dhsn.wissentest.model.AnswerOption> options;
         List<de.dhsn.wissentest.model.ClozeToken> tokens;
+    }
+
+    private static class LearnCard {
+        int id;
+        String q;
+        String a;
+        LearnCard(int id, String q, String a) { this.id=id; this.q=q; this.a=a; }
+    }
+
+    private String getCorrectAnswerText(Question q) {
+        if(q.getType().name().equals("MC") || q.getType().name().equals("IMAGE") || q.getType().name().equals("FREE")) {
+             List<de.dhsn.wissentest.model.AnswerOption> opts = answerDao.findByQuestion(q.getId());
+             if (q.getType().name().equals("FREE")) {
+                 return opts.stream().map(o -> o.getAnswerText()).reduce((a, b) -> a + " / " + b).orElse("Keine Musterlösung hinterlegt");
+             }
+             return opts.stream().filter(o -> o.isCorrect()).map(o -> o.getAnswerText()).reduce((a, b) -> a + ", " + b).orElse("Keine Antwort");
+        } else {
+             // Cloze
+             return "Lückentext (siehe Kontext)";
+        }
     }
 }

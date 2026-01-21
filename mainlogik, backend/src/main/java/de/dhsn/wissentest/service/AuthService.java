@@ -40,4 +40,10 @@ public class AuthService {
         }
         return user;
     }
+
+    public void requestPasswordReset(String username) {
+        User user = userDao.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        userDao.setPasswordResetRequested(user.getId(), true);
+    }
 }

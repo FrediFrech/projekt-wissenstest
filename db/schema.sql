@@ -8,6 +8,14 @@
 -- Optional: enable pgcrypto if you want to compute digests in Postgres
 -- CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+DROP TABLE IF EXISTS attempt_answers CASCADE;
+DROP TABLE IF EXISTS attempts CASCADE;
+DROP TABLE IF EXISTS cloze_answers CASCADE;
+DROP TABLE IF EXISTS answers CASCADE;
+DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS config CASCADE;
+
 -- Users
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -16,6 +24,7 @@ CREATE TABLE users (
   password_hash VARCHAR(256) NOT NULL,
   password_salt VARCHAR(128) NOT NULL,
   role VARCHAR(32) NOT NULL DEFAULT 'student',
+  reset_requested BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
@@ -26,6 +35,8 @@ CREATE TABLE questions (
   prompt TEXT NOT NULL,
   difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)), -- 1=easy,2=medium,3=hard
   points INTEGER NOT NULL DEFAULT 1,
+  category VARCHAR(64) DEFAULT 'Allgemein',
+  image_url VARCHAR(255),
   meta JSONB DEFAULT '{}'::jsonb,
   created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
@@ -57,6 +68,8 @@ CREATE TABLE attempts (
   total_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
   max_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
   difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  grade VARCHAR(10),
+  duration_seconds INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
@@ -64,7 +77,7 @@ CREATE TABLE attempts (
 CREATE TABLE attempt_answers (
   id SERIAL PRIMARY KEY,
   attempt_id INTEGER NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
-  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE SET NULL,
+  question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
   given_answer TEXT,
   points_awarded NUMERIC(8,4) NOT NULL DEFAULT 0.0
 );

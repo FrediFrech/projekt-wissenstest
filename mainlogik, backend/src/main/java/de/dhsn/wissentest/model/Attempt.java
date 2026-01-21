@@ -15,17 +15,21 @@ public class Attempt {
     private double maxPoints;
     private int difficulty;
     private OffsetDateTime createdAt;
+    private String grade;
+    private int durationSeconds;
 
     public Attempt() {
     }
 
-    public Attempt(int id, int userId, double totalPoints, double maxPoints, int difficulty, OffsetDateTime createdAt) {
+    public Attempt(int id, int userId, double totalPoints, double maxPoints, int difficulty, OffsetDateTime createdAt, String grade, int durationSeconds) {
         this.id = id;
         this.userId = userId;
         this.totalPoints = totalPoints;
         this.maxPoints = maxPoints;
         this.difficulty = difficulty;
         this.createdAt = createdAt;
+        this.grade = grade;
+        this.durationSeconds = durationSeconds;
     }
 
     public int getId() {
@@ -74,5 +78,21 @@ public class Attempt {
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public int getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(int durationSeconds) {
+        this.durationSeconds = durationSeconds;
     }
 }

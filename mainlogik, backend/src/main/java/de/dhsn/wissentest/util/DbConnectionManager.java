@@ -38,6 +38,7 @@ public final class DbConnectionManager {
             config.setJdbcUrl(props.getProperty("db.url"));
             config.setUsername(props.getProperty("db.user"));
             config.setPassword(props.getProperty("db.password"));
+            config.setDriverClassName("org.postgresql.Driver");
             config.setMaximumPoolSize(Integer.parseInt(props.getProperty("db.pool.maxSize", "10")));
             config.setPoolName("WissenstestPool");
 

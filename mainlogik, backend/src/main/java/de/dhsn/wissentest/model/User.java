@@ -14,6 +14,7 @@ public class User {
     private String passwordHash;
     private String passwordSalt;
     private String role;
+    private boolean resetRequested;
 
     public User() {
     }
@@ -25,6 +26,14 @@ public class User {
         this.passwordHash = passwordHash;
         this.passwordSalt = passwordSalt;
         this.role = role;
+    }
+
+    public boolean isResetRequested() {
+        return resetRequested;
+    }
+
+    public void setResetRequested(boolean resetRequested) {
+        this.resetRequested = resetRequested;
     }
 
     public int getId() {

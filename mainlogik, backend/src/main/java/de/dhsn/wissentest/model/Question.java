@@ -15,17 +15,21 @@ public class Question {
     private int difficulty;
     private int points;
     private String metaJson;
+    private String imageUrl;
+    private String category;
 
     public Question() {
     }
 
-    public Question(int id, QuestionType type, String prompt, int difficulty, int points, String metaJson) {
+    public Question(int id, QuestionType type, String prompt, int difficulty, int points, String metaJson, String imageUrl, String category) {
         this.id = id;
         this.type = type;
         this.prompt = prompt;
         this.difficulty = difficulty;
         this.points = points;
         this.metaJson = metaJson;
+        this.imageUrl = imageUrl;
+        this.category = category;
     }
 
     public int getId() {
@@ -74,5 +78,21 @@ public class Question {
 
     public void setMetaJson(String metaJson) {
         this.metaJson = metaJson;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

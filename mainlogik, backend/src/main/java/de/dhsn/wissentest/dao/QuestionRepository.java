@@ -18,5 +18,7 @@ public interface QuestionRepository {
     boolean delete(int id);
     Optional<Question> findById(int id);
     List<Question> findByDifficulty(int difficulty, int limit);
+    List<Question> findByDifficultyAndCategory(int difficulty, int limit, String category);
     List<Question> findAll();
+    List<String> findAllCategories();
 }

@@ -1,6 +1,19 @@
 # Projekt Wissenstest - Allgemeine Übersicht
 
-## 📋 Projektbeschreibung
+## � Quick Start (Lokale Umgebung)
+
+1.  **Voraussetzungen**: Keine Installation nötig (Java, Maven, Node, Postgres werden portabel geladen).
+2.  **Starten**:
+    *   Öffne PowerShell in `projekt-wissenstest/startup/`.
+    *   Führe `.\start_project.ps1` aus.
+    *   Das Skript lädt Tools, initiiert die PostgreSQL-Datenbank (Port 5433) und startet Tomcat (Port 8080).
+
+3.  **Zugriff**:
+    *   **URL**: [http://localhost:8080/wissentest/](http://localhost:8080/wissentest/)
+    *   **Login (Schüler)**: `student` / `student`
+    *   **Login (Admin)**: `lehrer` / `student`
+
+## �📋 Projektbeschreibung
 Das **Projekt Wissenstest** ist eine web-basierte Lernplattform, die Schülern ermöglicht, ihr Wissen durch automatisierte Tests zu überprüfen. Die Plattform bietet verschiedene Fragetypen (Multiple Choice, Lückentext), adaptive Schwierigkeitsanpassung und detailliertes Feedback. Administratoren können Tests verwalten und Statistiken einsehen.
 
 ## 🎯 Kernfunktionalität
@@ -27,7 +40,8 @@ Das **Projekt Wissenstest** ist eine web-basierte Lernplattform, die Schülern e
 ```
 ┌─────────────────────────────────────────────────────┐
 │             Präsentationsschicht (Frontend)         │
-│  React SPA mit Komponenten (Login, TestRunner, etc) │
+│           JSP Presentation Layer (Server-Rendered) │
+│  Java Server Pages mit Vanilla JS                   │
 │              REST-API Kommunikation                 │
 └──────────────────────────────────────────────────────┘
                          ↓ (HTTP/JSON)
@@ -102,31 +116,31 @@ src/main/java/de/dhsn/wissentest/
     └── util/TestUtils.java   # Test-Hilfsmittel
 ```
 
-### Frontend (`frondend/`)
+### Frontend (JSP - Server-rendered in Backend)
 ```
-src/
-├── App.jsx                   # Hauptkomponente, Routing
-├── main.jsx                  # React Entry Point
+src/main/webapp/
+├── index.jsp                 # Hauptseite, Navigation
+├── login.jsp                 # Login-Formular
+├── register.jsp              # Registrierungsformular
+├── testlist.jsp              # Übersicht verfügbarer Tests
+├── testrunner.jsp            # Test-Durchführung (UI)
+├── result.jsp                # Ergebnis-Anzeige
+├── adminpanel.jsp            # Admin-Dashboard
+├── learnmode.jsp             # Lernmodus
+├── flipcard.jsp              # Flip-Card Fragment
 │
-├── components/               # React-Komponenten
-│   ├── LandingPage.jsx       # Startseite (Features)
-│   ├── Login.jsx             # Login-Formular
-│   ├── Register.jsx          # Registrierungsformular
-│   ├── TestList.jsx          # Übersicht verfügbarer Tests
-│   ├── TestRunner.jsx        # Test-Durchführung (UI)
-│   ├── Result.jsx            # Ergebnis-Anzeige
-│   ├── AdminPanel.jsx        # Admin-Dashboard
-│   ├── LearnMode.jsx         # Lernmodus
-│   └── FlipCard.jsx          # Flip-Card Komponente
+├── css/
+│   ├── main.css              # Globale Styles
+│   ├── components.css        # Komponenten-Styles
+│   └── animations.css        # Animationen
 │
-├── services/
-│   └── apiClient.js          # REST-API Kommunikation
+├── js/
+│   ├── app.js                # Business Logic
+│   ├── apiClient.js          # REST-API Kommunikation
+│   └── utils.js              # Utility-Funktionen
 │
-└── styles/
-    └── main.css              # Globale Styles
-
-vite.config.js               # Vite Build-Konfiguration
-package.json                 # npm Dependencies
+└── WEB-INF/
+    └── web.xml               # Servlet-Konfiguration
 ```
 
 ### Datenbank (`db/`)
@@ -262,18 +276,18 @@ Benutzer                Frontend                Backend              DB
 
 | Layer | Technologien |
 |-------|--------------|
-| **Frontend** | React 18, Vite, Framer Motion, HTML5, CSS3 |
+| **Frontend** | JSP, HTML5, CSS3, Vanilla JS (Native Implementation) |
 | **Backend** | Java 17, Servlet API, JDBC |
-| **Datenbank** | PostgreSQL 15 |
-| **Build Tools** | Maven (Backend), npm/Vite (Frontend) |
+| **Datenbank** | PostgreSQL 16.1 (Lokal, Portabel) |
+| **Build Tools** | Maven (Backend), PowerShell (Orchestrierung) |
 | **Testing** | JUnit 5, TestUtils |
 | **Deployment** | Tomcat WAR-Datei |
 
 ---
 
-## 📊 Klassifikaation
+## 📊 Klassifikation
 
-- **REST-API:** ✅ Backend liefert JSON, Frontend verarbeitet es
+- **REST-API:** ✅ Backend liefert JSON, Frontend (JSP/JS) verarbeitet es
 - **3-Schichten-Architektur:** ✅ Web/Service/DAO/DB
 - **Datenbankgebunden:** ✅ PostgreSQL mit JDBC
 - **Benutzerauthentifizierung:** ✅ Login & Admin-Rollen
@@ -294,4 +308,4 @@ Weitere Details findest du hier:
 ## 👤 Autor & Status
 **Status:** Aktive Entwicklung
 **Letzte Aktualisierung:** Januar 2026
-**Conforitmität:** Java Backend (Servlets, JDBC) ✅ / Frontend (React statt JSP) ⚠️
+**Konformität:** Java Backend (Servlets, JDBC) ✅ / Frontend (JSP Native Version) ✅

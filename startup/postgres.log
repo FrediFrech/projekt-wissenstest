@@ -1,0 +1,490 @@
+2026-01-20 21:35:26.225 CET [1268] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-20 21:35:26.231 CET [1268] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-20 21:35:26.231 CET [1268] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-20 21:35:26.289 CET [39572] LOG:  database system was shut down at 2026-01-20 21:35:20 CET
+2026-01-20 21:35:26.320 CET [1268] LOG:  database system is ready to accept connections
+2026-01-20 21:39:07.291 CET [38360] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-20 21:39:07.296 CET [38360] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-20 21:39:07.296 CET [38360] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-20 21:39:07.348 CET [37244] LOG:  database system was shut down at 2026-01-20 21:39:01 CET
+2026-01-20 21:39:07.379 CET [38360] LOG:  database system is ready to accept connections
+2026-01-20 21:44:07.353 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 21:46:01.978 CET [20904] LOG:  checkpoint complete: wrote 1031 buffers (6.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=114.369 s, sync=0.248 s, total=114.626 s; sync files=385, longest=0.005 s, average=0.001 s; distance=5044 kB, estimate=5044 kB; lsn=0/1AE8330, redo lsn=0/1A64FE0
+2026-01-20 21:47:28.385 CET [25920] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.386 CET [376] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.387 CET [32596] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.388 CET [3800] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.389 CET [33428] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.389 CET [34528] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.390 CET [12984] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.390 CET [17980] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.390 CET [2568] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:47:28.390 CET [15268] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:49:07.999 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 21:49:21.950 CET [20904] LOG:  checkpoint complete: wrote 129 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=13.879 s, sync=0.054 s, total=13.951 s; sync files=61, longest=0.004 s, average=0.001 s; distance=723 kB, estimate=4612 kB; lsn=0/1B19FF8, redo lsn=0/1B19FC0
+2026-01-20 21:54:07.955 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 21:54:09.592 CET [20904] LOG:  checkpoint complete: wrote 16 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.618 s, sync=0.011 s, total=1.637 s; sync files=13, longest=0.002 s, average=0.001 s; distance=14 kB, estimate=4152 kB; lsn=0/1B1DB58, redo lsn=0/1B1DB20
+2026-01-20 21:56:20.622 CET [30568] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.624 CET [38628] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.624 CET [38920] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.625 CET [38324] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.625 CET [29972] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.626 CET [20392] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.627 CET [18052] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.628 CET [37200] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.628 CET [30628] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:56:20.629 CET [26372] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 21:59:07.597 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 21:59:08.582 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.968 s, sync=0.010 s, total=0.986 s; sync files=10, longest=0.002 s, average=0.001 s; distance=8 kB, estimate=3738 kB; lsn=0/1B1FF50, redo lsn=0/1B1FF18
+2026-01-20 22:01:30.335 CET [37764] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.336 CET [28280] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.338 CET [26000] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.339 CET [34496] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.340 CET [7380] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.341 CET [38992] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.341 CET [25532] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.343 CET [31488] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.344 CET [11420] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:01:30.344 CET [31300] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:04:07.597 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:04:08.924 CET [20904] LOG:  checkpoint complete: wrote 15 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.308 s, sync=0.012 s, total=1.328 s; sync files=15, longest=0.002 s, average=0.001 s; distance=30 kB, estimate=3367 kB; lsn=0/1B277C8, redo lsn=0/1B27790
+2026-01-20 22:08:54.350 CET [11472] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.351 CET [24104] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.352 CET [12152] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.353 CET [32900] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.354 CET [23288] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.355 CET [27392] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.355 CET [38620] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.356 CET [31992] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.357 CET [18816] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:08:54.357 CET [19080] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:09:07.928 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:09:08.913 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.967 s, sync=0.009 s, total=0.985 s; sync files=10, longest=0.002 s, average=0.001 s; distance=10 kB, estimate=3031 kB; lsn=0/1B2A0A0, redo lsn=0/1B2A068
+2026-01-20 22:12:20.682 CET [17376] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.683 CET [8712] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.684 CET [32568] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.685 CET [20328] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.687 CET [37360] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.687 CET [35892] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.689 CET [39836] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.689 CET [37356] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.690 CET [37436] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:12:20.690 CET [4996] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:14:07.924 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:14:08.923 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.975 s, sync=0.017 s, total=1.000 s; sync files=10, longest=0.005 s, average=0.002 s; distance=14 kB, estimate=2730 kB; lsn=0/1B2DA60, redo lsn=0/1B2DA28
+2026-01-20 22:16:40.846 CET [17528] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.847 CET [11472] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.850 CET [17980] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.850 CET [20188] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.851 CET [22360] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.851 CET [38536] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.851 CET [36732] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.852 CET [18120] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.852 CET [37944] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:16:40.852 CET [38248] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:19:07.931 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:19:08.933 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.985 s, sync=0.010 s, total=1.003 s; sync files=10, longest=0.002 s, average=0.001 s; distance=11 kB, estimate=2458 kB; lsn=0/1B309F0, redo lsn=0/1B309B8
+2026-01-20 22:24:07.942 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:24:08.939 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.964 s, sync=0.024 s, total=0.997 s; sync files=10, longest=0.005 s, average=0.003 s; distance=12 kB, estimate=2213 kB; lsn=0/1B33A50, redo lsn=0/1B33A18
+2026-01-20 22:24:32.664 CET [32684] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.665 CET [33652] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.666 CET [36640] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.668 CET [30180] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.668 CET [37360] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.668 CET [36704] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.669 CET [35868] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.669 CET [7728] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.669 CET [29092] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:24:32.670 CET [37500] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.160 CET [37132] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.161 CET [36976] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.162 CET [30020] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.163 CET [17172] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.163 CET [36396] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.165 CET [23660] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.165 CET [11696] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.167 CET [7348] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.167 CET [29692] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:29:21.168 CET [3264] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.161 CET [34288] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.162 CET [24044] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.163 CET [672] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.163 CET [26652] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.164 CET [37208] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.165 CET [39508] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.166 CET [37672] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.167 CET [29728] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.167 CET [26584] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:38:19.168 CET [37912] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.735 CET [36144] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.735 CET [36496] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.736 CET [18280] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.736 CET [34256] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.737 CET [1268] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.738 CET [28260] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.739 CET [36948] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.739 CET [2296] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.739 CET [32400] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:42:24.740 CET [34160] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 22:44:07.958 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 22:44:08.946 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.968 s, sync=0.011 s, total=0.989 s; sync files=10, longest=0.002 s, average=0.002 s; distance=12 kB, estimate=1993 kB; lsn=0/1B36BC8, redo lsn=0/1B36B90
+2026-01-20 22:46:05.329 CET [10392] FATAL:  role "postgres" does not exist
+2026-01-20 23:02:44.816 CET [39524] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.818 CET [39864] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.819 CET [31400] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.820 CET [5812] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.820 CET [35484] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.821 CET [35356] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.822 CET [38192] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.822 CET [37168] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.823 CET [38684] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:02:44.823 CET [21004] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-20 23:09:07.979 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:09:08.105 CET [20904] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.115 s, sync=0.003 s, total=0.127 s; sync files=2, longest=0.002 s, average=0.002 s; distance=1 kB, estimate=1794 kB; lsn=0/1B37128, redo lsn=0/1B370F0
+2026-01-20 23:19:07.125 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:19:09.523 CET [20904] LOG:  checkpoint complete: wrote 23 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.373 s, sync=0.016 s, total=2.398 s; sync files=17, longest=0.002 s, average=0.001 s; distance=115 kB, estimate=1626 kB; lsn=0/1B53E30, redo lsn=0/1B53DF8
+2026-01-20 23:29:07.544 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:29:08.638 CET [20904] LOG:  checkpoint complete: wrote 11 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.077 s, sync=0.010 s, total=1.095 s; sync files=11, longest=0.002 s, average=0.001 s; distance=52 kB, estimate=1468 kB; lsn=0/1B60FB8, redo lsn=0/1B60F80
+2026-01-20 23:34:07.649 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:34:09.391 CET [20904] LOG:  checkpoint complete: wrote 16 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.728 s, sync=0.006 s, total=1.743 s; sync files=5, longest=0.002 s, average=0.002 s; distance=30 kB, estimate=1325 kB; lsn=0/1B68A60, redo lsn=0/1B68A28
+2026-01-20 23:49:07.428 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:49:08.529 CET [20904] LOG:  checkpoint complete: wrote 11 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.084 s, sync=0.009 s, total=1.102 s; sync files=11, longest=0.002 s, average=0.001 s; distance=52 kB, estimate=1197 kB; lsn=0/1B75C38, redo lsn=0/1B75C00
+2026-01-20 23:54:07.536 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:54:08.741 CET [20904] LOG:  checkpoint complete: wrote 12 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.182 s, sync=0.014 s, total=1.205 s; sync files=12, longest=0.004 s, average=0.002 s; distance=21 kB, estimate=1080 kB; lsn=0/1B7B0D0, redo lsn=0/1B7B098
+2026-01-20 23:59:07.752 CET [20904] LOG:  checkpoint starting: time
+2026-01-20 23:59:09.395 CET [20904] LOG:  checkpoint complete: wrote 16 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.621 s, sync=0.014 s, total=1.643 s; sync files=16, longest=0.002 s, average=0.001 s; distance=17 kB, estimate=973 kB; lsn=0/1B7F568, redo lsn=0/1B7F530
+2026-01-21 00:04:07.409 CET [20904] LOG:  checkpoint starting: time
+2026-01-21 00:04:08.399 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.972 s, sync=0.010 s, total=0.990 s; sync files=10, longest=0.002 s, average=0.001 s; distance=13 kB, estimate=877 kB; lsn=0/1B82C90, redo lsn=0/1B82C58
+2026-01-21 00:14:07.416 CET [20904] LOG:  checkpoint starting: time
+2026-01-21 00:14:08.417 CET [20904] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.983 s, sync=0.010 s, total=1.001 s; sync files=10, longest=0.002 s, average=0.001 s; distance=14 kB, estimate=791 kB; lsn=0/1B86748, redo lsn=0/1B86710
+2026-01-21 00:26:23.071 CET [38760] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.071 CET [22200] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.072 CET [23788] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.078 CET [27268] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.079 CET [7784] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.080 CET [10692] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.081 CET [38828] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.084 CET [26164] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.084 CET [8692] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.088 CET [39424] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.088 CET [21352] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.090 CET [34876] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.090 CET [22072] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [35924] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [37776] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [36100] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [5892] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [29496] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [37628] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [32264] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [35124] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [38632] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [28048] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [34488] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [34608] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [30024] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [36120] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [36968] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [38496] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:26:23.091 CET [30636] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:34:07.428 CET [20904] LOG:  checkpoint starting: time
+2026-01-21 00:34:08.190 CET [20904] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.748 s, sync=0.006 s, total=0.762 s; sync files=8, longest=0.002 s, average=0.001 s; distance=4 kB, estimate=712 kB; lsn=0/1B878D8, redo lsn=0/1B878A0
+2026-01-21 00:36:03.650 CET [10632] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.651 CET [6348] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.652 CET [32280] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.653 CET [36988] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.653 CET [38940] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.653 CET [36688] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.654 CET [33844] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.654 CET [39648] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.654 CET [39044] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:36:03.654 CET [36540] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:42:10.592 CET [16688] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-21 00:42:10.597 CET [16688] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-21 00:42:10.598 CET [16688] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-21 00:42:10.648 CET [8712] LOG:  database system was shut down at 2026-01-21 00:42:04 CET
+2026-01-21 00:42:10.679 CET [16688] LOG:  database system is ready to accept connections
+2026-01-21 00:43:05.131 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:43:05.131 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:43:05.164 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:43:05.164 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:43:38.965 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:43:38.965 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:43:38.969 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:43:38.969 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:38.727 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:38.727 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:38.735 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:38.735 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:44.185 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:44.185 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:44.186 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:44.186 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:46.425 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:46.425 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:45:46.426 CET [13968] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:45:46.426 CET [13968] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:47:10.655 CET [20080] LOG:  checkpoint starting: time
+2026-01-21 00:49:04.952 CET [20080] LOG:  checkpoint complete: wrote 1060 buffers (6.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=114.035 s, sync=0.254 s, total=114.297 s; sync files=347, longest=0.005 s, average=0.001 s; distance=5048 kB, estimate=5048 kB; lsn=0/1A66168, redo lsn=0/1A66130
+2026-01-21 00:52:26.846 CET [38300] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-21 00:52:26.850 CET [38300] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-21 00:52:26.851 CET [38300] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-21 00:52:26.899 CET [29348] LOG:  database system was shut down at 2026-01-21 00:52:20 CET
+2026-01-21 00:52:26.926 CET [38300] LOG:  database system is ready to accept connections
+2026-01-21 00:53:12.598 CET [35312] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:53:12.598 CET [35312] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:53:12.643 CET [35312] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:53:12.643 CET [35312] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:54:41.668 CET [35312] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:54:41.668 CET [35312] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:54:41.671 CET [35312] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:54:41.671 CET [35312] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:55:33.953 CET [35312] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.956 CET [9468] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.957 CET [19932] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.958 CET [34444] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.959 CET [33380] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.959 CET [33372] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.959 CET [31700] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.960 CET [10700] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.960 CET [34164] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:55:33.960 CET [1144] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:06.436 CET [39584] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:56:06.436 CET [39584] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:56:06.468 CET [39584] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:56:06.468 CET [39584] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:56:54.856 CET [39584] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.857 CET [38592] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.858 CET [33192] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.859 CET [35696] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.860 CET [24600] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.862 CET [39560] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.862 CET [26832] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.862 CET [37960] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.862 CET [36092] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:56:54.862 CET [22036] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:57:26.899 CET [31492] LOG:  checkpoint starting: time
+2026-01-21 00:57:32.380 CET [17000] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:57:32.380 CET [17000] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:57:32.410 CET [17000] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:57:32.410 CET [17000] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:57:50.751 CET [17000] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:57:50.753 CET [39980] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:57:50.755 CET [38852] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:57:50.756 CET [40832] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-01-21 00:58:42.831 CET [13900] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-21 00:58:42.836 CET [13900] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-21 00:58:42.836 CET [13900] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-21 00:58:42.883 CET [20332] LOG:  database system was interrupted; last known up at 2026-01-21 00:52:26 CET
+2026-01-21 00:58:43.207 CET [20332] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-01-21 00:58:43.214 CET [20332] LOG:  redo starts at 0/1577E30
+2026-01-21 00:58:43.409 CET [20332] LOG:  invalid record length at 0/1A666B0: expected at least 24, got 0
+2026-01-21 00:58:43.409 CET [20332] LOG:  redo done at 0/1A66678 system usage: CPU: user: 0.01 s, system: 0.15 s, elapsed: 0.19 s
+2026-01-21 00:58:43.415 CET [40904] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-01-21 00:58:43.840 CET [40904] LOG:  checkpoint complete: wrote 1066 buffers (6.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.068 s, sync=0.351 s, total=0.428 s; sync files=348, longest=0.006 s, average=0.002 s; distance=5050 kB, estimate=5050 kB; lsn=0/1A666B0, redo lsn=0/1A666B0
+2026-01-21 00:58:43.878 CET [13900] LOG:  database system is ready to accept connections
+2026-01-21 00:59:21.317 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:59:21.317 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 00:59:21.352 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 00:59:21.352 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:01:50.220 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:01:50.220 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:01:50.223 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:01:50.223 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:02:49.200 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:02:49.200 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:02:49.207 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:02:49.207 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:03:43.850 CET [40904] LOG:  checkpoint starting: time
+2026-01-21 01:03:46.479 CET [40904] LOG:  checkpoint complete: wrote 25 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.604 s, sync=0.013 s, total=2.629 s; sync files=16, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=4545 kB; lsn=0/1A67048, redo lsn=0/1A67010
+2026-01-21 01:04:51.686 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:04:51.686 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:04:51.691 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:04:51.691 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:06:30.332 CET [10992] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:06:30.332 CET [10992] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:06:30.335 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:06:30.335 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:08:04.630 CET [1320] ERROR:  column "grade" of relation "attempts" does not exist at character 70
+2026-01-21 01:08:04.630 CET [1320] STATEMENT:  INSERT INTO attempts (user_id, total_points, max_points, difficulty, grade, duration_seconds) VALUES ($1,$2,$3,$4,$5,$6)
+	RETURNING *
+2026-01-21 01:08:43.493 CET [40904] LOG:  checkpoint starting: time
+2026-01-21 01:08:44.260 CET [40904] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.754 s, sync=0.006 s, total=0.768 s; sync files=7, longest=0.002 s, average=0.001 s; distance=1 kB, estimate=4091 kB; lsn=0/1A676A8, redo lsn=0/1A67670
+2026-01-21 01:12:07.666 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:12:07.666 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:12:07.669 CET [1320] ERROR:  column "grade" does not exist at character 71
+2026-01-21 01:12:07.669 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC

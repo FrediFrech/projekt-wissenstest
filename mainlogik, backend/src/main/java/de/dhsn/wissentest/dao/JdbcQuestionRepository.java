@@ -30,7 +30,7 @@ public class JdbcQuestionRepository implements QuestionRepository {
 
     @Override
     public int create(Question question) {
-        String sql = "INSERT INTO questions (type, prompt, difficulty, points, meta) VALUES (?,?,?,?,?::jsonb)";
+        String sql = "INSERT INTO questions (type, prompt, difficulty, points, meta, image_url, category) VALUES (?,?,?,?,?::jsonb,?,?)";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, question.getType().name());
@@ -38,6 +38,8 @@ public class JdbcQuestionRepository implements QuestionRepository {
             ps.setInt(3, question.getDifficulty());
             ps.setInt(4, question.getPoints());
             ps.setString(5, question.getMetaJson() == null ? "{}" : question.getMetaJson());
+            ps.setString(6, question.getImageUrl());
+            ps.setString(7, question.getCategory());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -52,7 +54,7 @@ public class JdbcQuestionRepository implements QuestionRepository {
 
     @Override
     public boolean update(Question question) {
-        String sql = "UPDATE questions SET type=?, prompt=?, difficulty=?, points=?, meta=?::jsonb WHERE id=?";
+        String sql = "UPDATE questions SET type=?, prompt=?, difficulty=?, points=?, meta=?::jsonb, image_url=?, category=? WHERE id=?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, question.getType().name());
@@ -60,7 +62,9 @@ public class JdbcQuestionRepository implements QuestionRepository {
             ps.setInt(3, question.getDifficulty());
             ps.setInt(4, question.getPoints());
             ps.setString(5, question.getMetaJson() == null ? "{}" : question.getMetaJson());
-            ps.setInt(6, question.getId());
+            ps.setString(6, question.getImageUrl());
+            ps.setString(7, question.getCategory());
+            ps.setInt(8, question.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update question", e);
@@ -81,7 +85,7 @@ public class JdbcQuestionRepository implements QuestionRepository {
 
     @Override
     public Optional<Question> findById(int id) {
-        String sql = "SELECT id, type, prompt, difficulty, points, meta FROM questions WHERE id = ?";
+        String sql = "SELECT id, type, prompt, difficulty, points, meta, image_url, category FROM questions WHERE id = ?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -98,7 +102,7 @@ public class JdbcQuestionRepository implements QuestionRepository {
 
     @Override
     public List<Question> findByDifficulty(int difficulty, int limit) {
-        String sql = "SELECT id, type, prompt, difficulty, points, meta FROM questions WHERE difficulty = ? ORDER BY random() LIMIT ?";
+        String sql = "SELECT id, type, prompt, difficulty, points, meta, image_url, category FROM questions WHERE difficulty = ? ORDER BY random() LIMIT ?";
         List<Question> result = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -116,8 +120,28 @@ public class JdbcQuestionRepository implements QuestionRepository {
     }
 
     @Override
+    public List<Question> findByDifficultyAndCategory(int difficulty, int limit, String category) {
+        String sql = "SELECT id, type, prompt, difficulty, points, meta, image_url, category FROM questions WHERE difficulty = ? AND category = ? ORDER BY random() LIMIT ?";
+        List<Question> result = new ArrayList<>();
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, difficulty);
+            ps.setString(2, category);
+            ps.setInt(3, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to find questions by difficulty and category", e);
+        }
+        return result;
+    }
+
+    @Override
     public List<Question> findAll() {
-        String sql = "SELECT id, type, prompt, difficulty, points, meta FROM questions ORDER BY id";
+        String sql = "SELECT id, type, prompt, difficulty, points, meta, image_url, category FROM questions ORDER BY id";
         List<Question> result = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -131,6 +155,22 @@ public class JdbcQuestionRepository implements QuestionRepository {
         return result;
     }
 
+    @Override
+    public List<String> findAllCategories() {
+        String sql = "SELECT DISTINCT category FROM questions ORDER BY category";
+        List<String> result = new ArrayList<>();
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                result.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to list categories", e);
+        }
+        return result;
+    }
+
     private Question mapRow(ResultSet rs) throws SQLException {
         return new Question(
                 rs.getInt("id"),
@@ -138,7 +178,9 @@ public class JdbcQuestionRepository implements QuestionRepository {
                 rs.getString("prompt"),
                 rs.getInt("difficulty"),
                 rs.getInt("points"),
-                rs.getString("meta")
+                rs.getString("meta"),
+                rs.getString("image_url"),
+                rs.getString("category")
         );
     }
 }

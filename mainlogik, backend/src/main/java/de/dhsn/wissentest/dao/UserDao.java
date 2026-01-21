@@ -18,4 +18,7 @@ public interface UserDao {
     Optional<User> findById(int id);
     List<User> findAll();
     boolean delete(int id);
+    void update(User user);
+    void setPasswordResetRequested(int userId, boolean requested);
+    List<User> findPasswordResetRequests();
 }

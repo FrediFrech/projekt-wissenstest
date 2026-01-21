@@ -1,5 +1,9 @@
 # PostgreSQL & pgAdmin4 Setup-Anleitung
 
+> **Hinweis:** Für dieses Projekt ist keine manuelle Installation von PostgreSQL erforderlich!
+> Das Start-Skript `startup/start_project.ps1` lädt und startet automatisch eine portable PostgreSQL-Instanz auf Port **5433**.
+> Diese Anleitung dient nur als Referenz für manuelle Setups oder pgAdmin4.
+
 ## Inhalt
 1. [PostgreSQL Installation](#1-postgresql-installation)
 2. [pgAdmin4 Installation & Konfiguration](#2-pgadmin4-installation--konfiguration)

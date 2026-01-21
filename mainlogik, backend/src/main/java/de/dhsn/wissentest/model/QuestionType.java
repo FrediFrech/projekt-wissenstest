@@ -9,5 +9,7 @@ package de.dhsn.wissentest.model;
 
 public enum QuestionType {
     MC,
-    CLOZE
+    CLOZE,
+    FREE,
+    IMAGE
 }

@@ -29,31 +29,37 @@ public class AdminService {
     }
 
     public int createMultipleChoiceQuestion(Question question, List<AnswerOption> answers) {
-        question.setType(QuestionType.MC);
+        // Type is already set in 'question'
         int questionId = questionDao.create(question);
-        for (AnswerOption option : answers) {
-            option.setQuestionId(questionId);
-            answerDao.create(option);
+        if (answers != null) {
+            for (AnswerOption option : answers) {
+                option.setQuestionId(questionId);
+                answerDao.create(option);
+            }
         }
         return questionId;
     }
 
     public void updateMultipleChoiceQuestion(Question question, List<AnswerOption> answers) {
-        question.setType(QuestionType.MC);
+        // Type is already set in 'question'
         questionDao.update(question);
         answerDao.deleteByQuestion(question.getId());
-        for (AnswerOption option : answers) {
-            option.setQuestionId(question.getId());
-            answerDao.create(option);
+        if (answers != null) {
+            for (AnswerOption option : answers) {
+                option.setQuestionId(question.getId());
+                answerDao.create(option);
+            }
         }
     }
 
     public int createClozeQuestion(Question question, List<ClozeToken> tokens) {
         question.setType(QuestionType.CLOZE);
         int questionId = questionDao.create(question);
-        for (ClozeToken token : tokens) {
-            token.setQuestionId(questionId);
-            clozeTokenDao.create(token);
+        if (tokens != null) {
+            for (ClozeToken token : tokens) {
+                token.setQuestionId(questionId);
+                clozeTokenDao.create(token);
+            }
         }
         return questionId;
     }
@@ -62,9 +68,11 @@ public class AdminService {
         question.setType(QuestionType.CLOZE);
         questionDao.update(question);
         clozeTokenDao.deleteByQuestion(question.getId());
-        for (ClozeToken token : tokens) {
-            token.setQuestionId(question.getId());
-            clozeTokenDao.create(token);
+        if (tokens != null) {
+            for (ClozeToken token : tokens) {
+                token.setQuestionId(question.getId());
+                clozeTokenDao.create(token);
+            }
         }
     }
 }

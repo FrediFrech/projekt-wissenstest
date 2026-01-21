@@ -1,0 +1,1 @@
+C:/Users/Micro/Projekt Wissenstest/projekt-wissenstest/startup/tools/pgsql/bin/postgres.exe "-D" "C:/Users/Micro/Projekt Wissenstest/projekt-wissenstest/startup/db-data" "-p" "5433"

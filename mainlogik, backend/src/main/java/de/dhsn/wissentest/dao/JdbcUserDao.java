@@ -28,7 +28,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public int create(User user) {
-        String sql = "INSERT INTO users (username, email, password_hash, password_salt, role) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO users (username, email, password_hash, password_salt, role, reset_requested) VALUES (?,?,?,?,?,?)";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getUsername());
@@ -36,6 +36,7 @@ public class JdbcUserDao implements UserDao {
             ps.setString(3, user.getPasswordHash());
             ps.setString(4, user.getPasswordSalt());
             ps.setString(5, user.getRole());
+            ps.setBoolean(6, user.isResetRequested());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -50,7 +51,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        String sql = "SELECT id, username, email, password_hash, password_salt, role FROM users WHERE username = ?";
+        String sql = "SELECT id, username, email, password_hash, password_salt, role, reset_requested FROM users WHERE username = ?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -67,7 +68,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public Optional<User> findById(int id) {
-        String sql = "SELECT id, username, email, password_hash, password_salt, role FROM users WHERE id = ?";
+        String sql = "SELECT id, username, email, password_hash, password_salt, role, reset_requested FROM users WHERE id = ?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -82,37 +83,10 @@ public class JdbcUserDao implements UserDao {
         return Optional.empty();
     }
 
-    @Override
-    public java.util.List<User> findAll() {
-        String sql = "SELECT id, username, email, password_hash, password_salt, role FROM users ORDER BY id";
-        java.util.List<User> result = new java.util.ArrayList<>();
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                result.add(mapRow(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to list users", e);
-        }
-        return result;
-    }
-
-    @Override
-    public boolean delete(int id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to delete user", e);
-        }
-    }
 
     @Override
     public List<User> findAll() {
-        String sql = "SELECT id, username, email, password_hash, password_salt, role FROM users ORDER BY id";
+        String sql = "SELECT id, username, email, password_hash, password_salt, role, reset_requested FROM users ORDER BY id";
         List<User> result = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -138,8 +112,55 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    @Override
+    public void update(User user) {
+        String sql = "UPDATE users SET username=?, email=?, role=?, password_hash=?, password_salt=?, reset_requested=? WHERE id=?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getRole());
+            ps.setString(4, user.getPasswordHash());
+            ps.setString(5, user.getPasswordSalt());
+            ps.setBoolean(6, user.isResetRequested());
+            ps.setInt(7, user.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update user", e);
+        }
+    }
+
+    @Override
+    public void setPasswordResetRequested(int userId, boolean requested) {
+        String sql = "UPDATE users SET reset_requested = ? WHERE id = ?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setBoolean(1, requested);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to set reset requested", e);
+        }
+    }
+
+    @Override
+    public List<User> findPasswordResetRequests() {
+         String sql = "SELECT id, username, email, password_hash, password_salt, role, reset_requested FROM users WHERE reset_requested = true ORDER BY id";
+        List<User> result = new ArrayList<>();
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                result.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to list password reset requests", e);
+        }
+        return result;
+    }
+
     private User mapRow(ResultSet rs) throws SQLException {
-        return new User(
+        User u = new User(
                 rs.getInt("id"),
                 rs.getString("username"),
                 rs.getString("email"),
@@ -147,5 +168,7 @@ public class JdbcUserDao implements UserDao {
                 rs.getString("password_salt"),
                 rs.getString("role")
         );
+        u.setResetRequested(rs.getBoolean("reset_requested"));
+        return u;
     }
 }

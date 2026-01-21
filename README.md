@@ -12,8 +12,8 @@ Entwicklung einer Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendu
 - [x] **Datenbank-Treiber:** PostgreSQL Treiber integriert (MS SQL Treiber vorbereitet)
 
 ### Frontend
-- [x] **Framework:** React (Konformität via REST-Architektur)
-- [x] **UI/UX:** Interaktives Design mit Animationen (Framer Motion)
+- [x] **Framework:** JSP (Java Server Pages) mit Vanilla JS
+- [x] **UI/UX:** Interaktives Design mit CSS3 Animationen
 - [x] **Kommunikation:** REST-ähnliche API Calls zum Backend
 
 ### Datenbank
@@ -37,13 +37,13 @@ Entwicklung einer Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendu
 - **[Dokumentations-Index](docs/INDEX.md)** – Alle Dokumente & Navigation
 
 **Compliance-Frage (KRITISCH!):**
-- **[JSP Native Guide (SAFE ALTERNATIVE)](docs/JSP_NATIVE_GUIDE.md)** – Die komplett React-freie Version (High-End JSP).
-- **[JSP Integration Guide (Hybrid Lösung)](docs/JSP_INTEGRATION_GUIDE.md)** – Wie wir React konform in JSP eingebettet haben.
+- **[JSP Native Guide (KONFORM)](docs/JSP_NATIVE_GUIDE.md)** – Die konforme JSP-basierte Version.
+- **[JSP Integration Guide (Hybrid Lösung)](docs/JSP_INTEGRATION_GUIDE.md)** – Wie wir die konformität sichergestellt haben.
 - **[Compliance & JSP-Frage](docs/JSP_COMPLIANCE_ANALYSIS.md)** – Hintergrund-Analyse.
 
 **Technische Architektur:**
 - [Backend Klassendiagramme](docs/ARCHITECTURE_DIAGRAMS.md) – DAO/Service/Servlet-Pattern
-- [Frontend React-Architektur](docs/FRONTEND_ARCHITECTURE.md) – Komponenten & State-Flow
+- [JSP Frontend-Architektur](docs/JSP_NATIVE_GUIDE.md) – Komponenten & Server-seitiges Rendering
 - [Datenbank Explorer](docs/DATABASE_EXPLORER.md) – ER-Diagramm & SQL-Queries
 
 **Setup & Tests:**
@@ -65,11 +65,11 @@ mvn clean package
 # Dann wissentest.war in Tomcat deployen
 ```
 
-### Frontend Start (React)
+### Frontend Start (JSP)
 ```bash
-cd frondend
-npm install
-npm run dev
+cd "mainlogik, backend"
+# JSP wird automatisch mit Tomcat deployed
+# Zugreifbar unter http://localhost:8080/wissentest
 ```
 
 ---
@@ -94,10 +94,9 @@ projekt-wissenstest/
 │   ├── src/main/java/.../model      Datenmodelle
 │   └── src/test/java/               JUnit Tests
 │
-├── frondend/                         ⚛️ React Frontend
-│   ├── src/components/               UI-Komponenten
-│   ├── src/services/apiClient.js    REST-Client
-│   └── vite.config.js               Build-Config
+├── alte_react_version/               🗂️ Archivierte React Version
+│   ├── frondend/                     Alte React-Dateien
+│   └── frontend_docs/                Alte React-Dokumentation
 │
 ├── db/                               🗄️ Datenbank
 │   ├── schema.sql                   Tabellen
@@ -110,7 +109,7 @@ projekt-wissenstest/
 
 | Layer | Technologie | Konformität |
 |-------|-------------|-------------|
-| **Frontend** | React 18, Vite, Framer Motion | ⚠️ JSP nicht implementiert |
+| **Frontend** | JSP (Java Server Pages), Vanilla JS, CSS3 | ✅ Konform |
 | **Backend** | Java 17, Servlets, JDBC | ✅ Konform |
 | **Datenbank** | PostgreSQL 15 | ✅ Konform |
 | **Testing** | JUnit 5 | ✅ Konform |

@@ -14,4 +14,6 @@ import java.util.List;
 public interface AttemptDao {
     int createAttempt(Attempt attempt);
     void saveAttemptAnswers(int attemptId, List<AttemptAnswer> answers);
+    List<Attempt> findByUser(int userId);
+    int countAll();
 }
