@@ -12,4 +12,8 @@ Zentrale Konfiguration der Datenbankverbindung (JDBC). Diese Datei erlaubt Anpas
 
 ## Verbindungen
 - `DbConnectionManager` liest diese Datei beim Start.
+
+**Aktueller Default im Repo:**
+`jdbc:postgresql://localhost:5433/wissentest`
+(Port 5433, passend zum Start‑Skript)
 - Alle JDBC‑DAOs verwenden indirekt die DataSource aus `DbConnectionManager`.

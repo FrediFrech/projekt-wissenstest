@@ -1,7 +1,7 @@
 # jsp_native/LandingPage.jsp
 
 ## Einfache Erklärung
-Das ist die Startseite der JSP-Variante. Sie zeigt dem Benutzer, worum es bei der Anwendung geht, und bietet Buttons zum Anmelden oder Registrieren. Mit CSS-Animationen sieht sie dabei hochmodern aus – ganz ohne React-Framework.
+Das ist die Startseite der JSP-Variante. Sie zeigt dem Benutzer, worum es bei der Anwendung geht, und bietet Buttons zum Anmelden oder Registrieren. Mit CSS-Animationen sieht sie dabei hochmodern aus – ganz ohne Framework.
 
 ## Zweck
 Einstiegspunkt der **Native JSP Frontend-Version**: Willkommen-Seite mit Übersicht und Navigation.
@@ -20,10 +20,9 @@ Einstiegspunkt der **Native JSP Frontend-Version**: Willkommen-Seite mit Übersi
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=landingPage` eingebunden
 - **Styling:** Nutzt `css_native/style.css` (Glassmorphism, Gradients)
-- **Frontend-Pendant:** `frondend/src/components/LandingPage.jsx`
 
 ## Wichtige Entscheidungen
-- ✅ Vanilla JS statt React (konform mit JSP-Anforderungen)
+- ✅ Vanilla JS ohne Framework (konform mit JSP-Anforderungen)
 - ✅ CSS3-Animationen statt Framer Motion (native Browser-Features)
 - ✅ Server-Side Template (keine JS-Rendering-Logik für Struktur)
 - ✅ Responsive Design (Mobile & Desktop)

@@ -247,12 +247,5 @@ Oder direkt per `<link>` im Kopf aller JSP-Seiten.
 }
 ```
 
-## Relation zu React-Styling
-
-Diese CSS ist ein **Funktionspendant** zu `frondend/src/styles/main.css`:
-- Gleiche Farbpalette
-- Ähnliche Animationen
-- Gleiches Layout-Konzept
-- Aber reine CSS statt CSS-in-JS
-
-Das zeigt, dass JSP + CSS modern aussehen kann wie React!
+## Hinweis
+Diese CSS ist eigenständig und benötigt keine Frontend‑Frameworks.

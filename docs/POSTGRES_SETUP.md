@@ -20,7 +20,7 @@
 1. Download von [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
 2. Installer ausführen (empfohlen: Version 15+)
 3. Installation-Wizard durchlaufen:
-   - Port: `5432` (Standard beibehalten)
+   - Port: `5432` (Standard) **oder** `5433` (passt zum Repo‑Default)
    - Superuser Passwort: **gut merken!**
    - Locale: German/Deutschland oder Standard
 4. Nach Installation: Prüfe ob PostgreSQL-Service läuft
@@ -62,7 +62,7 @@ sudo apt install pgadmin4
      - Name: `Wissenstest Local`
    - **Connection Tab:**
      - Host: `localhost`
-     - Port: `5432`
+   - Port: `5433` (wenn du das Start‑Skript nutzt)
      - Maintenance database: `postgres`
      - Username: `postgres`
      - Password: [dein PostgreSQL Superuser Passwort]
@@ -166,7 +166,7 @@ Datei: `mainlogik, backend/src/main/resources/db.properties`
 
 ```properties
 # PostgreSQL Verbindung
-db.url=jdbc:postgresql://localhost:5432/wissentest
+db.url=jdbc:postgresql://localhost:5433/wissentest
 db.user=student
 db.password=student
 db.pool.maxSize=10
@@ -236,8 +236,7 @@ mvn clean package
 Erwartete Antwort:
 ```json
 {
-  "status": "ok",
-  "database": "connected"
+   "status": "ok"
 }
 ```
 
@@ -272,14 +271,16 @@ Dann `db.properties` aktualisieren!
    ```
 
 2. **Falscher Port**
-   - Standard: 5432
-   - Prüfe in `postgresql.conf`: `port = 5432`
+   - Standard: 5432 (manuelle Installation)
+   - Start‑Skript: 5433
+   - Prüfe in `postgresql.conf`: `port = 5432` oder `5433`
    - Oder finde Port: `sudo netstat -plnt | grep postgres`
 
 3. **Firewall blockiert**
    ```bash
    # Linux: Port freigeben
    sudo ufw allow 5432/tcp
+   # oder 5433, falls du den Script‑Port nutzt
    ```
 
 ---
@@ -357,10 +358,9 @@ db.pool.maxSize=5  # Reduzieren falls nötig
 
 | Service       | Port  | URL                                    |
 |---------------|-------|----------------------------------------|
-| PostgreSQL    | 5432  | `jdbc:postgresql://localhost:5432/...` |
+| PostgreSQL    | 5433  | `jdbc:postgresql://localhost:5433/...` |
 | pgAdmin4      | 5050  | `http://localhost:5050` (Browser)      |
 | Tomcat        | 8080  | `http://localhost:8080/wissentest/`    |
-| React (Vite)  | 5173  | `http://localhost:5173`                |
 
 ---
 

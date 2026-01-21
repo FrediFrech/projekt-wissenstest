@@ -1,6 +1,6 @@
 # JSP Native Frontend - Komponenten-Übersicht
 
-Diese Dokumentation beschreibt alle Komponenten der **JSP-Native Variante** – die sichere, vollständig JSP-konforme Alternative zur React-Version.
+Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die aktuelle, vollständig JSP‑konforme Version.
 
 ---
 
@@ -8,7 +8,8 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP-Native Variante** – 
 
 | Komponente | Typ | Beschreibung | Wiki-Link |
 |-----------|-----|-------------|-----------|
-| **native.jsp** | Router | Haupt-Einstiegspunkt, JSP-basiertes Routing | [native.jsp](native_jsp.md) |
+| **index.jsp** | Einstieg | Standard‑Startseite (Welcome File) | – |
+| **native.jsp** | Router | JSP‑Routing per `?page=` | – |
 | **LandingPage.jsp** | Page | Startseite mit Willkommen & Navigation | [LandingPage.jsp](jsp_native_LandingPage.md) |
 | **Login.jsp** | Form | Authentifizierung (Benutzer einloggen) | [Login.jsp](jsp_native_Login.md) |
 | **Register.jsp** | Form | Benutzer-Registrierung | [Register.jsp](jsp_native_Register.md) |
@@ -17,6 +18,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP-Native Variante** – 
 | **Result.jsp** | Page | Ergebnisanzeige nach Test | [Result.jsp](jsp_native_Result.md) |
 | **AdminPanel.jsp** | Page | Admin-Dashboard: Statistiken & Frage-Management | [AdminPanel.jsp](jsp_native_AdminPanel.md) |
 | **LearnMode.jsp** | Page | Lernmodus mit Flip-Cards | [LearnMode.jsp](jsp_native_LearnMode.md) |
+| **ExamMode.jsp** | Page | Prüfungsmodus (Timer, Fokus) | – |
 | **FlipCard.jsp** | Fragment | Wiederverwendbare Karteikarten-Komponente | [FlipCard.jsp](jsp_native_FlipCard.md) |
 
 ---
@@ -33,20 +35,22 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP-Native Variante** – 
 ## 🏗️ Architektur-Übersicht
 
 ```
-native.jsp (Main Router)
+index.jsp (Start)
 │
-├─ Router Logic: Page-Parameter (?page=...)
+└─ native.jsp (Router)
+   ├─ Page-Parameter (?page=...)
 │
-├─ Includes JSP Pages:
-│  ├─ LandingPage.jsp
-│  ├─ Login.jsp  
-│  ├─ Register.jsp
-│  ├─ TestList.jsp
-│  ├─ TestRunner.jsp
-│  ├─ Result.jsp
-│  ├─ AdminPanel.jsp
-│  ├─ LearnMode.jsp
-│  └─ FlipCard.jsp
+   ├─ Includes JSP Pages:
+   │  ├─ LandingPage.jsp
+   │  ├─ Login.jsp
+   │  ├─ Register.jsp
+   │  ├─ TestList.jsp
+   │  ├─ TestRunner.jsp
+   │  ├─ Result.jsp
+   │  ├─ AdminPanel.jsp
+   │  ├─ LearnMode.jsp
+   │  ├─ ExamMode.jsp
+   │  └─ FlipCard.jsp
 │
 └─ Loads JavaScript & CSS:
    ├─ js_native/app.js (Business Logic)
@@ -57,7 +61,9 @@ Backend (Java Servlets)
 ├─ /api/auth/login → AuthServlet
 ├─ /api/auth/register → AuthServlet
 ├─ /api/test/start → TestServlet
-├─ /api/test/list → TestServlet
+├─ /api/test/categories → TestServlet
+├─ /api/test/history → TestServlet
+├─ /api/test/questions/all → TestServlet (LearnMode)
 ├─ /api/admin/* → AdminServlet
 └─ /health → HealthServlet
 ```
@@ -97,7 +103,7 @@ Navigation Bar
 ### Session-Handling
 - **Server-Side Sessions** in JSP (nicht localStorage)
 - Session-Check vor Admin-Seiten
-- Passwort-Hashing im Backend (PBKDF2/SHA-256)
+- Passwort-Hashing im Backend (iteriertes SHA‑256)
 
 ### AJAX-Security
 - CORS-Filter im Backend erlaubt Cross-Origin Requests
@@ -131,7 +137,8 @@ Alle Komponenten sind **Mobile-First** designt:
 - **Vanilla JS:** Minimal Overhead (keine Framework-Größe)
 - **CSS3 Native:** Hardwarebeschleunigung
 - **AJAX:** Nur Daten-Transfer, keine Page-Reloads
-- **sessionStorage:** Lokale State-Verwaltung
+- **localStorage:** Test‑Konfiguration
+- **sessionStorage:** Ergebnisdaten
 
 ### 🔄 Interaktivität
 - **3D-Flip-Cards:** CSS perspective + rotateY
@@ -144,21 +151,9 @@ Alle Komponenten sind **Mobile-First** designt:
 ## 🧪 Testing
 
 ### Manuelles Testing
-```bash
-# Backend starten
-cd mainlogik,\ backend
-mvn tomcat7:run
-
-# Browser öffnen
-http://localhost:8080/wissenstest/native.jsp
-
-# Test durchlaufen:
-1. Registrieren
-2. Login
-3. Test starten
-4. Alle Fragen beantworten
-5. Ergebnis anschauen
-```
+1. Backend bauen: `mvn clean package`
+2. WAR nach Tomcat deployen
+3. Öffnen: `http://localhost:8080/wissentest/`
 
 ### Unit-Tests
 - Java Tests im `src/test/java` (JUnit 5)
@@ -179,41 +174,15 @@ http://localhost:8080/wissenstest/native.jsp
 - Logging zum Browser-Console für Debugging
 
 ### Wartbarkeit
-- 1:1 Datei-Mapping zu React-Komponenten (leicht zu verstehen)
-- Zentrale Config in `app.js` (API_BASE, State)
+- Zentrale Logik in `app.js` (API_BASE, State)
 - Wiederverwendbare Komponenten (FlipCard.jsp)
-
----
-
-## 🔗 Verbindung zur React-Version
-
-Diese JSP-Variante ist ein **exaktes architektonisches Pendant** zur React-Version:
-
-| Aspekt | React (frondend/) | JSP Native (webapp/) |
-|--------|------------------|---------------------|
-| **Router** | React Router | native.jsp `?page=` Parameter |
-| **State** | React useState | JS Variablen + sessionStorage |
-| **Komponenten** | JSX + JS | JSP + HTML + Vanilla JS |
-| **Styling** | CSS Modules | css_native/style.css |
-| **API** | Fetch + apiClient.js | Fetch + apiCall() in app.js |
-
-Beide nutzen die **gleiche Backend-API**, unterscheiden sich nur in Frontend-Technologie.
 
 ---
 
 ## 💡 Häufig Gestellte Fragen
 
-**F: Warum JSP statt React?**  
-A: JSP ist "klassischer" und konformer mit älteren Anforderungen. Diese Variante ist der "sichere Weg" für konservative Dozenten.
-
-**F: Ist Vanilla JS schneller als React?**  
-A: Ja, weniger Code = schneller. Aber für komplexe Apps kann React besser sein.
-
-**F: Kann ich Components zwischen React & JSP teilen?**  
-A: Nein, aber die **Struktur & Logik sind identisch**, also einfach zu portieren.
-
-**F: Wo starte ich die JSP-Version?**  
-A: `http://localhost:8080/wissenstest/native.jsp` (Backend muss laufen)
+**F: Wo starte ich die JSP‑Version?**  
+A: `http://localhost:8080/wissentest/` (Backend muss laufen)
 
 ---
 

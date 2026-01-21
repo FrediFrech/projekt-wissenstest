@@ -10,8 +10,10 @@
 │ - username: String          │
 │ - email: String             │
 │ - passwordHash: String      │
-│ - isAdmin: boolean          │
-│ - createdAt: LocalDateTime  │
+│ - passwordSalt: String      │
+│ - role: String              │
+│ - resetRequested: boolean   │
+│ - createdAt: OffsetDateTime │
 ├─────────────────────────────┤
 │ + getId(): int              │
 │ + getUsername(): String     │
@@ -22,10 +24,12 @@
 │        Question             │
 ├─────────────────────────────┤
 │ - id: int                   │
-│ - questionText: String      │
+│ - prompt: String            │
 │ - type: QuestionType        │
 │ - difficulty: int           │
-│ - createdAt: LocalDateTime  │
+│ - points: int               │
+│ - category: String          │
+│ - imageUrl: String          │
 ├─────────────────────────────┤
 │ + getId(): int              │
 │ + getType(): QuestionType   │
@@ -37,8 +41,10 @@
 ┌─────────────────────────────┐
 │     QuestionType (Enum)     │
 ├─────────────────────────────┤
-│ MULTIPLE_CHOICE             │
-│ CLOZE_TEXT                  │
+│ MC                           │
+│ CLOZE                        │
+│ FREE                         │
+│ IMAGE                        │
 └─────────────────────────────┘
 
 ┌─────────────────────────────┐
@@ -46,8 +52,9 @@
 ├─────────────────────────────┤
 │ - id: int                   │
 │ - questionId: int           │
-│ - optionText: String        │
+│ - answerText: String        │
 │ - isCorrect: boolean        │
+│ - partialValue: double      │
 ├─────────────────────────────┤
 │ + getId(): int              │
 │ + getOptionText(): String   │
@@ -58,10 +65,11 @@
 ├─────────────────────────────┤
 │ - id: int                   │
 │ - userId: int               │
-│ - score: int                │
-│ - maxScore: int             │
-│ - grade: int (1-6)          │
-│ - completedAt: LocalDateTime│
+│ - totalPoints: double       │
+│ - maxPoints: double         │
+│ - grade: String             │
+│ - durationSeconds: int      │
+│ - createdAt: OffsetDateTime │
 ├─────────────────────────────┤
 │ + getId(): int              │
 │ + getScore(): int           │
@@ -76,7 +84,7 @@
 │ - attemptId: int            │
 │ - questionId: int           │
 │ - givenAnswer: String       │
-│ - isCorrect: boolean        │
+│ - pointsAwarded: double     │
 ├─────────────────────────────┤
 │ + getGivenAnswer(): String  │
 │ + isCorrect(): boolean      │
@@ -87,8 +95,8 @@
 ├─────────────────────────────┤
 │ - id: int                   │
 │ - questionId: int           │
-│ - tokenText: String         │
-│ - position: int             │
+│ - expectedText: String      │
+│ - tokenIndex: int           │
 ├─────────────────────────────┤
 │ + getTokenText(): String    │
 │ + getPosition(): int        │
@@ -131,7 +139,7 @@
 └──────────────────────────────┘
 
         Similar Pattern for:
-   - QuestionDao / JdbcQuestionDao
+     - QuestionRepository / JdbcQuestionRepository (JdbcQuestionDao = Alias)
    - AttemptDao / JdbcAttemptDao
    - AnswerDao / JdbcAnswerDao
    - ClozeTokenDao / JdbcClozeTokenDao
@@ -151,12 +159,11 @@
           │
      JdbcAttemptDao
           │
-          ├─→ queries: attempts table
-          ├─→ uses: JdbcAttemptAnswerDao
+          ├─→ queries: attempts & attempt_answers
           │
      JdbcAnswerDao
           │
-          └─→ queries: answer_options table
+          └─→ queries: answers table
 ```
 
 ---

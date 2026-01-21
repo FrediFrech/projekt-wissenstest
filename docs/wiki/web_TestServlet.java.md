@@ -8,7 +8,10 @@ Test‑API für Start und Submit.
 ## Inhalt & Verantwortung
 - `POST /api/test/start` liefert Fragen inkl. MC‑Optionen oder CLOZE‑Tokens.
 - `POST /api/test/submit` bewertet + speichert Attempt.
-- Submit payload: `questionIds` + `answers` Map.
+- `GET /api/test/categories` liefert Kategorien.
+- `GET /api/test/history` liefert Ergebnis‑Historie.
+- `GET /api/test/questions/all` liefert Lern‑Karten.
+- Submit payload: `questionIds`, `answers`, `difficulty`, `durationSeconds`.
 
 ## Verbindungen
 - Nutzt `TestService`.

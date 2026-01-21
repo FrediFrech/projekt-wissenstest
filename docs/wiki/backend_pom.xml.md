@@ -3,7 +3,7 @@
 Einfache Erklärung: Diese Datei sagt Maven, wie das Backend gebaut wird. Hier stehen alle Bibliotheken (z. B. Servlet‑API, JDBC, Tests) und dadurch weiß das Projekt, was es beim Build braucht.
 
 ## Zweck
-Beschreibt das Maven‑Build für das Java‑Backend und erzeugt ein WAR‑Artefakt für Tomcat 8.5/11. Die Datei definiert Abhängigkeiten, Compiler‑Version und Build‑Plugins.
+Beschreibt das Maven‑Build für das Java‑Backend und erzeugt ein WAR‑Artefakt für Tomcat 9.x. Die Datei definiert Abhängigkeiten, Compiler‑Version und Build‑Plugins.
 
 ## Inhalt & Verantwortung
 - **Packaging:** `war` für Tomcat‑Deployment.

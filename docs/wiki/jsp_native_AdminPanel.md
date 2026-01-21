@@ -2,26 +2,27 @@
 # jsp_native/AdminPanel.jsp
 
 ## Zweck
-Das **Admin Panel** ist die zentrale Verwaltungsstelle für Administratoren. Es bietet Funktionen zum Verwalten von Benutzern (Rollen, PW-Resets) und Fragen (CRUD).
+Das **Admin Panel** ist die zentrale Verwaltungsstelle fï¿½r Administratoren. Es bietet Funktionen zum Verwalten von Benutzern (Rollen, PW-Resets) und Fragen (CRUD).
 
 ## Inhalt & Features
 1.  **Dashboard-Statistiken**:
-    *   Zeigt Anzahl User, Fragen und durchgeführter Tests in Echtzeit an.
+    *   Zeigt Anzahl User, Fragen und durchgefï¿½hrter Tests in Echtzeit an.
 2.  **Passwort-Reset-Anfragen**:
     *   Automatisch erscheinende Sektion, wenn User einen Reset angefordert haben.
-    *   Ermöglicht das direkte Neusetzen des Passworts durch den Admin.
+    *   Ermï¿½glicht das direkte Neusetzen des Passworts durch den Admin.
 3.  **Fragen-Management (Table View)**:
     *   Tabellarische Auflistung aller Fragen.
-    *   **Erstellen**: Modal-Dialog für MC, Cloze, Free und Image Fragen.
+    *   **Erstellen**: Modal-Dialog fï¿½r MC, Cloze, Free und Image Fragen.
+        *Hinweis:* DBâ€‘Schema erlaubt aktuell MC/CLOZE. FREE/IMAGE sind UIâ€‘Optionen und brauchen Schemaâ€‘Erweiterung.
     *   **Bearbeiten**: Laden existierender Fragen in das Modal.
-    *   **Löschen**: Entfernen von Fragen (Datenbank-Constraints werden beachtet).
+    *   **Lï¿½schen**: Entfernen von Fragen (Datenbank-Constraints werden beachtet).
 4.  **Benutzerverwaltung**:
     *   Liste alle Benutzer mit Rollen.
-    *   User anlegen, bearbeiten (Passwort/Rolle) und löschen.
+    *   User anlegen, bearbeiten (Passwort/Rolle) und lï¿½schen.
 
 ## Technische Details
-*   **Technologie**: JSP + Vanilla JS (`app.js` für API Calls, Inline-Script für View-Logik).
-*   **Styling**: CSS-Grid für Dashboard-Cards, Modals für Formulare.
+*   **Technologie**: JSP + Vanilla JS (`app.js` fï¿½r API Calls, Inline-Script fï¿½r View-Logik).
+*   **Styling**: CSS-Grid fï¿½r Dashboard-Cards, Modals fï¿½r Formulare.
 *   **API-Endpunkte**:
     *   `GET /api/admin/stats`
     *   `GET/POST/PUT/DELETE /api/admin/questions`

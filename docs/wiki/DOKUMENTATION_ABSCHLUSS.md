@@ -4,7 +4,7 @@
 Das Projekt "Wissenstest" stellt eine voll funktionsfähige Lernplattform dar (Stand Januar 2026).
 Wesentliche Meilensteine waren:
 1.  **Backend-Refactoring**: Umstellung auf reine Servlet/JDBC Struktur für maximale Performance und Stabilität.
-2.  **Frontend-Optimierung**: Nutzung von "JSP Native" (JSP + Vanilla JS) statt React, um Build-Komplexität zu reduzieren.
+2.  **Frontend-Optimierung**: Nutzung von "JSP Native" (JSP + Vanilla JS).
 3.  **Feature-Expansion**:
     *   Implementierung eines adaptiven Test-Algorithmus.
     *   Vollständiges Admin-Panel mit Statistik und User-Management.
@@ -40,7 +40,7 @@ Wesentliche Meilensteine waren:
 - **Fix**: 
   - Schema-Migration: `psql -U student -d wissentest -f db/schema.sql`
   - Database Reseed: `psql -U student -d wissentest -f db/seeds.sql`
-  - 4 Users angelegt: student, lehrer, test_user, admin
+  - 4 Users angelegt: student, lehrer, teacher2, student2
 
 ### Phase 2: Umfassende Funktionstests
 
@@ -48,7 +48,7 @@ Wesentliche Meilensteine waren:
 - **Status**: ✅ Erfolgreich
 - **Testschritte**:
   - Login mit `student` / `student` → Weiterleitung zu TestList
-  - Login mit `lehrer` / `lehrer` → Admin-Status erkannt, Admin Panel verfügbar
+  - Login mit `lehrer` / `student` → Admin-Status erkannt, Admin Panel verfügbar
 - **Ergebnis**: Authentifizierung funktioniert korrekt
 
 #### 5. Test-Durchführung (Student)
@@ -133,16 +133,11 @@ Wesentliche Meilensteine waren:
   - ✅ Passwort-Reset Anfragen Tabelle verschwunden
   - ✅ User "student" hat kein 🔑-Symbol mehr
 
-### Phase 4: Cleanup
+### Phase 4: Cleanup (Optional)
 
-#### 13. Redundante Dateien löschen
-- **Status**: ✅ Abgeschlossen
-- **Gelöschte Ordner**:
-  - `alte_react_version/` (veraltetes React Frontend)
-  - `frondend/` (Typo-Ordner, obsolet)
-- **Gelöschte Dateien**:
-  - `startup/start_headless.ps1` (temporäres Test-Skript)
-- **Erstellt**: `.gitignore` für sauberes Repository
+#### 13. Aufräumen
+- **Status**: ℹ️ Optional
+- Prüfen, ob alte/temporäre Dateien entfernt werden sollen.
 
 ## Finale Testergebnisse
 

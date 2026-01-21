@@ -26,7 +26,7 @@ Diese Dokumentation bezieht sich auf die **aktuelle JSP-basierte Version** des P
 - **[wiki/testing_guide.md](wiki/testing_guide.md)** – JUnit Test-Anleitung
 
 ### Integration & Optionen
-- **[JSP_INTEGRATION_GUIDE.md](JSP_INTEGRATION_GUIDE.md)** – Hybrid-Lösungen & Integration
+- **[JSP_INTEGRATION_GUIDE.md](JSP_INTEGRATION_GUIDE.md)** – Legacy‑Hinweis (React‑Integration nicht aktiv)
 
 ## 🗂️ Zusätzliche Ressourcen
 
@@ -37,8 +37,8 @@ Siehe [wiki/](wiki/) für detaillierte Dokumentationen aller:
 - ✅ Datenbank-Schema und Queries
 - ✅ Test-Guides und Utilities
 
-### Archivierte React-Version
-Die **alte React-basierte Version** ist archiviert unter [../alte_react_version/](../alte_react_version/)
+### React‑Historie
+Die React‑Variante ist **nicht mehr Teil dieses Repos**. Das aktuelle Projekt nutzt ausschließlich JSP + Vanilla JS.
 
 ---
 

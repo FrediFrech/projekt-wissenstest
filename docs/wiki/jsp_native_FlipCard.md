@@ -40,7 +40,6 @@ Dies ist ein wiederverwendbares Fragment für die Flip-Karteikarten-Komponente. 
 ## Verbindungen
 - **Genutzt von:** `LearnMode.jsp` (erzeugt Instanzen via JavaScript)
 - **Styling:** `css_native/style.css` + interne `<style>`
-- **Frontend-Pendant:** `frondend/src/components/FlipCard.jsx`
 
 ## Verwendungsbeispiel
 ### Server-Side (JSP)

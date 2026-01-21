@@ -6,7 +6,7 @@ Einfache Erklärung: Dieses Objekt speichert das Ergebnis eines Tests (Punkte, S
 Repräsentiert einen Testversuch eines Users.
 
 ## Inhalt & Verantwortung
-- Hält Punkte, max. Punkte, Schwierigkeit und Timestamp.
+- Hält Punkte, max. Punkte, Schwierigkeit, Note, Dauer und Timestamp.
 
 ## Verbindungen
 - Persistiert via `AttemptDao`.

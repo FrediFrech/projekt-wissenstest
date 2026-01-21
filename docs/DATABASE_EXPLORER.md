@@ -21,8 +21,8 @@
          │
          ▼ uses
     PostgreSQL 15
-    localhost:5432
-    Database: wissentest_db
+    localhost:5433
+    Database: wissentest
     User: student
     Password: student
 ```
@@ -31,101 +31,108 @@
 
 ## 2. Tabellen-Schema (SQL-Struktur)
 
-### Vollständiges ER-Diagramm
+Hinweis: Die folgenden Diagramme und DDL-Snippets sind am `db/schema.sql` aus dem Repository orientiert und entsprechen der in der Projekt-Startlogik (startup/start_project.ps1) verwendeten Schema-Import-Routine.
+
+### Vollständiges ER-Diagramm (konform)
 
 ```
-┌────────────────────┐
-│      USERS         │
-├────────────────────┤
-│ id (PK) INT        │───┐
-│ username UNIQUE    │   │
-│ email UNIQUE       │   │
-│ password_hash      │   │
-│ is_admin BOOL      │   │
-│ created_at TIMESTAMP   │
-└────────────────────┘   │
-                         │ (1:n)
-                         │
-                         │
-                    ┌────────────────────┐
-                    │     ATTEMPTS       │
-                    ├────────────────────┤
-                    │ id (PK) INT        │───┐
-                    │ user_id (FK) ──────┘   │
-                    │ score INT              │
-                    │ max_score INT          │
-                    │ grade INT (1-6)        │
-                    │ completed_at TS        │
-                    └────────────────────┘   │
-                             │               │ (1:n)
-                             │               │
-                             │          ┌────────────────────────┐
-                             └─────────→│  ATTEMPT_ANSWERS       │
-                                        ├────────────────────────┤
-                                        │ id (PK) INT            │
-                                        │ attempt_id (FK) ───────┘
-                                        │ question_id (FK) ──┐
-                                        │ given_answer       │
-                                        │ is_correct BOOL    │
-                                        └────────────────────┘
-                                                 ↑
-                                                 │ (n:1)
-                                                 │
-                                        ┌────────────────────┐
-                                        │    QUESTIONS       │
-                                        ├────────────────────┤
-                                        │ id (PK) INT        │───┐
-                                        │ question_text      │   │
-                                        │ question_type ENUM │   │ (1:n)
-                                        │  (MC/CLOZE)        │   │
-                                        │ difficulty INT     │   │
-                                        │ created_at TS      │   │
-                                        └────────────────────┘   │
-                                                 ↑                │
-                                        (1:n)    │               │
-                                        ┌────────┴──────┐       │
-                                        │               │       │
-                                  ┌─────────────────┐  │  ┌──────────────────┐
-                                  │ ANSWER_OPTIONS  │  │  │  CLOZE_TOKENS    │
-                                  ├─────────────────┤  │  ├──────────────────┤
-                                  │ id (PK) INT     │  │  │ id (PK) INT      │
-                                  │ question_id ────┘  │  │ question_id ─────┘
-                                  │ option_text        │  │ token_text       │
-                                  │ is_correct BOOL    │  │ position INT      │
-                                  └─────────────────┘  │  └──────────────────┘
-                                                       │
-                                        (1:n)         │
-                                        ─────────────┘
+┌────────────────────────────────────────┐
+│                USERS                   │
+├────────────────────────────────────────┤
+│ id (PK) SERIAL                         │
+│ username VARCHAR(100) UNIQUE NOT NULL  │
+│ email VARCHAR(255) UNIQUE              │
+│ password_hash VARCHAR(256) NOT NULL    │
+│ password_salt VARCHAR(128) NOT NULL    │
+│ role VARCHAR(32) DEFAULT 'student'     │
+│ reset_requested BOOLEAN DEFAULT FALSE  │
+│ created_at TIMESTAMPTZ DEFAULT now()   │
+└────────────────────────────────────────┘
+                │
+                │ (1:n)
+                ▼
+┌────────────────────────────────────────┐
+│                ATTEMPTS                │
+├────────────────────────────────────────┤
+│ id (PK) SERIAL                         │
+│ user_id INTEGER REFERENCES users(id)  │
+│ total_points NUMERIC(8,4) DEFAULT 0.0 │
+│ max_points NUMERIC(8,4) DEFAULT 0.0   │
+│ difficulty SMALLINT CHECK (1..3)      │
+│ grade VARCHAR(10)                     │
+│ duration_seconds INTEGER DEFAULT 0    │
+│ created_at TIMESTAMPTZ DEFAULT now()  │
+└────────────────────────────────────────┘
+                │
+                │ (1:n)
+                ▼
+┌────────────────────────────────────────┐
+│             ATTEMPT_ANSWERS            │
+├────────────────────────────────────────┤
+│ id (PK) SERIAL                         │
+│ attempt_id INTEGER REFERENCES attempts│
+│ question_id INTEGER REFERENCES questions
+│ given_answer TEXT                      │
+│ points_awarded NUMERIC(8,4) DEFAULT 0.0│
+└────────────────────────────────────────┘
+                ▲
+                │ (n:1)
+                │
+┌────────────────────────────────────────┐
+│               QUESTIONS                │
+├────────────────────────────────────────┤
+│ id (PK) SERIAL                         │
+│ type VARCHAR(16) CHECK (IN ('MC','CLOZE'))
+│ prompt TEXT NOT NULL                   │
+│ difficulty SMALLINT CHECK (1..3)       │
+│ points INTEGER DEFAULT 1               │
+│ category VARCHAR(64) DEFAULT 'Allgemein'
+│ image_url VARCHAR(255)                 │
+│ meta JSONB DEFAULT '{}'::jsonb         │
+│ created_by INTEGER REFERENCES users(id)
+│ created_at TIMESTAMPTZ DEFAULT now()   │
+└────────────────────────────────────────┘
+         │             │
+         │             │ (1:n)
+         │ (1:n)       ▼
+┌────────────────────┐    ┌────────────────────┐
+│      ANSWERS        │    │   CLOZE_ANSWERS    │
+├────────────────────┤    ├────────────────────┤
+│ id (PK) SERIAL      │    │ id (PK) SERIAL     │
+│ question_id INTEGER │    │ question_id INTEGER│
+│ answer_text TEXT    │    │ token_index SMALLINT
+│ is_correct BOOLEAN  │    │ expected_text TEXT │
+│ partial_value NUMERIC(5,4) │ partial_value NUMERIC(5,4) DEFAULT 1.0
+└────────────────────┘    └────────────────────┘
 ```
 
 ---
 
-## 3. Tabellen Details
+## 3. Tabellen Details (konform zum `db/schema.sql`)
 
 ### USERS
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  is_admin BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  username VARCHAR(100) NOT NULL UNIQUE,
+  email VARCHAR(255) UNIQUE,
+  password_hash VARCHAR(256) NOT NULL,
+  password_salt VARCHAR(128) NOT NULL,
+  role VARCHAR(32) NOT NULL DEFAULT 'student',
+  reset_requested BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
-
-Indizes:
-- PK: id
-- UNIQUE: username, email
-- Optional: created_at (für Sortierung)
 ```
 
-**Beispiel-Daten:**
+Wichtig: Das Backend speichert neben `password_hash` auch `password_salt`. Das Passwort-Handling verwendet iterierte SHA-256-Hashes (siehe `util/PasswordUtils.java`) — die Dokumentation und Tests gehen davon aus, dass Salt separat vorliegt.
+
+**Beispiel-Daten (Beispielwerte, Salt/Hash gekürzt):**
 ```
-| id | username | email              | is_admin | created_at      |
-|----|----------|--------------------|---------|--------------------|
-| 1  | student1 | student1@example.. | false   | 2024-01-10 10:30 |
-| 2  | admin1   | admin@example.com  | true    | 2024-01-01 09:00 |
-| 3  | student2 | student2@example.. | false   | 2024-01-11 14:20 |
+| id | username | email               | role    | created_at           |
+|----|----------|---------------------|---------|----------------------|
+| 1  | student  | student@example.org | student | 2025-11-10 10:30+00  |
+| 2  | teacher  | lehrer@example.org  | teacher | 2025-11-01 09:00+00  |
+| 3  | admin    | admin@example.org   | admin   | 2025-11-11 14:20+00  |
 ```
 
 ---
@@ -134,73 +141,69 @@ Indizes:
 ```sql
 CREATE TABLE questions (
   id SERIAL PRIMARY KEY,
-  question_text TEXT NOT NULL,
-  question_type ENUM ('MULTIPLE_CHOICE', 'CLOZE_TEXT'),
-  difficulty INT CHECK (difficulty BETWEEN 1 AND 5),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  type VARCHAR(16) NOT NULL CHECK (type IN ('MC','CLOZE')),
+  prompt TEXT NOT NULL,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  points INTEGER NOT NULL DEFAULT 1,
+  category VARCHAR(64) DEFAULT 'Allgemein',
+  image_url VARCHAR(255),
+  meta JSONB DEFAULT '{}'::jsonb,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
-
-Indizes:
-- PK: id
-- Optional: question_type, difficulty (für Abfragen)
 ```
+
+Hinweis: Das Schema limitiert Typen derzeit auf `MC` und `CLOZE`. Falls das Java-Model zusätzliche Typen enthält, ist das bewusst vom Schema getrennt und erfordert eine Änderung von `db/schema.sql`, wenn neue Typen persistiert werden sollen.
 
 **Beispiel-Daten:**
 ```
-| id | question_text                | type           | difficulty |
-|----|-------------------------------|----------------|------------|
-| 1  | Was ist die Hauptstadt..?     | MULTIPLE_CHOICE| 1          |
-| 2  | Der größte Planet ist ____    | CLOZE_TEXT     | 2          |
-| 3  | Die Formel für Geschwindigkeit| CLOZE_TEXT     | 3          |
+| id | prompt                          | type | difficulty | points |
+|----|----------------------------------|------|------------|--------|
+| 1  | Was ist die Hauptstadt von D?    | MC   | 1          | 1      |
+| 2  | Der größte Planet ist ____       | CLOZE| 2          | 1      |
+| 3  | Rechne: Arbeit = Kraft * Weg     | MC   | 3          | 2      |
 ```
 
 ---
 
-### ANSWER_OPTIONS
+### ANSWERS
 ```sql
-CREATE TABLE answer_options (
+CREATE TABLE answers (
   id SERIAL PRIMARY KEY,
-  question_id INT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
-  option_text VARCHAR(255) NOT NULL,
-  is_correct BOOLEAN DEFAULT FALSE
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT false,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 0.0 CHECK (partial_value >= 0 AND partial_value <= 1)
 );
-
-Indizes:
-- PK: id
-- FK: question_id
-- Optional: question_id (für Index)
 ```
 
 **Beispiel-Daten (für Question 1):**
 ```
-| id | question_id | option_text | is_correct |
-|----|-------------|-------------|-----------|
-| 1  | 1           | Berlin      | true      |
-| 2  | 1           | München     | false     |
-| 3  | 1           | Hamburg     | false     |
+| id | question_id | answer_text | is_correct | partial_value |
+|----|-------------|-------------|------------|---------------|
+| 1  | 1           | Berlin      | true       | 1.0000        |
+| 2  | 1           | München     | false      | 0.0000        |
 ```
 
 ---
 
-### CLOZE_TOKENS
+### CLOZE_ANSWERS
 ```sql
-CREATE TABLE cloze_tokens (
+CREATE TABLE cloze_answers (
   id SERIAL PRIMARY KEY,
-  question_id INT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
-  token_text VARCHAR(255) NOT NULL,
-  position INT NOT NULL
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  token_index SMALLINT NOT NULL,
+  expected_text TEXT NOT NULL,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 1.0 CHECK (partial_value >= 0 AND partial_value <= 1),
+  UNIQUE(question_id, token_index)
 );
-
-Indizes:
-- PK: id
-- FK: question_id
 ```
 
-**Beispiel-Daten (für Question 2):**
+**Beispiel-Daten (für Frage 2):**
 ```
-| id | question_id | token_text | position |
-|----|-------------|-----------|----------|
-| 1  | 2           | Jupiter   | 0        |
+| id | question_id | token_index | expected_text | partial_value |
+|----|-------------|-------------|---------------|---------------|
+| 1  | 2           | 0           | Jupiter       | 1.0000        |
 ```
 
 ---
@@ -209,26 +212,21 @@ Indizes:
 ```sql
 CREATE TABLE attempts (
   id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  score INT NOT NULL,
-  max_score INT NOT NULL,
-  grade INT CHECK (grade BETWEEN 1 AND 6),
-  completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  max_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  grade VARCHAR(10),
+  duration_seconds INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
-
-Indizes:
-- PK: id
-- FK: user_id
-- Optional: user_id, completed_at (für Abfragen)
 ```
 
 **Beispiel-Daten:**
 ```
-| id | user_id | score | max_score | grade | completed_at        |
-|----|---------|-------|-----------|-------|---------------------|
-| 1  | 1       | 85    | 100       | 2     | 2024-01-15 11:20 |
-| 2  | 1       | 72    | 100       | 3     | 2024-01-16 14:10 |
-| 3  | 3       | 95    | 100       | 1     | 2024-01-16 15:30 |
+| id | user_id | total_points | max_points | difficulty | grade | created_at           |
+|----|---------|--------------|------------|------------|-------|----------------------|
+| 1  | 1       | 85.0000      | 100.0000   | 2          | "2"  | 2025-11-15 11:20+00  |
 ```
 
 ---
@@ -237,70 +235,45 @@ Indizes:
 ```sql
 CREATE TABLE attempt_answers (
   id SERIAL PRIMARY KEY,
-  attempt_id INT NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
-  question_id INT NOT NULL REFERENCES questions(id),
-  given_answer VARCHAR(255),
-  is_correct BOOLEAN
+  attempt_id INTEGER NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
+  question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
+  given_answer TEXT,
+  points_awarded NUMERIC(8,4) NOT NULL DEFAULT 0.0
 );
-
-Indizes:
-- PK: id
-- FK: attempt_id, question_id
 ```
 
 **Beispiel-Daten (Versuch 1, Frage 1):**
 ```
-| id | attempt_id | question_id | given_answer | is_correct |
-|----|------------|-------------|--------------|-----------|
-| 1  | 1          | 1           | Berlin       | true      |
-| 2  | 1          | 2           | Jupiter      | true      |
-| 3  | 1          | 3           | v = d/t      | true      |
+| id | attempt_id | question_id | given_answer | points_awarded |
+|----|------------|-------------|--------------|----------------|
+| 1  | 1          | 1           | Berlin       | 1.0000         |
+| 2  | 1          | 2           | Jupiter      | 1.0000         |
 ```
 
 ---
 
 ## 4. Datenbankzugriff - Query Beispiele
 
+(Die Beispiele orientieren sich an den DAO-Implementierungen in `mainlogik, backend/src/` und sind funktional gleich zu den SQL-Strings im Code.)
+
 ### In JdbcUserDao
 ```java
 // SELECT
 String sql = "SELECT * FROM users WHERE username = ?";
-ResultSet rs = stmt.executeQuery();
-
-// INSERT
-String sql = "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)";
-stmt.executeUpdate();
-
-// UPDATE
-String sql = "UPDATE users SET is_admin = ? WHERE id = ?";
-stmt.executeUpdate();
-
-// DELETE
-String sql = "DELETE FROM users WHERE id = ?";
-stmt.executeUpdate();
+// INSERT (Salt + Hash stored separately)
+String sql = "INSERT INTO users (username, email, password_hash, password_salt, role) VALUES (?, ?, ?, ?, ?)";
 ```
 
 ### In JdbcQuestionDao
 ```java
 // Zufällige Fragen laden
 String sql = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 10";
-ResultSet rs = stmt.executeQuery();
-
-// Mit Schwierigkeit filtern
-String sql = "SELECT * FROM questions WHERE difficulty >= ? ORDER BY RANDOM() LIMIT ?";
-stmt.setInt(1, minDifficulty);
-stmt.setInt(2, count);
 ```
 
 ### In JdbcAttemptDao
 ```java
 // Versuch speichern + Antworten
-String sql = "INSERT INTO attempts (user_id, score, max_score, grade) VALUES (?, ?, ?, ?)";
-stmt.executeUpdate();
-
-// Verlauf abrufen
-String sql = "SELECT * FROM attempts WHERE user_id = ? ORDER BY completed_at DESC";
-ResultSet rs = stmt.executeQuery();
+String sql = "INSERT INTO attempts (user_id, total_points, max_points, difficulty, grade) VALUES (?, ?, ?, ?, ?)";
 ```
 
 ---
@@ -320,7 +293,7 @@ BenutzerKlick → TestServlet.doPost()
      │
      ├─ Calculate Score & Grade
      │
-     ├─ UPDATE attempts SET score=?, grade=?
+     ├─ UPDATE attempts SET total_points=?, grade=?
      │
      ├─ IF all successful:
      │  └─ Connection.commit()  // COMMIT
@@ -334,8 +307,8 @@ BenutzerKlick → TestServlet.doPost()
 ## 6. Datenbank-Explorations-Befehle (psql)
 
 ```bash
-# Verbindung
-psql -U student -d wissentest_db -h localhost
+# Verbindung (Port beachten: 5433 wird lokal von startup/start_project.ps1 verwendet)
+psql -U student -d wissentest -h localhost -p 5433
 
 # Tabellen anzeigen
 \dt
@@ -344,8 +317,8 @@ psql -U student -d wissentest_db -h localhost
 \d users
 \d questions
 \d attempts
-\d answer_options
-\d cloze_tokens
+\d answers
+\d cloze_answers
 \d attempt_answers
 
 # Beispiel-Abfragen
@@ -365,12 +338,12 @@ TRUNCATE users RESTART IDENTITY;
 
 ### Backup erstellen
 ```bash
-pg_dump -U student -d wissentest_db > backup.sql
+pg_dump -U student -d wissentest -p 5433 > backup.sql
 ```
 
 ### Aus Backup wiederherstellen
 ```bash
-psql -U student -d wissentest_db < backup.sql
+psql -U student -d wissentest -p 5433 < backup.sql
 ```
 
 ---
@@ -379,32 +352,32 @@ psql -U student -d wissentest_db < backup.sql
 
 | Problem | Lösung |
 |---------|--------|
-| Langsame SELECT bei vielen Attempts | Index auf `attempts(user_id, completed_at)` |
+| Langsame SELECT bei vielen Attempts | Index auf `attempts(user_id, created_at)` oder `(user_id, created_at)` |
 | Langsame Fragen-Auswahl | Index auf `questions(difficulty)` |
-| Doppelte User-Namen | UNIQUE Constraint (bereits vorhanden) |
+| Doppelte User-Namen | UNIQUE Constraint (bereits vorhanden auf `username`) |
 | Verwaiste Attempt-Daten | CASCADE DELETE auf FKs (bereits vorhanden) |
 
 ---
 
 ## 9. Seed-Daten (seeds.sql)
 
-Die Datei `db/seeds.sql` enthält initiale Test-Daten:
+Die Datei `db/seeds.sql` enthält initiale Test-Daten (Beispiel):
 
 ```sql
-INSERT INTO users (username, email, password_hash, is_admin) VALUES
-  ('student1', 'student1@example.com', '...hash...', false),
-  ('student2', 'student2@example.com', '...hash...', false),
-  ('admin', 'admin@example.com', '...hash...', true);
+INSERT INTO users (username, email, password_hash, password_salt, role) VALUES
+  ('student1', 'student1@example.com', '...hash...', '...salt...', 'student'),
+  ('student2', 'student2@example.com', '...hash...', '...salt...', 'student'),
+  ('admin', 'admin@example.com', '...hash...', '...salt...', 'admin');
 
-INSERT INTO questions (question_text, question_type, difficulty) VALUES
-  ('Was ist die Hauptstadt von Deutschland?', 'MULTIPLE_CHOICE', 1),
-  ('Der größte Planet ist ____', 'CLOZE_TEXT', 2),
-  ('Die Formel für Arbeit ist ____', 'CLOZE_TEXT', 4);
+INSERT INTO questions (prompt, type, difficulty) VALUES
+  ('Was ist die Hauptstadt von Deutschland?', 'MC', 1),
+  ('Der größte Planet ist ____', 'CLOZE', 2),
+  ('Die Formel für Arbeit ist ____', 'MC', 3);
 
 -- ... weitere Daten
 ```
 
 **Daten laden:**
 ```bash
-psql -U student -d wissentest_db < db/seeds.sql
+psql -U student -d wissentest -p 5433 < db/seeds.sql
 ```

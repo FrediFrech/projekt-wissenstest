@@ -59,7 +59,6 @@ handleRegister(event) {
 - **Styling:** `css_native/style.css`
 - **Logik:** `js_native/app.js` (Funktion: `handleRegister()`)
 - **Backend:** POST zu `/api/auth/register`
-- **Frontend-Pendant:** `frondend/src/components/Register.jsx`
 
 ## Wichtige Entscheidungen
 - ✅ Client-Side Validierung (Passwort-Bestätigung)
@@ -69,6 +68,6 @@ handleRegister(event) {
 
 ## Security-Notes
 - ✅ Passwort wird nie im Frontend geloggt
-- ✅ Backend hasht & saltet Passwort mit PBKDF2/SHA-256
+- ✅ Backend hasht & saltet Passwort mit iteriertem SHA‑256
 - ✅ Email-Duplikate werden geprüft
 - ✅ Username-Format wird validiert

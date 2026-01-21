@@ -2,19 +2,19 @@
 # web/AdminServlet.java
 
 ## Beschreibung
-Controller für alle administrativen Aufgaben. Geschützt durch Rollen-Check ("admin").
+Controller fï¿½r alle administrativen Aufgaben. Geschï¿½tzt durch Rollen-Check ("admin").
 
 ## Endpunkte
-*   `GET /questions`: Liefert alle Fragen inkl. Antworten/Tokens als JSON (Nested Objects).
-*   `POST /questions`: Erstellt neue Frage (unterscheidet MC/Cloze anhand `type`).
-*   `PUT /questions`: Aktualisiert existierende Frage und deren Antworten.
-*   `DELETE /questions?id=X`: Löscht Frage X.
-*   `GET /users`: Liste aller User.
-*   `GET /users/requests`: Liste aller User mit `reset_requested = true`.
-*   `POST /users`: Legt neuen User an.
-*   `PUT /users`: 
+*   `GET /api/admin/questions`: Liefert alle Fragen inkl. Antworten/Tokens als JSON.
+*   `POST /api/admin/questions`: Erstellt neue Frage (MC/Cloze anhand `type`).
+*   `PUT /api/admin/questions`: Aktualisiert existierende Frage und deren Antworten.
+*   `DELETE /api/admin/questions?id=X`: Lï¿½scht Frage X.
+*   `GET /api/admin/users`: Liste aller User.
+*   `GET /api/admin/users/requests`: Liste aller User mit `reset_requested = true`.
+*   `POST /api/admin/users`: Legt neuen User an.
+*   `PUT /api/admin/users`: 
     *   Update von User-Details (Email, Rolle).
     *   Setzen eines neuen Passworts (Salt & Hash neu generiert).
     *   `resetComplete`: Setzt `reset_requested` auf `false`.
-*   `GET /stats`: Aggregierte Systemstatistiken.
+*   `GET /api/admin/stats`: Aggregierte Systemstatistiken.
 

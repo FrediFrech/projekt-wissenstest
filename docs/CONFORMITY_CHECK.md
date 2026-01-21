@@ -11,10 +11,10 @@ Diese Analyse basiert auf dem `SP Systementwurf Projektarbeit 24WI.pdf` und glei
 | **Backend Sprache** | ✅ **KONFORM** | Java 17 als Basis wie gefordert. |
 | **Backend Architektur** | ✅ **KONFORM** | Java Servlets (javax.servlet-api), keine Spring-Boot Magie. |
 | **Datenbank** | ✅ **KONFORM** | Relationale DB (PostgreSQL), JDBC-Zugriff via HikariCP, PreparedStatement Nutzung. |
-| **Frontend** | ⚠️ **GRAUZONE** | React wird genutzt. Anforderung war "Webtechnologie". Meist wird pure HTML/JSP erwartet, aber React als SPA gegen REST-Servlet-API ist technisch oft akzeptiert, wenn nicht explizit verboten. **Klärung empfohlen:** Prüfen ob "Server-Side Rendering (JSP)" explizit Pflicht war. Aktuell: Client-Side Rendering. |
-| **Testing** | ✅ **KONFORM** | JUnit 5 Tests (`src/test/java`) vorhanden. |
-| **Build System** | ✅ **KONFORM** | Maven (`pom.xml`) für Backend, npm für Frontend (Build → WAR Integration möglich). |
-| **Sicherheit** | ✅ **KONFORM** | Passwörter gehasht/salted (PBKDF2/SHA-256), PreparedStatements gegen SQL-Injection. |
+| **Frontend** | ✅ **KONFORM** | JSP‑Seiten vorhanden (`index.jsp`, `native.jsp`, `jsp_native/*`). Server‑Side Rendering erfüllt die Vorgabe. |
+| **Testing** | ✅ **KONFORM** | JUnit 5 Tests vorhanden (`src/test/java`). |
+| **Build System** | ✅ **KONFORM** | Maven (`pom.xml`) für Backend/WAR. Frontend ist Teil des Webapp‑Ordners (kein separates React‑Build). |
+| **Sicherheit** | ✅ **KONFORM** | Passwörter gehasht/salted (iteriertes SHA‑256), PreparedStatements gegen SQL‑Injection. |
 | **Schichtenarchitektur** | ✅ **KONFORM** | Klare Trennung: `dao` (DB), `service` (Logik), `web` (HTTP/Servlet), `model` (Daten). |
 
 ---
@@ -49,17 +49,9 @@ Diese Analyse basiert auf dem `SP Systementwurf Projektarbeit 24WI.pdf` und glei
 
 ### ⚠️ Grauzonen (Prüfung empfohlen)
 
-1.  **Frontend-Technologie (React vs. JSP)**
-    *   **Situation:** Der Systementwurf spricht oft von "Dynamischen Webseiten mit Java". Das impliziert klassischerweise **JSP (JavaServer Pages)** oder **Thymeleaf**.
-    *   **Aktueller Stand:** Wir nutzen **React** (Single Page Application) und kommunizieren nur per JSON mit dem Backend.
-    *   **Risiko:** Wenn die Dozenten explizit serverseitiges HTML-Rendering (JSP) sehen wollen, ist React "Thema verfehlt".
-    *   **Argumentation für React:** Es ist zeitgemäße "Webtechnologie". Die Trennung Backend (API) / Frontend (Client) ist sauberer. Falls REST-API nicht verboten ist, ist dies eine **hochwertigere** Lösung als JSP.
-    *   **Empfehlung:** Falls JSP Pflicht: React-App in `index.jsp` einbetten oder als statische Resource im WAR ausliefern (was wir tun: `npm run build` → `src/main/webapp`).
-
-2.  **Deployment (WAR-Struktur)**
-    *   **Situation:** React Build-Artefakte müssen korrekt im WAR landen.
-    *   **Lösung:** Manuelles Kopieren von `frondend/dist` nach `backend/src/main/webapp` vor dem Maven-Build ist nötig.
-    *   **Status:** Technisch lösbar, muss aber im Build-Prozess dokumentiert sein (siehe README).
+1.  **Deployment (WAR-Struktur)**
+    *   **Situation:** JSPs + statische Assets liegen direkt in `src/main/webapp`.
+    *   **Status:** Maven baut ein WAR, Tomcat deployt ohne zusätzliche Build‑Schritte.
 
 ### ❌ Nicht Konform (Handlungsbedarf)
 
@@ -86,9 +78,7 @@ Diese Analyse basiert auf dem `SP Systementwurf Projektarbeit 24WI.pdf` und glei
 
 Das Projekt ist **technisch sehr solide** und hält sich strikt an die **Java-Backend-Vorgaben** (Servlets, JDBC, Schichtenarchitektur).
 
-Der einzige Diskussionspunkt ist das **Frontend (React)**.
-*   **Sicherer Weg:** React wird als "moderne View-Schicht" verkauft. Das Backend liefert REST-Daten.
-*   **Fallback:** Sollte JSP zwingend gefordert sein, müsste man die React-Komponenten auflösen und JSPs schreiben, die HTML serverseitig rendern. Das wäre ein großer Rückschritt in Usability und Code-Qualität, aber prüfungsrelevant.
+Es gibt **keinen Frontend‑Diskussionspunkt**, da JSP aktiv genutzt wird.
 
 **Empfehlung:**
-Da im PDF oft von "Systementwurf" und "Webanwendung" die Rede ist, ist eine SPA (Single Page Application) mit REST-Backend heutzutage die korrekte Interpretation einer modernen Webarchitektur. Wir bleiben bei React, stellen aber sicher, dass die **API-Dokumentation** (Swagger/OpenAPI oder Wiki) sauber ist, da dies die Schnittstelle definiert.
+Für die Abgabe reicht es, die JSP‑Startseite und die Servlet‑Routen zu zeigen. Die optionale REST/JSON‑Nutzung ist erlaubt.

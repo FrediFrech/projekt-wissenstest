@@ -36,14 +36,14 @@ finishTest()        // Test abschließen & zu Result.jsp navigieren
 - **Router:** In `native.jsp` über `?page=testRunner` eingebunden
 - **Styling:** `css_native/style.css`
 - **Logik:** `js_native/app.js` (siehe `initTest()` und Quiz-Funktionen)
-- **Backend:** AJAX zu `/api/test/start` für Fragen
-- **Frontend-Pendant:** `frondend/src/components/TestRunner.jsx`
+- **Backend:** AJAX zu `/api/test/start` (POST, inkl. difficulty/limit/category)
 
 ## Wichtige Entscheidungen
-- ✅ Server-Side HTML + Client-Side JS (kein React Rendering)
+- ✅ Server-Side HTML + Client-Side JS (kein Framework‑Rendering)
 - ✅ Fragen via AJAX geladene (effizient)
 - ✅ CSS3 Animationen für smooth UX
-- ✅ sessionStorage für Ergebnis-Übergabe zu Result.jsp
+- ✅ localStorage für Test‑Konfiguration
+- ✅ sessionStorage für Ergebnis‑Übergabe zu Result.jsp
 
 ## Workflow
 1. User klickt "Test Starten" auf TestList.jsp

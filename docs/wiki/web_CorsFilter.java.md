@@ -1,9 +1,9 @@
 # web/CorsFilter.java
 
-Einfache Erklärung: Dieser Filter erlaubt dem Frontend, das Backend aufzurufen, obwohl beide auf verschiedenen Ports laufen.
+Einfache Erklärung: Dieser Filter erlaubt dem Frontend, das Backend aufzurufen, auch wenn die Herkunft (Origin) abweicht.
 
 ## Zweck
-Erlaubt Cross‑Origin Requests für das React‑Frontend.
+Erlaubt Cross‑Origin Requests für das Web‑Frontend.
 
 ## Inhalt & Verantwortung
 - Setzt Header: Origin, Methods, Headers, Credentials.

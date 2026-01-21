@@ -6,7 +6,7 @@ Einfache Erklärung: Dieses Objekt beschreibt einen Benutzer (Name, Rolle, Passw
 Domänenmodell für Benutzer.
 
 ## Inhalt & Verantwortung
-- Identität, Login‑Daten (Hash+Salt), Rolle (admin/student).
+- Identität, Login‑Daten (Hash+Salt), Rolle (admin/student), Reset‑Flag.
 
 ## Verbindungen
 - Persistiert via `UserDao`.

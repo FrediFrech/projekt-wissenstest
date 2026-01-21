@@ -7,6 +7,7 @@ Definiert erwartete Tokens für Lückentextfragen.
 
 ## Inhalt & Verantwortung
 - Reihenfolge über `tokenIndex`.
+- Erwartetes Wort über `expectedText`.
 - Teilwertung über `partialValue`.
 
 ## Verbindungen

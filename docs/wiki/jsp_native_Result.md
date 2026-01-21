@@ -22,10 +22,9 @@ Anzeige der Test-Ergebnisse mit Scoring-Logik und Navigation für Wiederholung.
 - **Router:** In `native.jsp` über `?page=result` eingebunden
 - **Datenfluss:** Empfängt JSON von `js_native/app.js` via `sessionStorage.getItem('lastTestResult')`
 - **Styling:** `css_native/style.css`
-- **Frontend-Pendant:** `frondend/src/components/Result.jsx`
 
 ## Wichtige Entscheidungen
-- ✅ sessionStorage statt React Props (JSP-konform)
+- ✅ sessionStorage statt Props (JSP‑konform)
 - ✅ Client-Side Berechnung des Prozentsatzes
 - ✅ Keine komplexe Backend-Anbindung nötig (Daten kommen vom TestRunner)
 

@@ -10,13 +10,13 @@ Diese Anleitung erklärt Schritt für Schritt, wie du die Anwendung lokal starte
 ## Voraussetzungen (Programme & Tools)
 1. **Java 17 JDK** (für Maven‑Build und Tomcat)
 2. **Maven 3.8+** (zum Bauen des Backends)
-3. **PostgreSQL 15** (lokale Datenbank)
-4. **Tomcat 8.5 oder 11** (für die WAR‑Datei mit JSP)
+3. **PostgreSQL 15/16** (lokale Datenbank)
+4. **Tomcat 9.x** (für die WAR‑Datei mit JSP)
 
 ---
 
 ## 1) Datenbank vorbereiten (Postgres)
-1. Postgres starten.
+1. Postgres starten (Port 5433, wenn du die Repo‑Defaults nutzt).
 2. Datenbank `wissentest` anlegen.
 3. Schema laden:
    - Öffne die Datei `db/schema.sql` und führe sie in der Datenbank aus.
@@ -75,21 +75,18 @@ mainlogik, backend/src/main/webapp/
     ├── TestRunner.jsp           # Quiz-Durchführung
     ├── Result.jsp               # Ergebnis-Anzeige
     ├── AdminPanel.jsp           # Admin-Dashboard
-    ├── LearnMode.jsp            # Lernmodus
+   ├── LearnMode.jsp            # Lernmodus
+   ├── ExamMode.jsp             # Prüfungsmodus
     └── FlipCard.jsp             # Flip-Card Fragment
 ```
 
 Außerdem CSS und JS:
 ```
 src/main/webapp/
-├── css/
-│   ├── main.css                 # Globale Styles
-│   ├── components.css           # Komponenten-Styles
-│   └── animations.css           # Animationen
-└── js/
-    ├── app.js                   # Business Logic
-    ├── apiClient.js             # REST-API Kommunikation
-    └── utils.js                 # Utility-Funktionen
+├── css_native/
+│   └── style.css                # Globale Styles
+└── js_native/
+   └── app.js                   # Business Logic
 ```
 
 ---
@@ -126,4 +123,4 @@ mvn clean package
 
 ---
 
-**Hinweis:** Die alte React-Version ist archiviert unter `alte_react_version/`. Das aktuelle Projekt verwendet nur noch JSP als Frontend!
+**Hinweis:** Das aktuelle Projekt verwendet nur JSP + Vanilla JS.

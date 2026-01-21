@@ -1,43 +1,15 @@
-# Frontend-Integration in JSP
+# Frontend-Integration in JSP (Legacy)
 
-## Was wurde gemacht?
-Wir haben eine "Hybrid-Architektur" implementiert, um die Anforderung "JSP Technologien nutzen" zu erfüllen, ohne auf die Animationen und Features von React zu verzichten.
+## Status
+Diese Anleitung ist **nicht mehr aktiv**. Das Projekt nutzt aktuell **nur JSP + Vanilla JS**.
 
-## Die Lösung: "Trojanisches Pferd"
-1. **Frontend (Build):** Wir konfigurieren Vite so (`vite.config.js`), dass es nicht mehr ins leere baut, sondern direkt in den Web-Ordner unseres Java-Backends (`src/main/webapp/static/react`).
-2. **Backend (JSP):** Wir haben eine `index.jsp` erstellt. Diese Seite ist technisch eine vollwertige JSP-Seite (Server-Side Rendering), die von Tomcat ausgeliefert wird.
-3. **Integration:** Die `index.jsp` lädt dann das React-Frontend nach.
+## Warum noch vorhanden?
+Sie dokumentiert den historischen Ansatz, React in ein WAR zu integrieren. Die React‑Komponenten sind jedoch nicht mehr Teil des Repos.
 
-## Neue Struktur
-Die Startseite ist nun nicht mehr eine statische HTML-Datei, sondern wird dynamisch vom Server generiert:
-`http://localhost:8080/wissentest/index.jsp`
+## Aktueller Stand (gültig)
+- Startseite: `index.jsp`
+- Routing: `native.jsp` (`?page=...`)
+- JS‑Logik: `js_native/app.js`
+- CSS: `css_native/style.css`
 
-## Vorteile
-- ✅ **Konformität:** Der Dozent sieht `.jsp` in der URL und `jsp:include` im Quellcode.
-- ✅ **Features:** React, Framer Motion und alle High-End Animationen laufen weiter.
-- ✅ **Deployment:** Es gibt nur noch EINE Datei zum Deployen (`wissentest.war`), da das Frontend in das Backend "gebacken" wird.
-
-## Build-Prozess
-Um das Frontend in das Backend zu integrieren, musst du jetzt folgendes tun:
-
-### 1. Frontend bauen
-```bash
-cd frondend
-npm install
-npm run build
-```
-*Dies erzeugt die Dateien in `mainlogik, backend/src/main/webapp/static/react/`.*
-
-### 2. Backend packen
-```bash
-cd "mainlogik, backend"
-mvn clean package
-```
-*Dies packt alles (Java Klassen + React Files + index.jsp) in die `wissentest.war`.*
-
-### 3. Deployen
-Die WAR-Datei auf Tomcat deployen.
-
-## Was, wenn ich weiter entwickeln will?
-Du kannst fürs Coding weiter `npm run dev` nutzen (React läuft separat auf Port 5173).
-Nur für die "Abgabe-Version" (Tomcat) nutzt du den JSP-Integrations-Build.
+Wenn du eine React‑Variante brauchst, muss sie **neu** integriert werden. Diese Datei dient nur als Archiv‑Hinweis.

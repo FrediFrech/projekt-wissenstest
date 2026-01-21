@@ -6,9 +6,9 @@ Einfache Erklärung: Hier stehen Beispiel‑Daten, damit du die App sofort teste
 Liefert Startdaten für Entwicklung/Tests: Admin‑User und Beispiel‑Fragen.
 
 ## Inhalt & Verantwortung
-- Admin‑User: `admin/student` (Hash/Salt als Platzhalter).
-- Beispiel‑MC‑Frage + Antwortoptionen.
-- Beispiel‑Cloze‑Frage + Token.
+- Users: `student`, `lehrer`, `teacher2`, `student2` (Passwort: `student`)
+- Beispiel‑MC‑Fragen + Antwortoptionen.
+- Beispiel‑Cloze‑Fragen + Token.
 
 ## Verbindungen
 - Muss nach `db/schema.sql` ausgeführt werden.

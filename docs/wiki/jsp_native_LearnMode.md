@@ -21,8 +21,7 @@ Interaktiver Lernbereich mit Karteikarten-Interface.
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=learnMode` eingebunden
 - **CSS:** `css_native/style.css` + interne `<style>` für Flip-Card-Effekt
-- **Datenquellen:** Mock-Daten hardcodiert oder über AJAX vom Backend (via `js_native/app.js`)
-- **Frontend-Pendant:** `frondend/src/components/LearnMode.jsx`
+- **Datenquellen:** AJAX zu `/api/test/questions/all` (via `js_native/app.js`)
 - **Sub-Component:** Verwendet die Struktur von `FlipCard.jsp`
 
 ## Wichtige Entscheidungen

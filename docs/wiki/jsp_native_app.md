@@ -1,7 +1,7 @@
 # js_native/app.js
 
 ## Einfache Erklärung
-Dies ist das "Gehirn" der JSP-Native-Version. Diese JavaScript-Datei kümmert sich um alle dynamischen Aufgaben: Login-Formular-Verarbeitung, Tests laden, Fragen anzeigen, Antworten speichern, zur nächsten Frage navigieren und Ergebnisse anzeigen. Sie ist das Vanilla-JS-Pendant zu Reacts komplexerem State-Management.
+Dies ist das "Gehirn" der JSP-Native-Version. Diese JavaScript-Datei kümmert sich um alle dynamischen Aufgaben: Login, Tests laden, Fragen anzeigen, Antworten speichern, zur nächsten Frage navigieren und Ergebnisse anzeigen.
 
 ## Zweck
 **Zentrales Business-Logic & Event-Handling Script** für die JSP-Frontend-Version.
@@ -10,7 +10,7 @@ Dies ist das "Gehirn" der JSP-Native-Version. Diese JavaScript-Datei kümmert si
 - **Vanilla JavaScript:** Keine Frameworks, reine ES6
 - **Fetch API:** Für HTTP-Requests zum Backend (AJAX)
 - **DOM-Manipulation:** `document.getElementById`, `innerHTML`, `addEventListener`
-- **Session Storage:** Zur Daten-Übergabe zwischen Seiten
+- **localStorage / sessionStorage:** Kleine Zustände zwischen Seiten
 
 ## Inhalt & Verantwortung
 
@@ -36,10 +36,10 @@ let userAnswers = {};                // Antworten des Users speichern
 - `logout()`: Beendet Session & navigiert zu Landing
 
 ### 4. **Test-Verwaltung**
-- `loadTests()`: Holt Testliste vom Backend
-  - Zeigt Test-Cards mit "Starten" Button
+- `loadTests()`: Holt Kategorien + Historie vom Backend
+  - Zeigt Konfiguration + letzte Ergebnisse
 - `initTest()`: Startet einen Test
-  - Fetcht Fragen von `/api/test/start`
+  - POST zu `/api/test/start`
   - Rendert erste Frage
 - `renderQuestion()`: Zeigt aktuelle Frage mit Optionen
   - Animiert Antwort-Buttons
@@ -67,14 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
 ## Verbindungen
 - **HTML:** Alle JSP-Seiten (`TestRunner.jsp`, `TestList.jsp`, etc.) laden diese Datei
 - **Backend:** Alle AJAX-Calls zu `/api/auth/*`, `/api/test/*`, `/api/admin/*`
-- **Session Storage:** Daten-Übergabe (z.B. Test-Ergebnis für Result.jsp)
-- **Frontend-Pendant:** `frondend/src/main.jsx` + React-Komponenten (Login.jsx, TestRunner.jsx, etc.)
+- **localStorage:** Test-Konfiguration (`testConfig`)
+- **sessionStorage:** Ergebnis (`lastTestResult`)
 
 ## Wichtige Entscheidungen
 - ✅ Vanilla JS (kein React, kein jQuery)
 - ✅ Fetch API statt XMLHttpRequest (modern)
 - ✅ Einfache State-Variablen statt Redux/Zustand
-- ✅ sessionStorage statt localStorage (Test-Daten nur für Sitzung)
+- ✅ localStorage für Test-Konfiguration
+- ✅ sessionStorage für Ergebnisdaten
 - ✅ Inliners Event-Handler im HTML (onclick=...) für Einfachheit
 
 ## Code-Architektur

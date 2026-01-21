@@ -24,8 +24,7 @@ Das Dashboard: Nach dem Login sieht der Benutzer hier eine Übersicht aller verf
 - **Router:** In `native.jsp` über `?page=testList` eingebunden
 - **Styling:** `css_native/style.css`
 - **Logik:** `js_native/app.js` (Funktion: `loadTests()`)
-- **Backend:** AJAX zu `/api/test/list` für Test-Übersicht
-- **Frontend-Pendant:** `frondend/src/components/TestList.jsx`
+- **Backend:** AJAX zu `/api/test/categories` und `/api/test/history`
 
 ## Wichtige Entscheidungen
 - ✅ Session-basierte Zugriffskontrolle (Server-Side)
@@ -38,9 +37,8 @@ Das Dashboard: Nach dem Login sieht der Benutzer hier eine Übersicht aller verf
 1. User ist eingeloggt & navigiert zu ?page=testList
 2. JSP prüft session.getAttribute("user") - OK
 3. JavaScript triggert loadTests()
-4. AJAX-Call zu /api/test/list
-5. Backend antwortet mit Test-Array
-6. JavaScript rendert Test-Karten dynamisch
-7. Jede Karte: "Test-Name • X Fragen • Schwierigkeit"
-8. User klickt "Starten" → navigate zu ?page=testRunner
+4. AJAX-Call zu /api/test/categories
+5. AJAX-Call zu /api/test/history
+6. JavaScript rendert Konfiguration + Historie
+7. User klickt "Starten" → navigate zu ?page=testRunner
 ```

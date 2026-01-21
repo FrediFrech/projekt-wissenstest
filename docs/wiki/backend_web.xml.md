@@ -15,4 +15,4 @@ Zentrale Servlet‑Konfiguration (Routing) und Filter‑Registrierung.
 
 ## Verbindungen
 - Verknüpft HTTP‑Routen mit den Servlet‑Klassen.
-- Aktiviert `CorsFilter`, damit React‑Frontend gegen das Backend kommunizieren kann.
+- Aktiviert `CorsFilter`, damit Browser‑Frontend (JSP + JS) die API nutzen kann.

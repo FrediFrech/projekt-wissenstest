@@ -1,30 +1,31 @@
 # Native JSP/HTML5 Frontend - Die "Safe Alternative"
 
-Wenn dir React zu riskant erscheint (wegen strenger Dozenten-Anforderungen), haben wir eine **vollständig JSP-konforme Alternative** gebaut.
+Dieses Projekt nutzt eine **vollständig JSP‑konforme Frontend‑Variante**.
 
 ## 🛡️ Was ist das?
-Das ist ein separates Frontend, das **OHNE React** auskommt. Es nutzt nur:
+Das Frontend nutzt nur:
 - **JSP** (JavaServer Pages) für die Struktur
 - **CSS3** (modernes Flexbox/Grid, Animations) für das "High-End" Design
 - **Vanilla JavaScript** (keine Frameworks) für die Logik
 
-## � 1:1 Spiegelung der React Architektur
-Um die technische Raffinesse zu beweisen, haben wir **für jede React-Komponente ein exaktes JSP-Pendant** erstellt. Die Struktur ist identisch, nur die Technologie ist simpler (konformer).
+## ✅ Komponenten-Struktur (JSP)
+Die JSP‑Variante besteht aus einem Router (`index.jsp`/`native.jsp`) und klar getrennten Komponenten unter `jsp_native/`.
 
 ### Datei-Mapping
-| React Komponente (Modern) | JSP Pendant (Native) | Beschreibung |
-|---------------------------|----------------------|--------------|
-| `App.jsx` | `native.jsp` | Haupt-Controller / Router |
-| `src/main.jsx` | `js_native/app.js` | App-Initialisierung & Logik |
-| `LandingPage.jsx` | `LandingPage.jsp` | Startseite mit Animationen |
-| `Login.jsx` | `Login.jsp` | Login-Formular |
-| `Register.jsx` | `Register.jsp` | Registrierungs-Formular |
-| `TestList.jsx` | `TestList.jsp` | Dashboard / Übersicht der Tests |
-| `TestRunner.jsx` | `TestRunner.jsp` | Der eigentliche Quiz-Ablauf |
-| `Result.jsx` | `Result.jsp` | Ergebnisanzeige nach dem Test |
-| `AdminPanel.jsx` | `AdminPanel.jsp` | Admin-Bereich (Statistiken) |
-| `LearnMode.jsx` | `LearnMode.jsp` | Lernmodus (Karteikarten) |
-| `FlipCard.jsx` | `FlipCard.jsp` | Einzelne Karteikarte (Fragment) |
+| JSP Datei | Rolle | Beschreibung |
+|-----------|------|--------------|
+| `index.jsp` | Einstieg | Startseite (Welcome File) |
+| `native.jsp` | Router | Routing über `?page=` |
+| `jsp_native/LandingPage.jsp` | Page | Startseite |
+| `jsp_native/Login.jsp` | Form | Login |
+| `jsp_native/Register.jsp` | Form | Registrierung |
+| `jsp_native/TestList.jsp` | Page | Test‑Dashboard |
+| `jsp_native/TestRunner.jsp` | Page | Test‑Ablauf |
+| `jsp_native/Result.jsp` | Page | Ergebnis |
+| `jsp_native/AdminPanel.jsp` | Page | Admin‑Bereich |
+| `jsp_native/LearnMode.jsp` | Page | Lernmodus |
+| `jsp_native/FlipCard.jsp` | Fragment | Karteikarte |
+| `jsp_native/ExamMode.jsp` | Page | Prüfungsmodus |
 
 ## 📂 Dateistruktur
 Die Dateien liegen in `mainlogik, backend/src/main/webapp/`:
@@ -37,9 +38,8 @@ Die Dateien liegen in `mainlogik, backend/src/main/webapp/`:
 Du musst nichts bauen oder installieren (kein npm nötig!).
 1. Starte den Tomcat Server (Java Backend).
 2. Öffne im Browser:
-   `http://localhost:8080/wissentest/native.jsp`
-
-*(Die React-Version läuft parallel unter `/index.jsp`, diese hier ist `/native.jsp`)*
+   `http://localhost:8080/wissentest/`
+3. Optional: `native.jsp` als direkter Router.
 
 ## ✨ Features
 Obwohl es "nur" JSP ist, haben wir moderne Features eingebaut:
@@ -49,16 +49,8 @@ Obwohl es "nur" JSP ist, haben wir moderne Features eingebaut:
 - **Flip-Cards:** Auch in CSS nachgebaut (siehe Landing Page Demo)
 - **Responsive:** Funktioniert auf Mobile & Desktop
 
-## ⚖️ Unterschied zur React-Version
-
-| Feature | React Version (`index.jsp`) | Native JSP Version (`native.jsp`) |
-|---------|---------------------------|-----------------------------------|
-| Technologie | React 18, Vite | JSP, HTML5, Vanilla JS |
-| Architektur | Single Page App (SPA) | JSP Includes + AJAX |
-| Konformität | Grauzone (Modern) | ✅ 100% Konform (Formal) |
-| Animationen | Framer Motion (Library) | CSS3 Transitions (Native) |
-| Performance | Client-Side Rendering | Server-Side Rendering + JS |
-| Sicherheit | Höheres Risiko beim Dozenten | "Safe Bet" |
+## ⚖️ Architektur‑Hinweis
+Die Seiten werden serverseitig mit JSP gerendert. Dynamik (Tests laden, Antworten senden) läuft über AJAX‑Calls aus `js_native/app.js`.
 
 ## 🛠️ Anpassung
 Wenn du Änderungen machen willst:
@@ -66,4 +58,4 @@ Wenn du Änderungen machen willst:
 - Logik: `js_native/app.js`
 - Struktur: `jsp_native/*.jsp`
 
-Damit hast du eine **perfekte Fallback-Lösung**, falls der Dozent React ablehnt. Du kannst einfach auf die URL `/native.jsp` verweisen und hast ein komplett konformes Projekt.
+Damit hast du eine **komplett konforme Lösung** ohne zusätzliche Frontend‑Build‑Schritte.

@@ -17,7 +17,7 @@
 3. **[DATABASE_EXPLORER.md](DATABASE_EXPLORER.md)** – ER-Diagramm & SQL-Schema
 
 ### Für Setup & Testing
-1. **🎬 [DEMO_MODE.md](DEMO_MODE.md)** – Frontend ohne DB anzeigen (5 Min Quick Demo!)
+1. **🎬 [DEMO_MODE.md](DEMO_MODE.md)** – Schnellstart mit lokaler DB (Script)
 2. **[JSP_STARTUP_GUIDE.md](JSP_STARTUP_GUIDE.md)** – 🚀 Detaillierter JSP-Startup (Vollständig)
 3. **[POSTGRES_SETUP.md](POSTGRES_SETUP.md)** – PostgreSQL lokal installieren
 4. **[wiki/testing_guide.md](wiki/testing_guide.md)** – JUnit Tests schreiben
@@ -88,7 +88,7 @@
 
 #### Utilities
 - `util_DbConnectionManager.java.md` – DB-Verbindung (Singleton)
-- `util_PasswordUtils.java.md` – PBKDF2 Passwort-Hashing
+- `util_PasswordUtils.java.md` – Passwort‑Hashing (iteriertes SHA‑256)
 
 #### JSP Frontend Components
 - `jsp_native_LandingPage.md` – Startseite (JSP)
@@ -123,13 +123,11 @@
 1. [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) – Was kann die App?
 2. [JSP_COMPLIANCE_ANALYSIS.md](JSP_COMPLIANCE_ANALYSIS.md) – Ist sie konform?
 3. [COMPLIANCE_SCAN.md](COMPLIANCE_SCAN.md) – Detaillierter Check
-4. [wiki/JAVASCRIPT_ERLAUBNIS.md](wiki/JAVASCRIPT_ERLAUBNIS.md) – JavaScript Erlaubnis geklärt
 5. [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) – Ist die Architektur sauber?
 
 **Sicherheitsbewusster Student (Fallback):**
 1. [JSP_NATIVE_GUIDE.md](JSP_NATIVE_GUIDE.md) – Sichere Alternative
 2. [wiki/JSP_NATIVE_COMPONENTS.md](wiki/JSP_NATIVE_COMPONENTS.md) – JSP-Komponenten
-3. [wiki/JAVASCRIPT_ERLAUBNIS.md](wiki/JAVASCRIPT_ERLAUBNIS.md) – Rechtfertigung
 
 **Backend-Entwickler:**
 1. [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) – Klassen & Pattern
@@ -137,11 +135,9 @@
 3. Service & DAO Dokumentation in [wiki/](wiki/) – Spezifische Komponenten
 
 **Frontend-Entwickler:**
-1. [FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md) – Komponenten-Baum (React)
-2. [wiki/JSP_NATIVE_COMPONENTS.md](wiki/JSP_NATIVE_COMPONENTS.md) – Komponenten-Baum (JSP)
-3. [wiki/frontend_*](wiki/) – React Komponenten-Details
-4. [wiki/jsp_native_*](wiki/) – JSP Komponenten-Details
-5. [wiki/frontend_services_apiClient.js.md](wiki/frontend_services_apiClient.js.md) – API-Integration
+1. [wiki/JSP_NATIVE_COMPONENTS.md](wiki/JSP_NATIVE_COMPONENTS.md) – Komponenten-Baum (JSP)
+2. [wiki/jsp_native_*](wiki/) – JSP Komponenten-Details
+3. [wiki/jsp_native_app.md](wiki/jsp_native_app.md) – JS‑Logik
 
 **DevOps/Datenbank-Admin:**
 1. [DATABASE_EXPLORER.md](DATABASE_EXPLORER.md) – ER-Diagramm
@@ -178,14 +174,11 @@
 ### "Ist das Projekt konform mit den Anforderungen?"
 → [JSP_COMPLIANCE_ANALYSIS.md](JSP_COMPLIANCE_ANALYSIS.md)
 
-### "Ist JavaScript erlaubt?"
-→ [wiki/JAVASCRIPT_ERLAUBNIS.md](wiki/JAVASCRIPT_ERLAUBNIS.md) ⭐
-
 ### "Wie funktioniert die JSP-Native Variante?"
 → [JSP_NATIVE_GUIDE.md](JSP_NATIVE_GUIDE.md) → [wiki/JSP_NATIVE_COMPONENTS.md](wiki/JSP_NATIVE_COMPONENTS.md) ⭐
 
 ### "Wie funktioniert die Architektur?"
-→ [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) + [FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md)
+→ [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)
 
 ### "Wie schreibe ich einen Test?"
 → [wiki/testing_guide.md](wiki/testing_guide.md)
@@ -215,4 +208,4 @@
 ---
 
 **Zuletzt aktualisiert:** Januar 2026
-**Dokumentations-Editor:** GitHub Copilot (Claude Haiku)
+**Dokumentations-Editor:** GitHub Copilot + Frederik Dehn

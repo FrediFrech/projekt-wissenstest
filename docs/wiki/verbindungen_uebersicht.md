@@ -5,7 +5,7 @@ Einfache Erklärung: Diese Übersicht erklärt, wie Frontend, Backend, Services 
 Dieser Text erklärt in einfachen Worten, wie die Dateien zusammenarbeiten.
 
 ## 1) Frontend → Backend
-- Die React‑Komponenten (Login, Register, TestRunner, AdminPanel) rufen HTTP‑Endpunkte unter `/api/...` auf.
+- Die JSP‑Seiten rufen über `js_native/app.js` HTTP‑Endpunkte unter `/api/...` auf.
 - Diese Endpunkte sind in `web.xml` mit Servlets verbunden (`AuthServlet`, `AdminServlet`, `TestServlet`).
 
 ## 2) Servlet‑Schicht → Service‑Schicht
@@ -26,6 +26,6 @@ Dieser Text erklärt in einfachen Worten, wie die Dateien zusammenarbeiten.
 
 ## 5) Konfiguration
 - `db.properties` liefert Datenbank‑Zugangsdaten, die `DbConnectionManager` liest.
-- `pom.xml` und `package.json` steuern Build und Abhängigkeiten.
+- `pom.xml` steuert Build und Abhängigkeiten.
 
 Damit entsteht eine klare Trennung: UI (Frontend) → HTTP → Services → Datenbank.
