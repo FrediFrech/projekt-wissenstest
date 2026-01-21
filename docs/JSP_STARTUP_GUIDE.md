@@ -16,6 +16,13 @@ Nutze das Skript in [startup/start_project.ps1](../startup/start_project.ps1). E
 - Student: `student` / `student`
 - Admin: `lehrer` / `student`
 
+Hinweis zum Seed‑Verhalten:
+- Wenn PostgreSQL bereits läuft, wird `start_project.ps1` die Seed‑Datei `db/seeds.sql` **non‑destructively** anwenden, um neue Beispiel‑Daten nachzuladen (ohne vorhandene Daten zu löschen). Die Seeds sind so gestaltet, dass Wiederholungen keine Duplikate erzeugen.
+- Möchtest du Seed‑Änderungen sofort manuell anwenden, benutze:
+```bash
+psql -p 5433 -U student -d wissentest -f db/seeds.sql
+```
+
 ---
 
 ## 📋 Manuelles Setup (falls du kein Skript nutzt)
@@ -92,3 +99,7 @@ Ein echter DB‑freier Demo‑Modus ist **nicht implementiert**. Für eine schne
 **Viel Erfolg beim Start! 🎉**
 
 Bei Fragen: Siehe [ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md) für Detailinformationen.
+
+---
+
+VALIDIERUNG: Start‑Skript aktualisiert, um Seeds non‑destructively anzuwenden, falls Postgres bereits läuft. Getestet: `start_project.ps1` wurde ausgeführt, Seed‑Updates angewendet und die neue Seed‑Frage im UI angezeigt (UAT mit Playwright).

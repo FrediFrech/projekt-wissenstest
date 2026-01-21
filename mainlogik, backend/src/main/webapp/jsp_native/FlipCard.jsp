@@ -2,7 +2,6 @@
 <% 
    /* 
     * Component: FlipCard.jsp
-    * Counterpart: FlipCard.jsx
     * Description: Shared markup structure for flip cards.
     * Note: This file is primarily for structural parity. 
     * In a dynamic list context (like LearnMode), this structure is often generated via JS.

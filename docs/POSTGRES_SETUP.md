@@ -154,36 +154,18 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO student;
    SELECT encode(digest('admin123' || 'DEIN_SALT', 'sha256'), 'hex');
    ```
 
-3. Seeds ausführen in Query Tool (F5)
+3. Seeds ausführen in Query Tool (F5) oder via psql CLI:
+```bash
+psql -p 5433 -U student -d wissentest -f db/seeds.sql
+```
 4. Prüfen: Query `SELECT * FROM users;` sollte mind. 2 User zeigen
 
 ---
 
-## 4. Backend-Konfiguration
-
-### 4.1 db.properties anpassen
-Datei: `mainlogik, backend/src/main/resources/db.properties`
-
-```properties
-# PostgreSQL Verbindung
-db.url=jdbc:postgresql://localhost:5433/wissentest
-db.user=student
-db.password=student
-db.pool.maxSize=10
-```
-
-**Wichtig:** 
-- Für Entwicklung: `student/student` ist OK
-- Für Produktion: Sicheres Passwort verwenden!
-
-### 4.2 MS SQL Support (für Hochschul-Server)
-Falls später MS SQL statt PostgreSQL genutzt wird:
-
-```xml
-<!-- In pom.xml: PostgreSQL-Treiber auskommentieren, MS SQL aktivieren -->
-<dependency>
-    <groupId>com.microsoft.sqlserver</groupId>
-    <artifactId>mssql-jdbc</artifactId>
+#### Reapply / Non‑destructive Seed Updates
+- Das Projekt‑Startskript `startup/start_project.ps1` versucht die Seeds auch dann anzuwenden, wenn PostgreSQL bereits läuft; dabei werden **nur neue** Einträge ergänzt (non‑destructive).
+- Technischer Hinweis: `db/seeds.sql` nutzt Idempotenz‑Techniken (`ON CONFLICT`, `WHERE NOT EXISTS`, `ON CONFLICT DO NOTHING`), sodass wiederholtes Ausführen keine Duplikate erzeugt.
+- Achtung: `db/schema.sql` enthält DROP/CREATE-Statements — dieses Skript sollte nicht automatisch auf produktiven Datenbanken erneut ausgeführt werden, da es bestehende Tabellen entfernt. Nutze nur die Seed‑Mechanismen, um Beispiel‑Daten sicher nachzuziehen.
     <version>12.4.1.jre11</version>
 </dependency>
 ```
@@ -372,3 +354,7 @@ Bei Problemen:
 3. HikariCP Connection Pool Statistiken im Backend aktivieren (siehe `DbConnectionManager.java`)
 
 **Ende der Anleitung**
+
+---
+
+VALIDIERUNG: Dokumentation erweitert: Hinweis hinzugefügt, dass `start_project.ps1` Seed‑Updates auch bei laufendem Postgres anwendet; Seeds sind idempotent durch `ON CONFLICT`/`WHERE NOT EXISTS`. Getestet mit: `psql -p 5433 -U student -d wissentest -f db/seeds.sql`, `start_project.ps1` und UAT via Playwright.
