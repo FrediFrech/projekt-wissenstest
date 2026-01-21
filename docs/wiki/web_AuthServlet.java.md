@@ -1,16 +1,18 @@
+
 # web/AuthServlet.java
 
-Einfache Erklärung: Dieses Servlet ist die Eingangstür für Login und Registrierung. Es nimmt JSON an und gibt JSON zurück.
+## Beschreibung
+Handhabt Authentifizierung und Session-Management.
 
-## Zweck
-HTTP‑API für Registrierung, Login, Logout.
+## Endpunkte
+*   `POST /login`: Pr�ft Credentials. Bei Erfolg:
+    *   Erstellt HttpSession.
+    *   Setzt Session-Attribute: `user` (Username), `role`, `id`.
+    *   Antwortet mit JSON User-Objekt.
+*   `POST /register`: Erstellt neuen User (Role="student"). Pr�ft auf Duplikate.
+*   `POST /logout`: Invalidiert die Session.
+*   `POST /reset-request`: 
+    *   Nimmt `{username}` entgegen.
+    *   Setzt `reset_requested = true` in der DB.
+    *   Wird vom AdminPanel angezeigt.
 
-## Inhalt & Verantwortung
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- Session‑Handling (userId, role)
-
-## Verbindungen
-- Nutzt `AuthService`.
-- JSON über `ServletUtils`/`JsonUtil`.

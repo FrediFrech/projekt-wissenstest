@@ -33,6 +33,7 @@
                     <a href="?page=register" class="btn btn-primary">Registrieren</a>
                 <% } else { %>
                     <a href="?page=testList" class="btn btn-ghost">Tests</a>
+                    <a href="?page=examMode" class="btn btn-ghost" style="color: #dc2626;">Pruefung (Exam)</a>
                     <a href="?page=learnMode" class="btn btn-ghost">Lernen</a>
                     <% if (session.getAttribute("role") != null && session.getAttribute("role").toString().equalsIgnoreCase("admin")) { %>
                         <a href="?page=adminPanel" class="btn btn-ghost" style="color:#ef4444;">Admin Panel</a>
@@ -69,6 +70,8 @@
                 <jsp:include page="jsp_native/Result.jsp" />
             <% } else if(pageParam.equals("learnMode")) { %>
                 <jsp:include page="jsp_native/LearnMode.jsp" />
+            <% } else if(pageParam.equals("examMode")) { %>
+                <jsp:include page="jsp_native/ExamMode.jsp" />
             <% } else { %>
                 <jsp:include page="jsp_native/LandingPage.jsp" />
             <% } %>

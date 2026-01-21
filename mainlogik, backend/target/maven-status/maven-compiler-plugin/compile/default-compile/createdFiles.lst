@@ -12,6 +12,7 @@ de\dhsn\wissentest\dao\AnswerDao.class
 de\dhsn\wissentest\dao\QuestionDao.class
 de\dhsn\wissentest\model\AnswerOption.class
 de\dhsn\wissentest\web\JsonUtil.class
+de\dhsn\wissentest\web\AuthServlet$ResetRequest.class
 de\dhsn\wissentest\dao\QuestionRepository.class
 de\dhsn\wissentest\dao\ClozeTokenDao.class
 de\dhsn\wissentest\dao\UserDao.class

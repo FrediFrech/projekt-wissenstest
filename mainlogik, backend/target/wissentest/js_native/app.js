@@ -225,6 +225,14 @@ function startTimer(durationSeconds) {
 
 function renderQuestion() {
     const q = currentQuestions[currentQuestionIndex];
+    
+    // Update Progress Bar
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar && currentQuestions.length > 0) {
+        const percentage = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+        progressBar.style.width = percentage + '%';
+    }
+
     if (!q) {
         finishTest();
         return;

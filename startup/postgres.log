@@ -488,3 +488,36 @@
 2026-01-21 01:12:07.666 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
 2026-01-21 01:12:07.669 CET [1320] ERROR:  column "grade" does not exist at character 71
 2026-01-21 01:12:07.669 CET [1320] STATEMENT:  SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = $1 ORDER BY created_at DESC
+2026-01-21 01:51:33.842 CET [23952] ERROR:  canceling statement due to user request
+2026-01-21 01:51:33.843 CET [13900] LOG:  received fast shutdown request
+2026-01-21 01:51:33.845 CET [13900] LOG:  aborting any active transactions
+2026-01-21 01:51:33.849 CET [40884] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.850 CET [38940] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.850 CET [40252] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.850 CET [6944] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.850 CET [39660] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.850 CET [27324] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.851 CET [11472] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.851 CET [41116] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.851 CET [41632] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.851 CET [32572] FATAL:  terminating connection due to administrator command
+2026-01-21 01:51:33.851 CET [13900] LOG:  background worker "logical replication launcher" (PID 23952) exited with exit code 1
+2026-01-21 01:51:33.869 CET [40904] LOG:  shutting down
+2026-01-21 01:51:33.871 CET [40904] LOG:  checkpoint starting: shutdown immediate
+2026-01-21 01:51:33.880 CET [40904] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.011 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=3681 kB; lsn=0/1A67758, redo lsn=0/1A67758
+2026-01-21 01:51:33.892 CET [13900] LOG:  database system is shut down
+2026-01-21 02:12:32.075 CET [37936] LOG:  starting PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit
+2026-01-21 02:12:32.080 CET [37936] LOG:  listening on IPv6 address "::1", port 5433
+2026-01-21 02:12:32.080 CET [37936] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-01-21 02:12:32.136 CET [36916] LOG:  database system was shut down at 2026-01-21 01:51:33 CET
+2026-01-21 02:12:32.169 CET [37936] LOG:  database system is ready to accept connections
+2026-01-21 02:17:32.139 CET [40296] LOG:  checkpoint starting: time
+2026-01-21 02:17:32.152 CET [40296] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.002 s, total=0.014 s; sync files=2, longest=0.002 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1A67840, redo lsn=0/1A67808
+2026-01-21 02:17:55.776 CET [33860] ERROR:  column "reset_requested" does not exist at character 65
+2026-01-21 02:17:55.776 CET [33860] STATEMENT:  SELECT id, username, email, password_hash, password_salt, role, reset_requested FROM users WHERE username = $1
+2026-01-21 02:18:27.531 CET [36996] FATAL:  role "postgres" does not exist
+2026-01-21 02:18:38.478 CET [35372] FATAL:  role "Fredis Desktop" does not exist
+2026-01-21 02:22:32.155 CET [40296] LOG:  checkpoint starting: time
+2026-01-21 02:22:44.464 CET [40296] LOG:  checkpoint complete: wrote 114 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=12.232 s, sync=0.058 s, total=12.309 s; sync files=78, longest=0.004 s, average=0.001 s; distance=669 kB, estimate=669 kB; lsn=0/1B0F028, redo lsn=0/1B0EFF0
+2026-01-21 02:27:32.476 CET [40296] LOG:  checkpoint starting: time
+2026-01-21 02:27:33.149 CET [40296] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.658 s, sync=0.006 s, total=0.674 s; sync files=7, longest=0.001 s, average=0.001 s; distance=5 kB, estimate=603 kB; lsn=0/1B107E0, redo lsn=0/1B107A8
