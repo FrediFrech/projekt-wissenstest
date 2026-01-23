@@ -36,6 +36,42 @@
 </div>
 
 <script>
+    function getPassConfig() {
+        try {
+            const storedConfig = localStorage.getItem('testConfig');
+            if (!storedConfig) return null;
+            const config = JSON.parse(storedConfig);
+            if (!config || !config.passThresholdType) return null;
+            return config;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function evaluatePass(attempt, config) {
+        if (!attempt || !config) return null;
+        const type = config.passThresholdType;
+        const value = Number(config.passThresholdValue);
+        if (!Number.isFinite(value)) return null;
+
+        const total = Number.isFinite(Number(attempt.totalPoints)) ? Number(attempt.totalPoints) : 0;
+        const max = Number.isFinite(Number(attempt.maxPoints)) ? Number(attempt.maxPoints) : 0;
+
+        if (type === 'points') {
+            return {
+                passed: total >= value,
+                label: `${value} Punkte`
+            };
+        }
+
+        if (max <= 0) return null;
+        const pct = (total / max) * 100;
+        return {
+            passed: pct >= value,
+            label: `${value}%`
+        };
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const stored = sessionStorage.getItem('lastTestResult');
         if (stored) {
@@ -65,22 +101,32 @@
             const gradeVal = attempt.grade || "-";
             gradeEl.innerText = gradeVal;
 
-            // Colorize Grade
-            const gradeNum = parseInt(gradeVal);
-            if(!isNaN(gradeNum)) {
-                if(gradeNum <= 2) {
-                    gradeEl.style.color = "#10b981"; // Green
-                    document.getElementById('gradeInfo').innerText = "Exzellent!";
-                } else if(gradeNum <= 4) {
-                    gradeEl.style.color = "#f59e0b"; // Orange
-                    document.getElementById('gradeInfo').innerText = "Bestanden.";
-                } else {
-                     gradeEl.style.color = "#ef4444"; // Red
-                     document.getElementById('gradeInfo').innerText = "Leider nicht bestanden.";
-                }
+            const passConfig = getPassConfig();
+            const passInfo = evaluatePass(attempt, passConfig);
+
+            if (passInfo) {
+                gradeEl.style.color = passInfo.passed ? "#10b981" : "#ef4444";
+                document.getElementById('gradeInfo').innerText = passInfo.passed
+                    ? `Bestanden (ab ${passInfo.label}).`
+                    : `Leider nicht bestanden (ab ${passInfo.label}).`;
             } else {
-                 gradeEl.style.color = "var(--text-main)";
-                 document.getElementById('gradeInfo').innerText = "";
+                // Colorize Grade (fallback)
+                const gradeNum = parseInt(gradeVal);
+                if(!isNaN(gradeNum)) {
+                    if(gradeNum <= 2) {
+                        gradeEl.style.color = "#10b981"; // Green
+                        document.getElementById('gradeInfo').innerText = "Exzellent!";
+                    } else if(gradeNum <= 4) {
+                        gradeEl.style.color = "#f59e0b"; // Orange
+                        document.getElementById('gradeInfo').innerText = "Bestanden.";
+                    } else {
+                         gradeEl.style.color = "#ef4444"; // Red
+                         document.getElementById('gradeInfo').innerText = "Leider nicht bestanden.";
+                    }
+                } else {
+                     gradeEl.style.color = "var(--text-main)";
+                     document.getElementById('gradeInfo').innerText = "";
+                }
             }
 
             // Populate Details

@@ -7,25 +7,237 @@
       - /url: "?page=landingPage"
       - generic [ref=e5]: ✨ UML Wissenstest
     - generic [ref=e6]:
-      - link "Login" [ref=e7] [cursor=pointer]:
-        - /url: "?page=login"
-      - link "Registrieren" [ref=e8] [cursor=pointer]:
-        - /url: "?page=register"
-  - main [ref=e9]:
-    - generic [ref=e10]:
-      - heading "Willkommen zurück 👋" [level=2] [ref=e11]
-      - generic [ref=e12]:
-        - generic [ref=e13]:
-          - text: Benutzername
-          - textbox "Benutzername" [ref=e14]:
-            - /placeholder: Dein Username
-        - generic [ref=e15]:
-          - text: Passwort
-          - textbox "Passwort" [ref=e16]:
-            - /placeholder: ••••••••
-        - button "Anmelden" [ref=e17] [cursor=pointer]
-      - paragraph [ref=e18]:
-        - text: Noch kein Konto?
-        - link "Hier registrieren" [ref=e19] [cursor=pointer]:
-          - /url: "?page=register"
+      - link "Tests" [ref=e7] [cursor=pointer]:
+        - /url: "?page=testList"
+      - link "Pruefung (Exam)" [ref=e8] [cursor=pointer]:
+        - /url: "?page=examMode"
+      - link "Lernen" [ref=e9] [cursor=pointer]:
+        - /url: "?page=learnMode"
+      - link "Admin Panel" [ref=e10] [cursor=pointer]:
+        - /url: "?page=adminPanel"
+      - button "Logout" [ref=e11] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - heading "Admin Panel 🔒" [level=2] [ref=e15]
+        - generic [ref=e16]: Verwaltungsoberfläche
+      - generic [ref=e17]:
+        - heading "Kurz-Anleitung für Admins" [level=3] [ref=e18]
+        - list [ref=e19]:
+          - listitem [ref=e20]: "Fragen erstellen: Typ wählen, Kategorie + Prompt setzen, Antworten konfigurieren."
+          - listitem [ref=e21]:
+            - text: "MC/IMAGE: * markiert richtige Antworten (z. B."
+            - code [ref=e22]: "*Richtig, Falsch"
+            - text: ).
+          - listitem [ref=e23]: "Freitext: Mehrere Lösungen per Komma oder neue Zeile (alle gelten als korrekt)."
+          - listitem [ref=e24]:
+            - text: "Lückentext: JSON-Array verwenden, z. B."
+            - code [ref=e25]: "[ [\"Sequenz\",\"Sequenzdiagramm\"], [\"Zeit\"] ]"
+            - text: .
+          - listitem [ref=e26]: "Bild-Frage: Datei per Drag & Drop oder Dateiauswahl hochladen."
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - heading "Total Users" [level=3] [ref=e29]
+          - generic [ref=e30]: "7"
+        - generic [ref=e31]:
+          - heading "Total Questions" [level=3] [ref=e32]
+          - generic [ref=e33]: "16"
+        - generic [ref=e34]:
+          - heading "Completed Tests" [level=3] [ref=e35]
+          - generic [ref=e36]: "4"
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - heading "Fragenkatalog" [level=3] [ref=e41]
+            - button "Frage erstellen" [ref=e42] [cursor=pointer]
+          - table [ref=e44]:
+            - rowgroup [ref=e45]:
+              - row "ID Prompt Type Diff Actions" [ref=e46]:
+                - columnheader "ID" [ref=e47]
+                - columnheader "Prompt" [ref=e48]
+                - columnheader "Type" [ref=e49]
+                - columnheader "Diff" [ref=e50]
+                - columnheader "Actions" [ref=e51]
+            - rowgroup [ref=e52]:
+              - row "1 Welche UML-Diagrammart zeigt Klassen und ihre Beziehungen? MC 1 ✎ 🗑" [ref=e53]:
+                - cell "1" [ref=e54]
+                - cell "Welche UML-Diagrammart zeigt Klassen und ihre Beziehungen?" [ref=e55]
+                - cell "MC" [ref=e56]
+                - cell "1" [ref=e57]
+                - cell "✎ 🗑" [ref=e58]:
+                  - button "✎" [ref=e59] [cursor=pointer]
+                  - button "🗑" [ref=e60] [cursor=pointer]
+              - row "2 In UML beschreibt das ___ Diagramm die Abläufe zwischen Objekten. CLOZE 2 ✎ 🗑" [ref=e61]:
+                - cell "2" [ref=e62]
+                - cell "In UML beschreibt das ___ Diagramm die Abläufe zwischen Objekten." [ref=e63]
+                - cell "CLOZE" [ref=e64]
+                - cell "2" [ref=e65]
+                - cell "✎ 🗑" [ref=e66]:
+                  - button "✎" [ref=e67] [cursor=pointer]
+                  - button "🗑" [ref=e68] [cursor=pointer]
+              - row "3 Welche Aussage trifft auf ein Use-Case-Diagramm zu? MC 1 ✎ 🗑" [ref=e69]:
+                - cell "3" [ref=e70]
+                - cell "Welche Aussage trifft auf ein Use-Case-Diagramm zu?" [ref=e71]
+                - cell "MC" [ref=e72]
+                - cell "1" [ref=e73]
+                - cell "✎ 🗑" [ref=e74]:
+                  - button "✎" [ref=e75] [cursor=pointer]
+                  - button "🗑" [ref=e76] [cursor=pointer]
+              - row "4 Ein ___ Diagramm zeigt den Lebenszyklus eines Objekts mit Zuständen und Übergängen. CLOZE 2 ✎ 🗑" [ref=e77]:
+                - cell "4" [ref=e78]
+                - cell "Ein ___ Diagramm zeigt den Lebenszyklus eines Objekts mit Zuständen und Übergängen." [ref=e79]
+                - cell "CLOZE" [ref=e80]
+                - cell "2" [ref=e81]
+                - cell "✎ 🗑" [ref=e82]:
+                  - button "✎" [ref=e83] [cursor=pointer]
+                  - button "🗑" [ref=e84] [cursor=pointer]
+              - row "5 Was beschreibt ein Sequenzdiagramm am genauesten? MC 2 ✎ 🗑" [ref=e85]:
+                - cell "5" [ref=e86]
+                - cell "Was beschreibt ein Sequenzdiagramm am genauesten?" [ref=e87]
+                - cell "MC" [ref=e88]
+                - cell "2" [ref=e89]
+                - cell "✎ 🗑" [ref=e90]:
+                  - button "✎" [ref=e91] [cursor=pointer]
+                  - button "🗑" [ref=e92] [cursor=pointer]
+              - row "6 Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern? MC 3 ✎ 🗑" [ref=e93]:
+                - cell "6" [ref=e94]
+                - cell "Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern?" [ref=e95]
+                - cell "MC" [ref=e96]
+                - cell "3" [ref=e97]
+                - cell "✎ 🗑" [ref=e98]:
+                  - button "✎" [ref=e99] [cursor=pointer]
+                  - button "🗑" [ref=e100] [cursor=pointer]
+              - row "7 Was zeigt dieses Diagramm? MC 2 ✎ 🗑" [ref=e101]:
+                - cell "7" [ref=e102]
+                - cell "Was zeigt dieses Diagramm?" [ref=e103]
+                - cell "MC" [ref=e104]
+                - cell "2" [ref=e105]
+                - cell "✎ 🗑" [ref=e106]:
+                  - button "✎" [ref=e107] [cursor=pointer]
+                  - button "🗑" [ref=e108] [cursor=pointer]
+              - row "8 Welche UML-Diagrammart beschreibt die Struktur von Klassen? MC 1 ✎ 🗑" [ref=e109]:
+                - cell "8" [ref=e110]
+                - cell "Welche UML-Diagrammart beschreibt die Struktur von Klassen?" [ref=e111]
+                - cell "MC" [ref=e112]
+                - cell "1" [ref=e113]
+                - cell "✎ 🗑" [ref=e114]:
+                  - button "✎" [ref=e115] [cursor=pointer]
+                  - button "🗑" [ref=e116] [cursor=pointer]
+              - row "9 Das UML Klassendiagramm zeigt die ___ zwischen den Klassen. CLOZE 2 ✎ 🗑" [ref=e117]:
+                - cell "9" [ref=e118]
+                - cell "Das UML Klassendiagramm zeigt die ___ zwischen den Klassen." [ref=e119]
+                - cell "CLOZE" [ref=e120]
+                - cell "2" [ref=e121]
+                - cell "✎ 🗑" [ref=e122]:
+                  - button "✎" [ref=e123] [cursor=pointer]
+                  - button "🗑" [ref=e124] [cursor=pointer]
+              - row "10 Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt. CLOZE 2 ✎ 🗑" [ref=e125]:
+                - cell "10" [ref=e126]
+                - cell "Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt." [ref=e127]
+                - cell "CLOZE" [ref=e128]
+                - cell "2" [ref=e129]
+                - cell "✎ 🗑" [ref=e130]:
+                  - button "✎" [ref=e131] [cursor=pointer]
+                  - button "🗑" [ref=e132] [cursor=pointer]
+              - row "41 Welche Komponente rendert die JSP-Ansichten? MC 1 ✎ 🗑" [ref=e133]:
+                - cell "41" [ref=e134]
+                - cell "Welche Komponente rendert die JSP-Ansichten?" [ref=e135]
+                - cell "MC" [ref=e136]
+                - cell "1" [ref=e137]
+                - cell "✎ 🗑" [ref=e138]:
+                  - button "✎" [ref=e139] [cursor=pointer]
+                  - button "🗑" [ref=e140] [cursor=pointer]
+              - row "43 UML ist eine ____ Sache? FREE 1 ✎ 🗑" [ref=e141]:
+                - cell "43" [ref=e142]
+                - cell "UML ist eine ____ Sache?" [ref=e143]
+                - cell "FREE" [ref=e144]
+                - cell "1" [ref=e145]
+                - cell "✎ 🗑" [ref=e146]:
+                  - button "✎" [ref=e147] [cursor=pointer]
+                  - button "🗑" [ref=e148] [cursor=pointer]
+              - row "44 Was zeigt dieses Bild? IMAGE 1 ✎ 🗑" [ref=e149]:
+                - cell "44" [ref=e150]
+                - cell "Was zeigt dieses Bild?" [ref=e151]
+                - cell "IMAGE" [ref=e152]
+                - cell "1" [ref=e153]
+                - cell "✎ 🗑" [ref=e154]:
+                  - button "✎" [ref=e155] [cursor=pointer]
+                  - button "🗑" [ref=e156] [cursor=pointer]
+              - row "45 Ein Sequenzdiagramm zeigt die ___ zwischen Objekten. CLOZE 1 ✎ 🗑" [ref=e157]:
+                - cell "45" [ref=e158]
+                - cell "Ein Sequenzdiagramm zeigt die ___ zwischen Objekten." [ref=e159]
+                - cell "CLOZE" [ref=e160]
+                - cell "1" [ref=e161]
+                - cell "✎ 🗑" [ref=e162]:
+                  - button "✎" [ref=e163] [cursor=pointer]
+                  - button "🗑" [ref=e164] [cursor=pointer]
+              - row "46 Playwright Question? MC 1 ✎ 🗑" [ref=e165]:
+                - cell "46" [ref=e166]
+                - cell "Playwright Question?" [ref=e167]
+                - cell "MC" [ref=e168]
+                - cell "1" [ref=e169]
+                - cell "✎ 🗑" [ref=e170]:
+                  - button "✎" [ref=e171] [cursor=pointer]
+                  - button "🗑" [ref=e172] [cursor=pointer]
+              - row "47 Playwright Question? MC 1 ✎ 🗑" [ref=e173]:
+                - cell "47" [ref=e174]
+                - cell "Playwright Question?" [ref=e175]
+                - cell "MC" [ref=e176]
+                - cell "1" [ref=e177]
+                - cell "✎ 🗑" [ref=e178]:
+                  - button "✎" [ref=e179] [cursor=pointer]
+                  - button "🗑" [ref=e180] [cursor=pointer]
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - heading "Benutzerverwaltung" [level=3] [ref=e183]
+            - button "Create User" [ref=e184] [cursor=pointer]
+          - table [ref=e186]:
+            - rowgroup [ref=e187]:
+              - row "User Role Actions" [ref=e188]:
+                - columnheader "User" [ref=e189]
+                - columnheader "Role" [ref=e190]
+                - columnheader "Actions" [ref=e191]
+            - rowgroup [ref=e192]:
+              - row "student student ✎ 🗑" [ref=e193]:
+                - cell "student" [ref=e194]
+                - cell "student" [ref=e195]
+                - cell "✎ 🗑" [ref=e196]:
+                  - button "✎" [ref=e197] [cursor=pointer]
+                  - button "🗑" [ref=e198] [cursor=pointer]
+              - row "lehrer admin ✎ 🗑" [ref=e199]:
+                - cell "lehrer" [ref=e200]
+                - cell "admin" [ref=e201]
+                - cell "✎ 🗑" [ref=e202]:
+                  - button "✎" [ref=e203] [cursor=pointer]
+                  - button "🗑" [ref=e204] [cursor=pointer]
+              - row "teacher2 admin ✎ 🗑" [ref=e205]:
+                - cell "teacher2" [ref=e206]
+                - cell "admin" [ref=e207]
+                - cell "✎ 🗑" [ref=e208]:
+                  - button "✎" [ref=e209] [cursor=pointer]
+                  - button "🗑" [ref=e210] [cursor=pointer]
+              - row "student2 student ✎ 🗑" [ref=e211]:
+                - cell "student2" [ref=e212]
+                - cell "student" [ref=e213]
+                - cell "✎ 🗑" [ref=e214]:
+                  - button "✎" [ref=e215] [cursor=pointer]
+                  - button "🗑" [ref=e216] [cursor=pointer]
+              - row "uat_user_0121 student ✎ 🗑" [ref=e217]:
+                - cell "uat_user_0121" [ref=e218]
+                - cell "student" [ref=e219]
+                - cell "✎ 🗑" [ref=e220]:
+                  - button "✎" [ref=e221] [cursor=pointer]
+                  - button "🗑" [ref=e222] [cursor=pointer]
+              - row "uatuser student ✎ 🗑" [ref=e223]:
+                - cell "uatuser" [ref=e224]
+                - cell "student" [ref=e225]
+                - cell "✎ 🗑" [ref=e226]:
+                  - button "✎" [ref=e227] [cursor=pointer]
+                  - button "🗑" [ref=e228] [cursor=pointer]
+              - row "uatui2026 student ✎ 🗑" [ref=e229]:
+                - cell "uatui2026" [ref=e230]
+                - cell "student" [ref=e231]
+                - cell "✎ 🗑" [ref=e232]:
+                  - button "✎" [ref=e233] [cursor=pointer]
+                  - button "🗑" [ref=e234] [cursor=pointer]
 ```

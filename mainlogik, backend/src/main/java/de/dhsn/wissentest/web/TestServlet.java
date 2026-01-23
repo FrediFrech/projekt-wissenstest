@@ -76,7 +76,7 @@ public class TestServlet extends HttpServlet {
         try {
             if (path.equals("/start")) {
                 StartRequest r = JsonUtil.gson().fromJson(body, StartRequest.class);
-                List<Question> questions = testService.startTest(r.difficulty, r.limit, r.category);
+                List<Question> questions = testService.startTest(r.difficulty, r.limit, r.category, r.categories);
                 List<QuestionView> view = buildQuestionView(questions);
                 ServletUtils.writeJson(resp, view);
                 return;
@@ -109,6 +109,7 @@ public class TestServlet extends HttpServlet {
         int difficulty;
         int limit;
         String category;
+        List<String> categories;
     }
 
     private static class SubmitRequest {

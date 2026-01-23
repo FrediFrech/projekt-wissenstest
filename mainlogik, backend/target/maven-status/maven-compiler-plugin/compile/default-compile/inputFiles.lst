@@ -15,11 +15,14 @@ C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\ma
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\AdminServlet.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\JdbcAttemptDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\AttemptAnswer.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\QuestionImage.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\Attempt.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\QuestionType.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\ServletUtils.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\User.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\CharacterEncodingFilter.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\JsonUtil.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\QuestionImageDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\AttemptResult.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\service\ProgressionService.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\CorsFilter.java
@@ -28,6 +31,8 @@ C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\ma
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\AttemptDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\util\PasswordUtils.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\Question.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\JdbcQuestionImageDao.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\ImageServlet.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\JdbcAnswerDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\QuestionDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\AnswerDao.java

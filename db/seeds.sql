@@ -7,6 +7,34 @@
 --   SELECT encode(digest('student' || 'somesalt','sha256'),'hex');
 -- and then plug the salt and hash below.
 
+SET client_encoding = 'UTF8';
+
+-- Ensure schema extensions for new question types and image storage
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.table_constraints
+    WHERE table_name = 'questions'
+      AND constraint_type = 'CHECK'
+      AND constraint_name = 'questions_type_check'
+  ) THEN
+    ALTER TABLE questions DROP CONSTRAINT questions_type_check;
+  END IF;
+EXCEPTION WHEN undefined_table THEN
+  -- table not created yet
+END $$;
+
+ALTER TABLE questions
+  ADD CONSTRAINT questions_type_check CHECK (type IN ('MC','CLOZE','FREE','IMAGE'));
+
+CREATE TABLE IF NOT EXISTS question_images (
+  id SERIAL PRIMARY KEY,
+  content_type VARCHAR(128) NOT NULL,
+  data BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- Student user (student / student)
 INSERT INTO users (username, email, password_hash, password_salt, role)
 VALUES (

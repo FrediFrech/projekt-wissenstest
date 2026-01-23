@@ -20,6 +20,7 @@ public class AuthService {
     }
 
     public User register(String username, String email, String password) {
+        validateLoginInput(username, password);
         Optional<User> existing = userDao.findByUsername(username);
         if (existing.isPresent()) {
             throw new IllegalArgumentException("Username already exists");
@@ -33,12 +34,29 @@ public class AuthService {
     }
 
     public User login(String username, String password) {
+        validateLoginInput(username, password);
         User user = userDao.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
         if (!PasswordUtils.verifyPassword(password, user.getPasswordSalt(), user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid credentials");
         }
         return user;
+    }
+
+    private void validateLoginInput(String username, String password) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+        String trimmed = username.trim();
+        if (trimmed.length() < 3 || trimmed.length() > 50) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+        if (!trimmed.matches("[A-Za-z0-9._-]+")) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+        if (password == null || password.length() < 6 || password.length() > 128) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
     }
 
     public void requestPasswordReset(String username) {

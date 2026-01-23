@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS attempts CASCADE;
 DROP TABLE IF EXISTS cloze_answers CASCADE;
 DROP TABLE IF EXISTS answers CASCADE;
 DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS question_images CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS config CASCADE;
 
@@ -31,7 +32,7 @@ CREATE TABLE users (
 -- Questions
 CREATE TABLE questions (
   id SERIAL PRIMARY KEY,
-  type VARCHAR(16) NOT NULL CHECK (type IN ('MC','CLOZE')),
+  type VARCHAR(16) NOT NULL CHECK (type IN ('MC','CLOZE','FREE','IMAGE')),
   prompt TEXT NOT NULL,
   difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)), -- 1=easy,2=medium,3=hard
   points INTEGER NOT NULL DEFAULT 1,
@@ -39,6 +40,14 @@ CREATE TABLE questions (
   image_url VARCHAR(255),
   meta JSONB DEFAULT '{}'::jsonb,
   created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Stored images (uploaded via admin UI)
+CREATE TABLE question_images (
+  id SERIAL PRIMARY KEY,
+  content_type VARCHAR(128) NOT NULL,
+  data BYTEA NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 

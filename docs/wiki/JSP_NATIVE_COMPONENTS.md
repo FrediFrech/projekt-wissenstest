@@ -18,7 +18,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die a
 | **Result.jsp** | Page | Ergebnisanzeige nach Test | [Result.jsp](jsp_native_Result.md) |
 | **AdminPanel.jsp** | Page | Admin-Dashboard: Statistiken & Frage-Management | [AdminPanel.jsp](jsp_native_AdminPanel.md) |
 | **LearnMode.jsp** | Page | Lernmodus mit Flip-Cards | [LearnMode.jsp](jsp_native_LearnMode.md) |
-| **ExamMode.jsp** | Page | Prüfungsmodus (Timer, Fokus) | – |
+| **ExamMode.jsp** | Page | Prüfungsmodus (Konfiguration & Bestehensgrenze) | [ExamMode.jsp](jsp_native_ExamMode.md) |
 | **FlipCard.jsp** | Fragment | Wiederverwendbare Karteikarten-Komponente | [FlipCard.jsp](jsp_native_FlipCard.md) |
 
 ---

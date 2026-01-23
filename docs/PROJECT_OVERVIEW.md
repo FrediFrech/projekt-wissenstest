@@ -13,11 +13,13 @@ Web‑basierte Lernplattform für UML‑Wissenstests. Server‑Rendering mit JSP
 - Tests starten (MC & CLOZE)
 - Ergebnisse & Historie
 - Lernmodus mit Flip‑Cards
+- Prüfungsmodus mit Bestehensgrenze (Prozent/Punkte)
 
 ### Für Admins
 - Fragen anlegen/ändern/löschen
 - Benutzer verwalten (inkl. Passwort‑Reset)
 - Statistiken (User/Fragen/Attempts)
+- Sortieren/Filtern im Admin‑Panel (Wildcard `*`, Schwierigkeit, Typ)
 
 ## Architektur (Schichten)
 1. **Web/Servlets** – Request/Response, Session

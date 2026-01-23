@@ -17,6 +17,8 @@ import de.dhsn.wissentest.service.AdminService;
 import de.dhsn.wissentest.util.PasswordUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.Part;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,12 +27,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+@MultipartConfig(maxFileSize = 5_000_000, maxRequestSize = 6_000_000)
 public class AdminServlet extends HttpServlet {
     private final UserDao userDao = new JdbcUserDao();
     private final QuestionRepository questionDao = new JdbcQuestionRepository();
     private final AnswerDao answerDao = new JdbcAnswerDao();
     private final ClozeTokenDao clozeTokenDao = new JdbcClozeTokenDao();
     private final AttemptDao attemptDao = new JdbcAttemptDao();
+    private final QuestionImageDao imageDao = new JdbcQuestionImageDao();
     private final AdminService adminService = new AdminService(questionDao, answerDao, clozeTokenDao);
 
     @Override
@@ -72,6 +76,10 @@ public class AdminServlet extends HttpServlet {
             return;
         }
         String path = req.getPathInfo() == null ? "" : req.getPathInfo();
+        if (path.equals("/images")) {
+            handleImageUpload(req, resp);
+            return;
+        }
         if (path.equals("/questions")) {
             String body = ServletUtils.readBody(req);
             QuestionPayload payload = JsonUtil.gson().fromJson(body, QuestionPayload.class);
@@ -226,6 +234,7 @@ public class AdminServlet extends HttpServlet {
             v.prompt = q.getPrompt();
             v.difficulty = q.getDifficulty();
             v.points = q.getPoints();
+            v.metaJson = q.getMetaJson();
             v.imageUrl = q.getImageUrl();
             v.category = q.getCategory();
             if (q.getType() == QuestionType.CLOZE) {
@@ -236,6 +245,23 @@ public class AdminServlet extends HttpServlet {
             view.add(v);
         }
         return view;
+    }
+
+    private void handleImageUpload(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        Part filePart = req.getPart("file");
+        if (filePart == null || filePart.getSize() == 0) {
+            ServletUtils.writeError(resp, 400, "No image uploaded");
+            return;
+        }
+        String contentType = filePart.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            ServletUtils.writeError(resp, 400, "Invalid image type");
+            return;
+        }
+        byte[] data = filePart.getInputStream().readAllBytes();
+        int id = imageDao.create(data, contentType);
+        String url = req.getContextPath() + "/api/images/" + id;
+        ServletUtils.writeJson(resp, new ImageResponse(id, url));
     }
 
     private static class QuestionView {
@@ -264,6 +290,16 @@ public class AdminServlet extends HttpServlet {
 
         Message(String status) {
             this.status = status;
+        }
+    }
+
+    private static class ImageResponse {
+        int id;
+        String url;
+
+        ImageResponse(int id, String url) {
+            this.id = id;
+            this.url = url;
         }
     }
 }

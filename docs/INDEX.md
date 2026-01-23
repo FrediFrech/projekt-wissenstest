@@ -95,6 +95,7 @@
 - `jsp_native_Login.md` – Login-Formular (JSP)
 - `jsp_native_Register.md` – Registrierungs-Formular (JSP)
 - `jsp_native_TestList.md` – Test-Dashboard (JSP)
+- `jsp_native_ExamMode.md` – Prüfungsmodus-Konfiguration (JSP)
 - `jsp_native_TestRunner.md` – Quiz-Durchführung (JSP)
 - `jsp_native_Result.md` – Ergebnis-Anzeige (JSP)
 - `jsp_native_AdminPanel.md` – Admin-Dashboard (JSP)

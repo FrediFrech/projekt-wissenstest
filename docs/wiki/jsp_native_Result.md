@@ -1,35 +1,36 @@
 # jsp_native/Result.jsp
 
 ## Einfache Erklärung
-Nachdem der Benutzer einen Test beendet hat, zeigt diese Seite das Ergebnis: Wie viele Fragen richtig beantwortet wurden und eine prozentuale Bewertung. Der Benutzer kann danach entweder zum Dashboard zurück oder den Test nochmal versuchen.
+Nach dem Test zeigt diese Seite dein Ergebnis: **Punkte**, **Note** und eine kurze Bewertung. Optional werden Details je Frage angezeigt.
 
 ## Zweck
-Anzeige der Test-Ergebnisse mit Scoring-Logik und Navigation für Wiederholung.
+Anzeige der Test-Ergebnisse mit Schulnoten-Logik und Navigation für Wiederholung oder Dashboard.
 
 ## Technologie
-- **JSP**: Server-Side Template mit Request-Attributen
-- **CSS3**: Animate-Effekte (Celebration-Look mit Emoji)
-- **Vanilla JS**: Daten aus `sessionStorage` auslesen (vom TestRunner gespeichert)
+- **JSP**: Server-Side Template
+- **Vanilla JS**: Ergebnisdaten aus `sessionStorage` (`lastTestResult`)
+- **CSS3**: Cards, Buttons und Animationen
 
 ## Inhalt & Verantwortung
-- Zeigt Gesamt-Score (prozentual) in großem Kreis
-- Anzeige: "X von Y Fragen richtig"
-- Buttons: "Zurück zur Übersicht" und "Nochmal versuchen"
-- Daten werden via `sessionStorage` vom TestRunner übertragen
-- Animierte Einblendung (Slide-Up-Effekt)
+- Gesamtscore in Punkten (`X / Y Punkte`)
+- Anzeige der Note (1 - 6)
+- Bewertungs-Text (z. B. "Bestanden")
+- Optionaler Detailbereich je Frage (Antwort, Lösung, Punkte)
+
+## Prüfungsmodus: Bestehensgrenze
+Wenn der Prüfungsmodus gestartet wurde, wird die **Bestehensgrenze** aus der Konfiguration gelesen:
+- **Prozent** (z. B. 60 %) oder
+- **Punkte** (z. B. 12 Punkte).
+
+Die Seite zeigt dann **Bestanden/Nicht bestanden** anhand dieser Grenze an.
 
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=result` eingebunden
-- **Datenfluss:** Empfängt JSON von `js_native/app.js` via `sessionStorage.getItem('lastTestResult')`
-- **Styling:** `css_native/style.css`
-
-## Wichtige Entscheidungen
-- ✅ sessionStorage statt Props (JSP‑konform)
-- ✅ Client-Side Berechnung des Prozentsatzes
-- ✅ Keine komplexe Backend-Anbindung nötig (Daten kommen vom TestRunner)
+- **Datenfluss:** `js_native/app.js` speichert das Ergebnisobjekt in `sessionStorage`
+- **Config-Quelle:** `localStorage.testConfig` (enthält ggf. die Prüfungs-Bestehensgrenze)
 
 ## Beispiel-Workflow
-1. TestRunner beendet → speichert `{correct: 7, total: 10}` in sessionStorage
-2. Navigiert zu `?page=result`
-3. Result.jsp liest die Daten aus sessionStorage
-4. Zeigt "70%" an
+1. TestRunner beendet den Test und speichert `lastTestResult`
+2. Ergebnis-Seite wird geladen
+3. Punkte/Note werden angezeigt
+4. Im Prüfungsmodus wird die Bestehensgrenze angewandt

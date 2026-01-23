@@ -49,13 +49,13 @@
                         <div class="flip-card-front">
                             <div>
                                 <div style="font-size: 2rem; margin-bottom: 1rem;">❓</div>
-                                <h3 style="padding: 0 1rem;">\${item.q}</h3>
+                                <h3 style="padding: 0 1rem; max-height: 120px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word;">\${item.q}</h3>
                             </div>
                         </div>
                         <div class="flip-card-back">
                             <div>
                                 <div style="font-size: 2rem; margin-bottom: 1rem;">💡</div>
-                                <h3 style="padding: 0 1rem;">\${item.a}</h3>
+                                <h3 style="padding: 0 1rem; max-height: 120px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word;">\${item.a}</h3>
                             </div>
                         </div>
                     </div>

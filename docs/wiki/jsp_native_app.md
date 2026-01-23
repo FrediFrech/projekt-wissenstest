@@ -10,7 +10,7 @@ Dies ist das "Gehirn" der JSP-Native-Version. Diese JavaScript-Datei kümmert si
 - **Vanilla JavaScript:** Keine Frameworks, reine ES6
 - **Fetch API:** Für HTTP-Requests zum Backend (AJAX)
 - **DOM-Manipulation:** `document.getElementById`, `innerHTML`, `addEventListener`
-- **localStorage / sessionStorage:** Kleine Zustände zwischen Seiten
+- **localStorage / sessionStorage:** Kleine Zustände zwischen Seiten (z. B. Test-Konfig)
 
 ## Inhalt & Verantwortung
 
@@ -45,6 +45,12 @@ let userAnswers = {};                // Antworten des Users speichern
   - Animiert Antwort-Buttons
   - Speichert User-Input bei Click
 
+**Hinweis zur Konfiguration:**
+- `localStorage.testConfig` speichert u. a. Kategorie(n), Schwierigkeit, Anzahl Fragen, Zeitlimit.
+- Im Prüfungsmodus werden zusätzlich **Bestehensgrenzen** gespeichert:
+  - `passThresholdType`: `percent` oder `points`
+  - `passThresholdValue`: z. B. `60` oder `12`
+
 ### 5. **Test-Logik**
 - `selectAnswer(id, answer, element)`: Speichert gewählte Antwort
   - Visuelles Feedback (Border-Highlight)
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ## Verbindungen
 - **HTML:** Alle JSP-Seiten (`TestRunner.jsp`, `TestList.jsp`, etc.) laden diese Datei
 - **Backend:** Alle AJAX-Calls zu `/api/auth/*`, `/api/test/*`, `/api/admin/*`
-- **localStorage:** Test-Konfiguration (`testConfig`)
+- **localStorage:** Test-Konfiguration (`testConfig`, inkl. Bestehensgrenze im Prüfungsmodus)
 - **sessionStorage:** Ergebnis (`lastTestResult`)
 
 ## Wichtige Entscheidungen

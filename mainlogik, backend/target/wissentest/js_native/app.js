@@ -23,6 +23,23 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     return response.json();
 }
 
+function isAttemptPassed(attempt) {
+    if (!attempt) return false;
+    const rawGrade = attempt.grade;
+    if (rawGrade !== null && rawGrade !== undefined) {
+        const normalized = String(rawGrade).trim().replace(',', '.');
+        const gradeValue = parseFloat(normalized);
+        if (!Number.isNaN(gradeValue)) {
+            return gradeValue <= 4;
+        }
+    }
+    if (attempt.maxPoints > 0) {
+        const pct = (attempt.totalPoints / attempt.maxPoints) * 100;
+        return pct >= 50;
+    }
+    return false;
+}
+
 // Auth Logic
 async function handleLogin(event) {
     event.preventDefault();
@@ -51,6 +68,8 @@ async function loadTests() {
     const container = document.getElementById('testList');
     if (!container) return;
 
+    const passedCountEl = document.getElementById('dashboardPassedCount');
+
     // Update Rank
     if(document.getElementById('dashboardRank') && window.USER_ROLE) {
         document.getElementById('dashboardRank').innerText = window.USER_ROLE;
@@ -63,10 +82,10 @@ async function loadTests() {
             <div class="glass-card" style="background: white; border-left: 5px solid #ef4444; margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h3>Admin Panel 🔒</h3>
+                        <h3>Admin Panel \uD83D\uDD12</h3>
                         <p style="color: grey;">Verwaltung von Usern & Fragen</p>
                     </div>
-                    <a href="?page=adminPanel" class="btn btn-primary" style="background: #ef4444; border:none;">Öffnen</a>
+                    <a href="?page=adminPanel" class="btn btn-primary" style="background: #ef4444; border:none;">\u00d6ffnen</a>
                 </div>
             </div>
          `;
@@ -109,12 +128,15 @@ async function loadTests() {
                             <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 0.4rem;">Modus</label>
                             <select name="difficulty" class="form-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
                                 <option value="1">Leicht (Training)</option>
-                                <option value="2">Mittel (Prüfung)</option>
+                                <option value="2">Mittel (Pr\u00fcfung)</option>
                                 <option value="3">Schwer (Experte)</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Starten ▶</button>
+                        <button type="submit" class="btn btn-primary">Starten \u25B6</button>
                     </form>
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="openCustomTestModal()">Benutzerdefinierter Test</button>
+                    </div>
                 </div>
             </div>
     `;
@@ -123,6 +145,10 @@ async function loadTests() {
     let historyHtml = '<div class="glass-card" style="background: white;"><h3>Deine letzten Ergebnisse</h3><p>Keine Ergebnisse vorhanden.</p></div>';
     try {
         const history = await apiCall('/test/history');
+        if (passedCountEl) {
+            const passedCount = Array.isArray(history) ? history.filter(isAttemptPassed).length : 0;
+            passedCountEl.innerText = passedCount;
+        }
         if (history && history.length > 0) {
             const rows = history.map(h => {
                 const pct = h.maxPoints > 0 ? Math.round((h.totalPoints / h.maxPoints) * 100) : 0;
@@ -146,9 +172,16 @@ async function loadTests() {
         }
     } catch (e) {
         console.error("Failed to load history", e);
+        if (passedCountEl) passedCountEl.innerText = '0';
     }
     
     container.innerHTML = adminHtml + testHtml + historyHtml;
+
+    const customSelect = document.getElementById('customCategories');
+    if (customSelect) {
+        customSelect.innerHTML = '<option value="All">Alle Kategorien</option>' +
+            categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
 }
 
 function startConfiguredTest(event) {
@@ -161,6 +194,38 @@ function startConfiguredTest(event) {
     };
     // Store config in localStorage to pass it to the TestRunner page
     localStorage.setItem('testConfig', JSON.stringify(config));
+    window.location.href = '?page=testRunner';
+}
+
+function openCustomTestModal() {
+    const modal = document.getElementById('customTestModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeCustomTestModal() {
+    const modal = document.getElementById('customTestModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function startCustomTest(event) {
+    event.preventDefault();
+    const categorySelect = document.getElementById('customCategories');
+    const selected = categorySelect ? Array.from(categorySelect.selectedOptions).map(o => o.value) : [];
+    const categories = selected.filter(v => v && v !== 'All');
+    const limit = parseInt(document.getElementById('customLimit')?.value || '10', 10);
+    const difficulty = parseInt(document.getElementById('customDifficulty')?.value || '2', 10);
+    const durationMinutes = parseInt(document.getElementById('customMinutes')?.value || '10', 10);
+
+    const config = {
+        category: categories.length > 0 ? null : 'All',
+        categories: categories.length > 0 ? categories : null,
+        limit: Number.isFinite(limit) ? limit : 10,
+        difficulty: Number.isFinite(difficulty) ? difficulty : 2,
+        durationMinutes: Number.isFinite(durationMinutes) ? durationMinutes : 10
+    };
+
+    localStorage.setItem('testConfig', JSON.stringify(config));
+    closeCustomTestModal();
     window.location.href = '?page=testRunner';
 }
 
@@ -178,14 +243,32 @@ function initTest() {
         if (stored) config = JSON.parse(stored);
     } catch(e) { console.warn("Invalid config, using defaults"); }
 
+    const isExamMode = sessionStorage.getItem('isExamMode') === 'true';
+    const titleEl = document.getElementById('testTitle');
+    const modeLabel = isExamMode ? 'Pr\u00fcfungsmodus' : 'Wissenstest';
+    if (titleEl) {
+        titleEl.textContent = `${modeLabel} (${config.limit} Fragen)`;
+    }
+
     // Fetch questions from Backend
     apiCall('/test/start', 'POST', config).then(questions => {
-        currentQuestions = questions;
+        currentQuestions = Array.isArray(questions) ? questions : [];
         currentQuestionIndex = 0;
         userAnswers = {};
         testStartTime = Date.now();
+        if (titleEl) {
+            const loadedCount = currentQuestions.length;
+            const titleSuffix = loadedCount && loadedCount < config.limit
+                ? `${loadedCount}/${config.limit} Fragen verf\u00fcgbar`
+                : `${loadedCount || config.limit} Fragen`;
+            titleEl.textContent = `${modeLabel} (${titleSuffix})`;
+        }
         renderQuestion();
-        startTimer(config.limit * 60); // 1 minute per question default
+        const baseCount = currentQuestions.length > 0 ? currentQuestions.length : config.limit;
+        const durationMinutes = Number.isFinite(config.durationMinutes) && config.durationMinutes > 0
+            ? config.durationMinutes
+            : baseCount;
+        startTimer(durationMinutes * 60); // 1 minute per question default
     }).catch(e => {
         console.error(e);
         document.getElementById('questionContainer').innerHTML = "<p>Fehler beim Starten des Tests. Bitte erneut versuchen.</p>";
@@ -238,11 +321,21 @@ function renderQuestion() {
         return;
     }
 
-    let promptHtml = q.prompt;
-    if (q.imageUrl && q.imageUrl.trim() !== "") {
-        promptHtml += `<br><img src="${q.imageUrl}" style="max-width:100%; max-height:300px; margin-top:1rem; border-radius:8px;">`;
+    const questionText = document.getElementById('questionText');
+    if (questionText) {
+        questionText.textContent = q.prompt || '';
+        if (q.imageUrl && q.imageUrl.trim() !== "") {
+            const img = document.createElement('img');
+            img.src = q.imageUrl;
+            img.alt = 'Fragebild';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '300px';
+            img.style.marginTop = '1rem';
+            img.style.borderRadius = '8px';
+            questionText.appendChild(document.createElement('br'));
+            questionText.appendChild(img);
+        }
     }
-    document.getElementById('questionText').innerHTML = promptHtml; 
 
     const answersContainer = document.getElementById('answersContainer');
     answersContainer.innerHTML = ''; // Clear
@@ -274,7 +367,7 @@ function renderQuestion() {
              q.tokens.sort((a,b) => a.tokenIndex - b.tokenIndex).forEach(token => {
                 const row = document.createElement('div');
                 row.style.marginBottom = '0.5rem';
-                row.innerHTML = `<label>Lücke ${token.tokenIndex + 1}:</label> <input type="text" class="form-input" data-index="${token.tokenIndex}">`;
+                     row.innerHTML = `<label>L\u00fccke ${token.tokenIndex + 1}:</label> <input type="text" class="form-input" data-index="${token.tokenIndex}">`;
                 container.appendChild(row);
              });
              // Listen to changes
@@ -285,7 +378,7 @@ function renderQuestion() {
              });
              answersContainer.appendChild(container);
         } else {
-             answersContainer.innerHTML = '<p>Lückentext Fehler: Keine Tokens.</p>';
+             answersContainer.innerHTML = '<p>L\u00fcckentext Fehler: Keine Tokens.</p>';
         }
 
     } else if (q.options && q.options.length > 0) {
@@ -297,8 +390,14 @@ function renderQuestion() {
             btn.style.cursor = 'pointer';
             btn.style.marginTop = '0.5rem'; // Add spacing
             btn.style.animationDelay = `${idx * 0.1}s`;
-            // Fix: opt.answerText from Backend
-            btn.innerHTML = `<span style="font-weight:bold; margin-right:10px;">${String.fromCharCode(65+idx)}</span> ${opt.answerText}`;
+            const label = document.createElement('span');
+            label.style.fontWeight = 'bold';
+            label.style.marginRight = '10px';
+            label.textContent = String.fromCharCode(65 + idx);
+            const text = document.createElement('span');
+            text.textContent = opt.answerText;
+            btn.appendChild(label);
+            btn.appendChild(text);
             
             // Check if selected
             if(userAnswers[q.id] === opt.id) {
@@ -310,7 +409,7 @@ function renderQuestion() {
             answersContainer.appendChild(btn);
         });
     } else {
-         answersContainer.innerHTML = '<p>Keine Antwortmöglichkeiten geladen.</p>';
+         answersContainer.innerHTML = '<p>Keine Antwortm\u00f6glichkeiten geladen.</p>';
     }
 }
 
@@ -326,7 +425,7 @@ function selectAnswer(questionId, answerId, element) {
 function nextQuestion() {
     const currentQ = currentQuestions[currentQuestionIndex];
     if (!userAnswers[currentQ.id]) {
-        alert("Bitte wähle eine Antwort!");
+        alert("Bitte w\u00e4hle eine Antwort!");
         return;
     }
     
@@ -339,8 +438,9 @@ function nextQuestion() {
 }
 
 function cancelTest() {
-    if(confirm("Möchtest du den Test wirklich abbrechen? Dein Fortschritt geht verloren.")) {
+    if(confirm("M\u00f6chtest du den Test wirklich abbrechen? Dein Fortschritt geht verloren.")) {
         if(testTimer) clearInterval(testTimer);
+        sessionStorage.removeItem('isExamMode');
         window.location.href = '?page=testList';
     }
 }
@@ -348,6 +448,7 @@ function cancelTest() {
 async function finishTest() {
     // Show Loading
     if(testTimer) clearInterval(testTimer); // Stop timer immediately
+    sessionStorage.removeItem('isExamMode');
     
     // Config
     let config = { difficulty: 1 };

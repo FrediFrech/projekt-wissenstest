@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% 
-   boolean isLoggedIn = session.getAttribute("user") != null; 
-   String userRole = (session.getAttribute("role") != null) ? session.getAttribute("role").toString() : "student";
+    boolean isLoggedIn = session.getAttribute("user") != null; 
+    String userRole = (session.getAttribute("role") != null) ? session.getAttribute("role").toString() : "student";
+    boolean isAdmin = "admin".equalsIgnoreCase(userRole);
 %>
 <!DOCTYPE html>
 <html lang="de">
@@ -66,7 +67,11 @@
             <% } else if(pageParam.equals("testRunner")) { %>
                 <jsp:include page="jsp_native/TestRunner.jsp" />
             <% } else if(pageParam.equals("adminPanel")) { %>
-                <jsp:include page="jsp_native/AdminPanel.jsp" />
+                <% if (isAdmin) { %>
+                    <jsp:include page="jsp_native/AdminPanel.jsp" />
+                <% } else { %>
+                    <jsp:include page="jsp_native/AccessDenied.jsp" />
+                <% } %>
             <% } else if(pageParam.equals("result")) { %>
                 <jsp:include page="jsp_native/Result.jsp" />
             <% } else if(pageParam.equals("learnMode")) { %>
