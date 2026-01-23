@@ -1,0 +1,13 @@
+ich möchte das du bei der datenbank auch bilder speichern kannst und das ein drag and drop in den fragenerstellungsmodus bild möglihc ist, ebenso ein select von pc wo man die bilddatei im explorer auswählt. dann möchte ich das du die login anmeldepage robust gegen SQL injections machst und das man nicht als user ohne admin rechte auf das admin panel kommt. dann in den admin panel eine kleine erklärung am start der seite für den andmin wie man fragen erstellt, verschiedene arten und wie man das panel sosnt bedient. dann habe ich noch ein fehler bei der fragenerstellugn gefunden. das modal kann ich auch nicht mit einem kreuz schleißen, all diese modale sollten mit einem modal schließbar sein. dannn sollte es beim lückentext natürlich mehrere schriebarten für eine lösung berücksichtigen können, also das man für jede einzelne lösung ein array hat oder so, mit lösungen. den text mit regeln usw entfernen, das macht kein sinn. und den kleinen text darunter auch nicht mit der internetverbindung,  es gibt ein bug wo der text / inhalt größer als die karte wird, also muss man zeilenlänge und größe / kleinigkeit vl begrenzen für die karteikarten. dann die funktion das mein ein custom / benutzerdefinierten test machen kann und prüfung wo man ein modal öffnet und definieren kann das man ein test mit verschiednen kategorien zusammen macht also fragen mischt. dann komplexität auswählt. viel mehr optionen soll man in dem prüfungsmodus haben wo man ALLES einstellen kann. erneut, teste alles mit playwright mcp als UAT und fixe alle probleme bis du fertig bist
+
+VALIDIERUNG / BEWEIS (2026-01-23)
+- DB: question_images Tabelle + CHECK-Constraint fuer FREE/IMAGE angelegt (Migration per psql).
+- Admin Panel: Anleitung sichtbar, Admin-Modal per X/Overlay schliessbar.
+- Bild-Upload: Datei-Auswahl (admin_panel_full.png) ueber Drag/Select -> /api/images/1 gesetzt, IMAGE-Frage gespeichert.
+- Freitext-Frage gespeichert (alert: "Gespeichert"), neue FREE-Zeile im Katalog sichtbar.
+- Lueckentext mit JSON-Alternativen gespeichert (alert: "Gespeichert").
+- Nicht-Admin Zugriff auf ?page=adminPanel zeigt "Zugriff verweigert".
+- SQL-Injection-Login ("admin' OR 1=1 --") -> Login fehlgeschlagen (HTTP 400).
+- Benutzerdefinierter Test: Modal oeffnet, Mehrfach-Kategorien auswaehlbar, Start leitet zu TestRunner ("Wissenstest (1/10 Fragen verfuegbar)").
+- Pruefungsmodus: Modal oeffnet, Optionen gesetzt, Start -> TestRunner ("Pruefungsmodus (6/20 Fragen verfuegbar)", Timer 10:00).
+- Lernmodus Karten: Text laesst sich ohne Ueberlauf anzeigen (Line-Clamp aktiv).

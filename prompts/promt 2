@@ -1,0 +1,76 @@
+scanne jede einzelne datei von docs und wiki durch und schaue ob diese sich noch voin der erklärung und richtigkeit mit dem code decken. ebenso erweitere die erklärungen in den selben einfachen stil
+snchließend schreibe in DIESER datei ein check für jede einzelne datei rein und bestätige korrektheit. höre erst auf wenn du jede validiert hast
+
+VALIDIERUNG (Docs)
+- docs/ARCHITECTURE_DIAGRAMS.md — OK (Model/DAO aktualisiert)
+- docs/COMPLIANCE_SCAN.md — OK (JSP statt React)
+- docs/CONFORMITY_CHECK.md — OK (Frontend konform)
+- docs/DATABASE_EXPLORER.md — OK (Schema/Port aktualisiert)
+- docs/DEMO_MODE.md — OK (kein Fake-Demo, Script-Start)
+- docs/DOCUMENTATION_STATUS.md — OK (bereinigt, kurz & korrekt)
+- docs/INDEX.md — OK (Links bereinigt)
+- docs/JSP_COMPLIANCE_ANALYSIS.md — OK (JSP erfüllt)
+- docs/JSP_INTEGRATION_GUIDE.md — OK (Legacy-Hinweis)
+- docs/JSP_NATIVE_GUIDE.md — OK (JSP aktuell)
+- docs/JSP_STARTUP_GUIDE.md — OK (Ports/Login korrekt)
+- docs/POSTGRES_SETUP.md — OK (5433 + Hinweis 5432)
+- docs/PROJECT_OVERVIEW.md — OK (neu, korrekt)
+- docs/README.md — OK (React-Historie korrekt)
+
+VALIDIERUNG (Wiki)
+- docs/wiki/backend_db.properties.md — OK (Port 5433 erwähnt)
+- docs/wiki/backend_pom.xml.md — OK (Tomcat 9.x)
+- docs/wiki/backend_web.xml.md — OK (CORS neutral)
+- docs/wiki/css_native.md — OK (kein React-Vergleich)
+- docs/wiki/dao_AnswerDao.java.md — OK
+- docs/wiki/dao_AttemptDao.java.md — OK
+- docs/wiki/dao_ClozeTokenDao.java.md — OK
+- docs/wiki/dao_JdbcAnswerDao.java.md — OK
+- docs/wiki/dao_JdbcAttemptDao.java.md — OK
+- docs/wiki/dao_JdbcClozeTokenDao.java.md — OK
+- docs/wiki/dao_JdbcQuestionDao.java.md — OK (Alias)
+- docs/wiki/dao_JdbcQuestionRepository.java.md — OK
+- docs/wiki/dao_JdbcUserDao.java.md — OK
+- docs/wiki/dao_QuestionDao.java.md — OK (veraltet)
+- docs/wiki/dao_QuestionRepository.java.md — OK
+- docs/wiki/dao_UserDao.java.md — OK
+- docs/wiki/db_schema.sql.md — OK (Felder/Tabellen korrekt)
+- docs/wiki/db_seeds.sql.md — OK (User/Seeds korrekt)
+- docs/wiki/DOKUMENTATION_ABSCHLUSS.md — OK (bereinigt, Login angepasst)
+- docs/wiki/jsp_native_AdminPanel.md — OK (Endpoints + Hinweis zu FREE/IMAGE)
+- docs/wiki/jsp_native_app.md — OK (localStorage/sessionStorage)
+- docs/wiki/JSP_NATIVE_COMPONENTS.md — OK (index.jsp + ExamMode)
+- docs/wiki/jsp_native_FlipCard.md — OK
+- docs/wiki/jsp_native_LandingPage.md — OK
+- docs/wiki/jsp_native_LearnMode.md — OK (/api/test/questions/all)
+- docs/wiki/jsp_native_Login.md — OK
+- docs/wiki/jsp_native_Register.md — OK (SHA-256 iteriert)
+- docs/wiki/jsp_native_Result.md — OK
+- docs/wiki/jsp_native_TestList.md — OK (/api/test/categories + /history)
+- docs/wiki/jsp_native_TestRunner.md — OK (Start/Storage korrekt)
+- docs/wiki/model_AnswerOption.java.md — OK
+- docs/wiki/model_Attempt.java.md — OK (Felder ergänzt)
+- docs/wiki/model_AttemptAnswer.java.md — OK
+- docs/wiki/model_ClozeToken.java.md — OK (expectedText/tokenIndex)
+- docs/wiki/model_Question.java.md — OK (category/imageUrl/meta)
+- docs/wiki/model_QuestionType.java.md — OK (FREE/IMAGE Hinweis)
+- docs/wiki/model_User.java.md — OK (role/resetRequested)
+- docs/wiki/service_AdminService.java.md — OK
+- docs/wiki/service_AuthService.java.md — OK
+- docs/wiki/service_ProgressionService.java.md — OK
+- docs/wiki/service_TestService.java.md — OK
+- docs/wiki/start_local.md — OK (css_native/js_native)
+- docs/wiki/test_AuthServiceTest.java.md — OK (als Vorlage markiert)
+- docs/wiki/test_ProgressionServiceTest.java.md — OK
+- docs/wiki/test_util_TestUtils.java.md — OK
+- docs/wiki/testing_guide.md — OK
+- docs/wiki/util_DbConnectionManager.java.md — OK
+- docs/wiki/util_PasswordUtils.java.md — OK
+- docs/wiki/verbindungen_uebersicht.md — OK (JSP/JS angepasst)
+- docs/wiki/web_AdminServlet.java.md — OK (/api/admin/*)
+- docs/wiki/web_AuthServlet.java.md — OK (/api/auth/*)
+- docs/wiki/web_CorsFilter.java.md — OK
+- docs/wiki/web_HealthServlet.java.md — OK
+- docs/wiki/web_JsonUtil.java.md — OK
+- docs/wiki/web_ServletUtils.java.md — OK
+- docs/wiki/web_TestServlet.java.md — OK (Endpunkte ergänzt)

@@ -1,0 +1,13 @@
+starte und teste das script bis das ausführen keine fehler macht und das das ändern der seeds sql datei möglich ist und die neuen werte macht. teste das mithilfe von MCP Playwright inden du eine UAT durchfühsrt. anschließened validiere das änderungne gehen, die datei nicht crahed, .ps1 geht und im interface alles richitg angezeit wird ud alle tests gehen
+
+VALIDIERUNG (Durchgeführt)
+- Script-Start: start_project.ps1 läuft ohne Abbruch. Tomcat-Install wurde repariert (fehlende startup.bat), danach Start erfolgreich.
+- Seed-Updates: seeds.sql wurde erweitert (Beispiel 10) und per psql erneut eingespielt, ohne bestehende Daten zu löschen. Ergebnis: neue Frage erscheint im UI.
+- UAT (Playwright): 
+	1) Öffnen http://localhost:8080/wissentest/ (Landing OK)
+	2) Registrierung neuer Nutzer (uat_user_0121) erfolgreich, Session aktiv
+	3) Lernmodus geöffnet, Flip-Cards laden korrekt
+	4) Neue Seed-Frage „Welche Komponente rendert die JSP-Ansichten?“ ist sichtbar
+- Tests: mvn test ausgeführt → BUILD SUCCESS, 1 Test (ProgressionServiceTest) grün.
+
+Hinweis: Seed-Updates sind jetzt idempotent (neue Inhalte werden ergänzt, alte Daten bleiben bestehen).
