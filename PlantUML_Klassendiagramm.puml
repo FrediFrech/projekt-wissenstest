@@ -1,0 +1,552 @@
+@startuml Wissenstest_Klassendiagramm
+!theme plain
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333333
+skinparam classArrowColor #333333
+skinparam fontSize 11
+
+' ==================== ENUMS ====================
+enum QuestionType {
+  MC
+  CLOZE
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+' ==================== MODEL CLASSES ====================
+class User {
+  -id: int
+  -username: String
+  -password: String (hashed)
+  -role: Role
+  -email: String
+  -isActive: boolean
+  -createdAt: LocalDateTime
+  -updatedAt: LocalDateTime
+  --
+  +getId(): int
+  +getUsername(): String
+  +setPassword(String): void
+  +getRole(): Role
+  +getEmail(): String
+  +isActive(): boolean
+  +getCreatedAt(): LocalDateTime
+}
+
+class Question {
+  -id: int
+  -text: String
+  -type: QuestionType
+  -difficulty: String (EASY|MEDIUM|HARD)
+  -createdBy: User
+  -createdAt: LocalDateTime
+  -updatedAt: LocalDateTime
+  --
+  +getId(): int
+  +getText(): String
+  +getType(): QuestionType
+  +getDifficulty(): String
+  +getCreatedBy(): User
+  +getCreatedAt(): LocalDateTime
+}
+
+class AnswerOption {
+  -id: int
+  -question: Question
+  -text: String
+  -isCorrect: boolean
+  -optionOrder: int
+  --
+  +getId(): int
+  +getQuestion(): Question
+  +getText(): String
+  +isCorrect(): boolean
+  +getOptionOrder(): int
+}
+
+class ClozeToken {
+  -id: int
+  -question: Question
+  -tokenText: String
+  -originalText: String
+  -position: int
+  --
+  +getId(): int
+  +getQuestion(): Question
+  +getTokenText(): String
+  +getOriginalText(): String
+  +getPosition(): int
+  +matchesToken(String): boolean
+}
+
+class Test {
+  -id: int
+  -title: String
+  -description: String
+  -createdBy: User
+  -timeLimit: int (seconds)
+  -passingScore: int (percent)
+  -questions: List<Question>
+  -createdAt: LocalDateTime
+  -updatedAt: LocalDateTime
+  --
+  +getId(): int
+  +getTitle(): String
+  +getDescription(): String
+  +getCreatedBy(): User
+  +getTimeLimit(): int
+  +getPassingScore(): int
+  +getQuestions(): List<Question>
+  +addQuestion(Question): void
+  +removeQuestion(Question): void
+  +getQuestionCount(): int
+}
+
+class Attempt {
+  -id: int
+  -user: User
+  -test: Test
+  -startedAt: LocalDateTime
+  -completedAt: LocalDateTime
+  -score: int
+  -percentage: double
+  -passed: boolean
+  -grade: String
+  -answers: List<AttemptAnswer>
+  --
+  +getId(): int
+  +getUser(): User
+  +getTest(): Test
+  +getStartedAt(): LocalDateTime
+  +getCompletedAt(): LocalDateTime
+  +getScore(): int
+  +getPercentage(): double
+  +isPassed(): boolean
+  +getGrade(): String
+  +addAnswer(AttemptAnswer): void
+  +getAnswers(): List<AttemptAnswer>
+  +getDurationInSeconds(): int
+}
+
+class AttemptAnswer {
+  -id: int
+  -attempt: Attempt
+  -question: Question
+  -answerText: String
+  -isCorrect: boolean
+  -createdAt: LocalDateTime
+  --
+  +getId(): int
+  +getAttempt(): Attempt
+  +getQuestion(): Question
+  +getAnswerText(): String
+  +isCorrect(): boolean
+  +getCreatedAt(): LocalDateTime
+}
+
+' ==================== DAO INTERFACES ====================
+interface UserDao {
+  +create(User): void
+  +read(int): User
+  +readByUsername(String): User
+  +readAll(): List<User>
+  +update(User): void
+  +delete(int): void
+  +findByRole(Role): List<User>
+}
+
+interface QuestionDao {
+  +create(Question): void
+  +read(int): Question
+  +readAll(): List<Question>
+  +update(Question): void
+  +delete(int): void
+  +findByType(QuestionType): List<Question>
+  +findByDifficulty(String): List<Question>
+}
+
+interface AnswerDao {
+  +create(AnswerOption): void
+  +read(int): AnswerOption
+  +readByQuestion(int): List<AnswerOption>
+  +update(AnswerOption): void
+  +delete(int): void
+}
+
+interface ClozeTokenDao {
+  +create(ClozeToken): void
+  +read(int): ClozeToken
+  +readByQuestion(int): List<ClozeToken>
+  +update(ClozeToken): void
+  +delete(int): void
+}
+
+interface TestDao {
+  +create(Test): void
+  +read(int): Test
+  +readAll(): List<Test>
+  +update(Test): void
+  +delete(int): void
+  +findByCreator(User): List<Test>
+}
+
+interface AttemptDao {
+  +create(Attempt): void
+  +read(int): Attempt
+  +readAll(): List<Attempt>
+  +update(Attempt): void
+  +delete(int): void
+  +findByUser(User): List<Attempt>
+  +findByTest(Test): List<Attempt>
+}
+
+' ==================== DAO IMPLEMENTATIONS ====================
+class JdbcUserDao {
+  -dataSource: DataSource
+  --
+  +create(User): void
+  +read(int): User
+  +readByUsername(String): User
+  +readAll(): List<User>
+  +update(User): void
+  +delete(int): void
+  +findByRole(Role): List<User>
+  -mapResultSetToUser(ResultSet): User
+}
+
+class JdbcQuestionDao {
+  -dataSource: DataSource
+  --
+  +create(Question): void
+  +read(int): Question
+  +readAll(): List<Question>
+  +update(Question): void
+  +delete(int): void
+  +findByType(QuestionType): List<Question>
+  +findByDifficulty(String): List<Question>
+  -mapResultSetToQuestion(ResultSet): Question
+}
+
+class JdbcAnswerDao {
+  -dataSource: DataSource
+  --
+  +create(AnswerOption): void
+  +read(int): AnswerOption
+  +readByQuestion(int): List<AnswerOption>
+  +update(AnswerOption): void
+  +delete(int): void
+  -mapResultSetToAnswer(ResultSet): AnswerOption
+}
+
+class JdbcClozeTokenDao {
+  -dataSource: DataSource
+  --
+  +create(ClozeToken): void
+  +read(int): ClozeToken
+  +readByQuestion(int): List<ClozeToken>
+  +update(ClozeToken): void
+  +delete(int): void
+  -mapResultSetToToken(ResultSet): ClozeToken
+}
+
+class JdbcTestDao {
+  -dataSource: DataSource
+  --
+  +create(Test): void
+  +read(int): Test
+  +readAll(): List<Test>
+  +update(Test): void
+  +delete(int): void
+  +findByCreator(User): List<Test>
+  -mapResultSetToTest(ResultSet): Test
+}
+
+class JdbcAttemptDao {
+  -dataSource: DataSource
+  --
+  +create(Attempt): void
+  +read(int): Attempt
+  +readAll(): List<Attempt>
+  +update(Attempt): void
+  +delete(int): void
+  +findByUser(User): List<Attempt>
+  +findByTest(Test): List<Attempt>
+  -mapResultSetToAttempt(ResultSet): Attempt
+}
+
+class QuestionRepository {
+  -questionDao: QuestionDao
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  --
+  +findByFilter(type, difficulty): List<Question>
+  +findRandom(count): List<Question>
+  +findByTypeAndDifficulty(QuestionType, String): List<Question>
+  +getQuestionStats(): Map<String, Integer>
+}
+
+' ==================== SERVICE CLASSES ====================
+class AuthService {
+  -userDao: UserDao
+  -passwordUtils: PasswordUtils
+  -logger: Logger
+  --
+  +authenticate(String username, String password): User
+  +register(String username, String password, String email): User
+  +validatePassword(String password): boolean
+  +hashPassword(String password): String
+  +verifyPassword(String password, String hash): boolean
+  +changePassword(User, String oldPassword, String newPassword): void
+  +resetPassword(User, String newPassword): void
+}
+
+class TestService {
+  -testDao: TestDao
+  -questionDao: QuestionDao
+  -attemptDao: AttemptDao
+  -logger: Logger
+  --
+  +createTest(Test): void
+  +updateTest(Test): void
+  +deleteTest(int): void
+  +getTest(int): Test
+  +getAllTests(): List<Test>
+  +getTestsByCreator(User): List<Test>
+  +getQuestionsForTest(int): List<Question>
+  +addQuestionToTest(int testId, int questionId): void
+  +removeQuestionFromTest(int testId, int questionId): void
+}
+
+class ProgressionService {
+  -attemptDao: AttemptDao
+  -answerDao: AnswerDao
+  -logger: Logger
+  --
+  +calculateScore(Attempt): int
+  +calculatePercentage(Attempt): double
+  +calculateGrade(double percentage): String
+  +evaluateAttempt(Attempt): void
+  +getAttemptStats(User): Map<String, Object>
+  +getTestStats(Test): Map<String, Object>
+  +isPassed(Attempt): boolean
+  +getPassingRate(Test): double
+}
+
+class AdminService {
+  -userDao: UserDao
+  -testDao: TestDao
+  -questionDao: QuestionDao
+  -attemptDao: AttemptDao
+  -logger: Logger
+  --
+  +getAllUsers(): List<User>
+  +activateUser(User): void
+  +deactivateUser(User): void
+  +resetUserPassword(User, String newPassword): void
+  +getSystemStatistics(): Map<String, Object>
+  +getUserStatistics(User): Map<String, Object>
+  +getQuestionStatistics(): Map<String, Object>
+  +generateReport(Date startDate, Date endDate): String
+}
+
+' ==================== SERVLET CLASSES ====================
+class AuthServlet {
+  -authService: AuthService
+  -logger: Logger
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -handleLogin(HttpServletRequest, HttpServletResponse): void
+  -handleRegister(HttpServletRequest, HttpServletResponse): void
+  -handleLogout(HttpServletRequest, HttpServletResponse): void
+  -setSessionAttribute(HttpSession, String key, Object value): void
+}
+
+class TestServlet {
+  -testService: TestService
+  -progressionService: ProgressionService
+  -logger: Logger
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -handleListTests(HttpServletRequest, HttpServletResponse): void
+  -handleStartTest(HttpServletRequest, HttpServletResponse): void
+  -handleSubmitTest(HttpServletRequest, HttpServletResponse): void
+  -handleGetResult(HttpServletRequest, HttpServletResponse): void
+}
+
+class QuestionServlet {
+  -questionDao: QuestionDao
+  -authService: AuthService
+  -logger: Logger
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -handleListQuestions(HttpServletRequest, HttpServletResponse): void
+  -handleCreateQuestion(HttpServletRequest, HttpServletResponse): void
+  -handleUpdateQuestion(HttpServletRequest, HttpServletResponse): void
+  -handleDeleteQuestion(HttpServletRequest, HttpServletResponse): void
+}
+
+class AdminServlet {
+  -adminService: AdminService
+  -authService: AuthService
+  -logger: Logger
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -handleAdminPanel(HttpServletRequest, HttpServletResponse): void
+  -handleUserManagement(HttpServletRequest, HttpServletResponse): void
+  -handleStatistics(HttpServletRequest, HttpServletResponse): void
+  -authorizeAdmin(HttpServletRequest): boolean
+}
+
+class ProgressionServlet {
+  -progressionService: ProgressionService
+  -attemptDao: AttemptDao
+  -logger: Logger
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  -handleGetStats(HttpServletRequest, HttpServletResponse): void
+  -handleGetAttempts(HttpServletRequest, HttpServletResponse): void
+}
+
+' ==================== UTILITY CLASSES ====================
+class DbConnectionManager {
+  -{static} instance: DbConnectionManager
+  -dataSource: HikariDataSource
+  --
+  +{static} getInstance(): DbConnectionManager
+  +getConnection(): Connection
+  +getDataSource(): DataSource
+  -initialize(): void
+  +close(): void
+}
+
+class PasswordUtils {
+  --
+  +{static} hashPassword(String password): String
+  +{static} verifyPassword(String password, String hash): boolean
+  +{static} generatePassword(int length): String
+  +{static} isValidPassword(String password): boolean
+}
+
+class Logger {
+  --
+  +{static} info(String message): void
+  +{static} warn(String message): void
+  +{static} error(String message): void
+  +{static} error(String message, Exception e): void
+  +{static} debug(String message): void
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Enums
+QuestionType --* Question : uses
+Role --* User : uses
+
+' User relationships
+User --o "*" Test : creates
+User --o "*" Attempt : takes
+User --o "*" Question : creates
+
+' Question relationships
+Question --o "*" AnswerOption : has
+Question --o "*" ClozeToken : has
+Question --* "*" Test : contains
+
+' Test relationships
+Test --o "*" Attempt : has
+
+' Attempt relationships
+Attempt --o "*" AttemptAnswer : records
+
+' DAO relationships
+JdbcUserDao ..|> UserDao : implements
+JdbcQuestionDao ..|> QuestionDao : implements
+JdbcAnswerDao ..|> AnswerDao : implements
+JdbcClozeTokenDao ..|> ClozeTokenDao : implements
+JdbcTestDao ..|> TestDao : implements
+JdbcAttemptDao ..|> AttemptDao : implements
+
+' Service relationships
+AuthService --> UserDao : uses
+AuthService --> PasswordUtils : uses
+TestService --> TestDao : uses
+TestService --> QuestionDao : uses
+TestService --> AttemptDao : uses
+ProgressionService --> AttemptDao : uses
+ProgressionService --> AnswerDao : uses
+AdminService --> UserDao : uses
+AdminService --> TestDao : uses
+AdminService --> QuestionDao : uses
+AdminService --> AttemptDao : uses
+
+' Servlet relationships
+AuthServlet --> AuthService : uses
+TestServlet --> TestService : uses
+TestServlet --> ProgressionService : uses
+QuestionServlet --> QuestionDao : uses
+QuestionServlet --> AuthService : uses
+AdminServlet --> AdminService : uses
+AdminServlet --> AuthService : uses
+ProgressionServlet --> ProgressionService : uses
+ProgressionServlet --> AttemptDao : uses
+
+' Utility relationships
+DbConnectionManager --> JdbcUserDao : provides connection
+DbConnectionManager --> JdbcQuestionDao : provides connection
+DbConnectionManager --> JdbcAnswerDao : provides connection
+DbConnectionManager --> JdbcClozeTokenDao : provides connection
+DbConnectionManager --> JdbcTestDao : provides connection
+DbConnectionManager --> JdbcAttemptDao : provides connection
+
+' Repository relationships
+QuestionRepository --> QuestionDao : uses
+QuestionRepository --> AnswerDao : uses
+QuestionRepository --> ClozeTokenDao : uses
+
+note right of User
+  Enthält Benutzerinformationen
+  Rollen: STUDENT, TEACHER, ADMIN
+  Passwort ist gehashed
+end note
+
+note right of Question
+  Kann zwei Typen haben:
+  - MC: Multiple Choice
+  - CLOZE: Lückentext
+end note
+
+note right of Attempt
+  Speichert einen Testversuch
+  Enthält Score, Prozent, Note
+  und alle Antworten
+end note
+
+note right of AuthService
+  Verantwortlich für:
+  - Authentifizierung
+  - Passwort-Management
+  - Registrierung
+end note
+
+note right of ProgressionService
+  Berechnet:
+  - Score und Prozentuale Quote
+  - Noten (1-6)
+  - Statistiken
+end note
+
+note right of DbConnectionManager
+  Singleton Pattern
+  Verwaltet Connection Pool
+  mit HikariCP
+end note
+
+@enduml
