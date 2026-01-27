@@ -5,7 +5,7 @@ Einfache Erklärung: Diese Übersicht erklärt, wie Frontend, Backend, Services 
 Dieser Text erklärt in einfachen Worten, wie die Dateien zusammenarbeiten.
 
 ## 1) Frontend → Backend
-- Die JSP‑Seiten rufen über `js_native/app.js` HTTP‑Endpunkte unter `/api/...` auf.
+- Die JSP‑Seiten rufen über `js_native/app_main.js` HTTP‑Endpunkte unter `/api/...` auf.
 - Diese Endpunkte sind in `web.xml` mit Servlets verbunden (`AuthServlet`, `AdminServlet`, `TestServlet`).
 
 ## 2) Servlet‑Schicht → Service‑Schicht

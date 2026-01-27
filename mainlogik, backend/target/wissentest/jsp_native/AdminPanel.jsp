@@ -19,7 +19,7 @@
             <li>MC/IMAGE: * markiert richtige Antworten (z. B. <code>*Richtig, Falsch</code>).</li>
             <li>Freitext: Mehrere L&ouml;sungen per Komma oder neue Zeile (alle gelten als korrekt).</li>
             <li>L&uuml;ckentext: JSON-Array verwenden, z. B. <code>[ ["Sequenz","Sequenzdiagramm"], ["Zeit"] ]</code>.</li>
-            <li>Bild-Frage: Datei per Drag & Drop oder Dateiauswahl hochladen.</li>
+            <li>Bild-Frage: Mehrere Bilder per Drag & Drop oder Dateiauswahl hochladen (Import in DB).</li>
         </ul>
     </div>
 
@@ -115,12 +115,13 @@
                             <th style="padding:0.75rem;">Prompt</th>
                             <th style="padding:0.75rem;">Type</th>
                             <th style="padding:0.75rem;">Diff</th>
+                            <th style="padding:0.75rem; text-align:center;">Kartei</th>
                             <th style="padding:0.75rem;">Optionen</th>
                             <th style="padding:0.75rem; text-align:right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="questionTableBody">
-                        <tr><td colspan="6" style="text-align:center; padding:1rem;">Lade Fragen...</td></tr>
+                        <tr><td colspan="7" style="text-align:center; padding:1rem;">Lade Fragen...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -194,17 +195,30 @@
                 <input type="text" name="category" id="qCategory" class="form-input" required>
             </div>
             <div class="form-group">
+                <label style="display:flex; gap:0.6rem; align-items:center; cursor:pointer; user-select:none;">
+                    <input type="checkbox" id="qLearnEnabled" checked>
+                    <span>Als Karteikarte im Lernmodus anzeigen</span>
+                </label>
+                <small style="display:block; color:gray;">Wenn deaktiviert, erscheint die Frage nicht im Lernmodus.</small>
+            </div>
+            <div class="form-group">
                 <label>Fragetext (Prompt)</label>
                 <textarea name="prompt" id="qPrompt" class="form-input" rows="2" required></textarea>
             </div>
             <div class="form-group" id="imageUrlGroup" style="display:none;">
                 <label>Bild (Upload oder URL)</label>
                 <div id="imageDropZone" style="border:2px dashed #cbd5f5; border-radius:8px; padding:1rem; text-align:center; color:#64748b; margin-bottom:0.75rem;">
-                    <strong>Drag & Drop</strong> oder <button type="button" class="btn btn-ghost" onclick="document.getElementById('qImageFile').click()">Datei ausw&auml;hlen</button>
-                    <input type="file" id="qImageFile" accept="image/*" style="display:none" onchange="handleImageFileChange(event)">
+                    <strong>Drag & Drop</strong> oder <button type="button" class="btn btn-ghost" onclick="document.getElementById('qImageFile').click()">Dateien ausw&auml;hlen</button>
+                    <input type="file" id="qImageFile" accept="image/*" multiple style="display:none" onchange="handleImageFileChange(event)">
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-ghost" onclick="importImagesFromFolder()">Import aus Ordner (assets/questions)</button>
+                    <span style="font-size:0.8rem; color:#64748b;">Importiert Bilder in die DB und liefert URLs.</span>
                 </div>
                 <input type="text" name="imageUrl" id="qImageUrl" class="form-input" placeholder="Optional: Bild-URL" oninput="previewImage(this.value)">
                 <div id="imgPreview" style="margin-top:0.5rem; max-height:140px; overflow:hidden;"></div>
+                <div id="imgUploadStatus" style="margin-top:0.5rem; font-size:0.85rem; color:#64748b;"></div>
+                <div id="imgUploadList" style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.35rem;"></div>
             </div>
             <div class="form-group">
                  <label>Antworten / Config (JSON)</label>
@@ -276,6 +290,7 @@
 <script>
     let adminUsers = [];
     let adminQuestions = [];
+    let uploadedImages = [];
 
     document.addEventListener('DOMContentLoaded', () => {
         loadAdminStats();
@@ -413,6 +428,21 @@
         loadAdminStats();
     }
 
+    function safeParseJson(value) {
+        if (!value) return {};
+        try {
+            const obj = JSON.parse(value);
+            return obj && typeof obj === 'object' ? obj : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function isLearnEnabledQuestion(q) {
+        const meta = safeParseJson(q && q.metaJson ? q.metaJson : '{}');
+        return meta.learnEnabled !== false;
+    }
+
     function renderUserTable(users) {
         const tbody = document.getElementById('userTableBody');
         if (!tbody) return;
@@ -445,18 +475,22 @@
         if (!tbody) return;
         tbody.innerHTML = '';
         if (!questions || questions.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1rem;">Keine Fragen gefunden.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1rem;">Keine Fragen gefunden.</td></tr>';
             return;
         }
         questions.forEach(q => {
              const row = document.createElement('tr');
              row.style.borderBottom = '1px solid #eee';
              const optionCount = getOptionCount(q);
+             const learnEnabled = isLearnEnabledQuestion(q);
              row.innerHTML = `
                  <td style="padding:0.5rem; color:grey;">\${q.id}</td>
                  <td style="padding:0.5rem; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">\${q.prompt}</td>
                  <td style="padding:0.5rem;"><small style="background:#e5e7eb; padding:2px 4px; border-radius:4px;">\${q.type}</small></td>
                  <td style="padding:0.5rem;">\${q.difficulty}</td>
+                 <td style="padding:0.5rem; text-align:center;">
+                     <input type="checkbox" class="learnToggle" \${learnEnabled ? 'checked' : ''} aria-label="Als Karteikarte anzeigen" />
+                 </td>
                  <td style="padding:0.5rem;">\${optionCount}</td>
                  <td style="padding:0.5rem; text-align:right;">
                      <button class="btn btn-ghost" style="font-size:0.8rem;">✎</button>
@@ -467,8 +501,50 @@
              editBtn.onclick = () => openQuestionModal(q);
              const delBtn = row.querySelector('button:last-of-type');
              delBtn.onclick = () => deleteObject('questions', q.id);
+
+             const toggle = row.querySelector('input.learnToggle');
+             if (toggle) {
+                 toggle.onchange = async () => {
+                     const enabled = toggle.checked === true;
+                     toggle.disabled = true;
+                     try {
+                         await setQuestionLearnEnabled(q.id, enabled);
+                     } catch (e) {
+                         console.error(e);
+                         toggle.checked = !enabled;
+                         alert(e && e.message ? e.message : 'Fehler beim Speichern');
+                     } finally {
+                         toggle.disabled = false;
+                     }
+                 };
+             }
              tbody.appendChild(row);
         });
+    }
+
+    async function setQuestionLearnEnabled(questionId, enabled) {
+        const q = (Array.isArray(adminQuestions) ? adminQuestions : []).find(x => Number(x?.id) === Number(questionId));
+        if (!q) return;
+
+        const meta = safeParseJson(q.metaJson || '{}');
+        meta.learnEnabled = enabled;
+        const metaJson = JSON.stringify(meta);
+
+        const payload = {
+            id: q.id,
+            type: q.type,
+            prompt: q.prompt,
+            category: q.category,
+            imageUrl: q.imageUrl || null,
+            difficulty: parseInt(q.difficulty),
+            points: parseInt(q.points),
+            metaJson: metaJson,
+            answers: (q.type === 'CLOZE') ? null : (q.options || []),
+            tokens: (q.type === 'CLOZE') ? (q.tokens || []) : null
+        };
+
+        await apiCall('/admin/questions', 'PUT', payload);
+        q.metaJson = metaJson;
     }
 
     function applyUserFilters(users) {
@@ -580,6 +656,13 @@
         f.reset();
         document.getElementById('imgPreview').innerHTML = '';
         document.getElementById('qImageFile').value = '';
+        uploadedImages = [];
+        renderUploadedImages();
+        setUploadStatus('');
+
+        // Default: enabled for legacy questions
+        const learnBox = document.getElementById('qLearnEnabled');
+        if (learnBox) learnBox.checked = true;
         
         if (q) {
             document.getElementById('qModalTitle').innerText = 'Frage bearbeiten';
@@ -589,6 +672,10 @@
             document.getElementById('qPrompt').value = q.prompt;
             document.getElementById('qDiff').value = q.difficulty;
             document.getElementById('qPoints').value = q.points;
+
+            if (learnBox) {
+                learnBox.checked = isLearnEnabledQuestion(q);
+            }
             
             toggleQuestionFields(q.type);
             if(q.imageUrl) {
@@ -637,6 +724,18 @@
         const type = f.type.value;
         const raw = f.answersRaw.value || '';
 
+        const learnEnabled = document.getElementById('qLearnEnabled')?.checked !== false;
+
+        // When editing: preserve existing meta keys (e.g. future flags) and only update what we control.
+        // When creating: start with an empty meta object.
+        const existingQuestion = idVal
+            ? (adminQuestions || []).find(q => String(q.id) === String(idVal))
+            : null;
+        const metaObj = (existingQuestion && existingQuestion.metaJson)
+            ? (safeParseJson(existingQuestion.metaJson) || {})
+            : {};
+        metaObj.learnEnabled = learnEnabled;
+
         let answers = null;
         let tokens = null;
         let metaJson = '{}';
@@ -675,14 +774,18 @@
                 expectedText: opts[0] || '',
                 partialValue: 1
             }));
-            metaJson = JSON.stringify({ clozeAlternatives: alternatives });
+            metaObj.clozeAlternatives = alternatives;
+            metaJson = JSON.stringify(metaObj);
         } else if (type === 'FREE') {
             const entries = raw.split(/,|\n/).map(s => s.trim()).filter(Boolean);
             if (entries.length === 0) {
                 alert('Bitte mindestens eine L&ouml;sung angeben.');
                 return;
             }
-            answers = entries.map(text => ({ answerText: text, isCorrect: true, partialValue: 1 }));
+            answers = entries.map(text => ({ answerText: text, correct: true, partialValue: 1 }));
+            // Remove CLOZE-only keys if the type was changed.
+            delete metaObj.clozeAlternatives;
+            metaJson = JSON.stringify(metaObj);
         } else {
             const entries = raw.split(/,|\n/).map(s => s.trim()).filter(Boolean);
             if (entries.length === 0) {
@@ -692,12 +795,15 @@
             answers = entries.map(s => {
                 const isCorrect = s.startsWith('*');
                 const text = isCorrect ? s.substring(1) : s;
-                return { answerText: text.trim(), isCorrect: isCorrect, partialValue: isCorrect ? 1 : 0 };
+                return { answerText: text.trim(), correct: isCorrect, partialValue: isCorrect ? 1 : 0 };
             });
-            if (!answers.some(a => a.isCorrect)) {
+            if (!answers.some(a => a.correct)) {
                 alert('Bitte mindestens eine richtige Antwort mit * markieren.');
                 return;
             }
+            // Remove CLOZE-only keys if the type was changed.
+            delete metaObj.clozeAlternatives;
+            metaJson = JSON.stringify(metaObj);
         }
 
         const payload = {
@@ -753,6 +859,52 @@
         else div.innerHTML = '';
     }
 
+    function setImageUrl(url) {
+        if (!url) return;
+        const input = document.getElementById('qImageUrl');
+        if (input) input.value = url;
+        previewImage(url);
+    }
+
+    function setUploadStatus(message, isError = false) {
+        const status = document.getElementById('imgUploadStatus');
+        if (!status) return;
+        status.textContent = message || '';
+        status.style.color = isError ? '#b91c1c' : '#64748b';
+    }
+
+    function renderUploadedImages() {
+        const list = document.getElementById('imgUploadList');
+        if (!list) return;
+        list.innerHTML = '';
+        if (!uploadedImages || uploadedImages.length === 0) return;
+        uploadedImages.forEach(img => {
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '0.5rem';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-ghost';
+            btn.style.fontSize = '0.75rem';
+            btn.textContent = 'Verwenden';
+            btn.onclick = () => setImageUrl(img.url);
+
+            const link = document.createElement('a');
+            link.href = img.url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = img.name || img.url;
+            link.style.fontSize = '0.8rem';
+            link.style.color = '#4f46e5';
+
+            row.appendChild(btn);
+            row.appendChild(link);
+            list.appendChild(row);
+        });
+    }
+
     function closeCreateUserModal() {
         document.getElementById('createUserModal').style.display = 'none';
     }
@@ -777,20 +929,76 @@
             e.preventDefault();
             dropZone.style.borderColor = '#cbd5f5';
             dropZone.style.background = 'transparent';
-            const file = e.dataTransfer.files[0];
-            if (file) uploadQuestionImage(file);
+            const files = Array.from(e.dataTransfer.files || []);
+            if (files.length > 0) uploadQuestionImages(files);
         });
     }
 
     function handleImageFileChange(e) {
-        const file = e.target.files && e.target.files[0];
-        if (file) uploadQuestionImage(file);
+        const files = Array.from(e.target.files || []);
+        if (files.length > 0) uploadQuestionImages(files);
+        e.target.value = '';
+    }
+
+    async function importImagesFromFolder() {
+        setUploadStatus('Import gestartet...');
+        try {
+            const resp = await fetch('api/admin/images/import', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+            if (!resp.ok) {
+                throw new Error('Import fehlgeschlagen');
+            }
+            const data = await resp.json();
+            const items = data && Array.isArray(data.images) ? data.images : [];
+            if (items.length === 0) {
+                setUploadStatus('Keine Bilder gefunden.', true);
+                return;
+            }
+            items.forEach(item => {
+                if (item && item.url) {
+                    uploadedImages.unshift({ name: item.name || item.url, url: item.url, id: item.id });
+                }
+            });
+            renderUploadedImages();
+            if (uploadedImages.length > 0) {
+                setImageUrl(uploadedImages[0].url);
+            }
+            setUploadStatus(`Import abgeschlossen (\${items.length})`);
+        } catch (e) {
+            console.error(e);
+            setUploadStatus('Import fehlgeschlagen.', true);
+        }
+    }
+
+    async function uploadQuestionImages(files) {
+        const validFiles = Array.from(files || []).filter(file => file && file.type && file.type.startsWith('image/'));
+        if (validFiles.length === 0) {
+            alert('Bitte eine Bilddatei ausw&auml;hlen.');
+            return;
+        }
+        setUploadStatus(`Upload gestartet (\${validFiles.length})...`);
+        let success = 0;
+        for (const file of validFiles) {
+            const data = await uploadQuestionImage(file);
+            if (data && data.url) {
+                uploadedImages.unshift({ name: file.name, url: data.url, id: data.id });
+                success += 1;
+            }
+        }
+        renderUploadedImages();
+        if (uploadedImages.length > 0) {
+            setImageUrl(uploadedImages[0].url);
+        }
+        const message = `Upload abgeschlossen (\${success}/\${validFiles.length})`;
+        setUploadStatus(message, success !== validFiles.length);
     }
 
     async function uploadQuestionImage(file) {
         if (!file.type.startsWith('image/')) {
             alert('Bitte eine Bilddatei ausw&auml;hlen.');
-            return;
+            return null;
         }
         const formData = new FormData();
         formData.append('file', file);
@@ -804,12 +1012,11 @@
                 throw new Error('Upload fehlgeschlagen');
             }
             const data = await resp.json();
-            if (data && data.url) {
-                document.getElementById('qImageUrl').value = data.url;
-                previewImage(data.url);
-            }
+            return data;
         } catch (e) {
+            console.error(e);
             alert('Bild-Upload fehlgeschlagen');
+            return null;
         }
     }
 </script>

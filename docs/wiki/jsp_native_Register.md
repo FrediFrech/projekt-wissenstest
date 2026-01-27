@@ -57,7 +57,7 @@ handleRegister(event) {
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=register` eingebunden
 - **Styling:** `css_native/style.css`
-- **Logik:** `js_native/app.js` (Funktion: `handleRegister()`)
+- **Logik:** `js_native/app_main.js` (Funktion: `handleRegister()`)
 - **Backend:** POST zu `/api/auth/register`
 
 ## Wichtige Entscheidungen

@@ -1,7 +1,7 @@
 # jsp_native/TestList.jsp
 
 ## Einfache Erklärung
-Das Dashboard: Nach dem Login sieht der Benutzer hier eine Übersicht aller verfügbaren Tests. Jeder Test wird als schöne Karte angezeigt mit Metadaten wie Anzahl der Fragen und Schwierigkeit. Mit einem Klick kann der Benutzer einen Test starten.
+Das Dashboard ist die "Schaltzentrale" nach dem Login. Hier stellst du deinen Test zusammen, siehst deine letzten Ergebnisse und kannst direkt starten.
 
 ## Zweck
 **Dashboard / Test-Übersicht:** Listet verfügbare Tests auf und ermöglicht das Starten eines Tests.
@@ -12,18 +12,16 @@ Das Dashboard: Nach dem Login sieht der Benutzer hier eine Übersicht aller verf
 - **Vanilla JS:** Test-Liste laden via AJAX, Navigation
 
 ## Inhalt & Verantwortung
-- Session-Check: Nur angemeldete Benutzer sehen diese Seite
-- Test-Karten anzeigen mit:
-  - Test-Titel
-  - Beschreibung (z.B. "10 Fragen • Gemischt")
-  - "Starten" Button
-- Dynamisches Laden der Test-Liste via `loadTests()` Funktion
-- Buttons verlinken zu `?page=testRunner`
+- **Admin-Karte** (nur für Admins): Link zum Admin Panel
+- **Test-Konfiguration**: Kategorie, Anzahl, Schwierigkeit → Start-Button
+- **Benutzerdefinierter Test**: Modal mit Mehrfachauswahl von Kategorien und Zeitlimit
+- **Historie**: Anzeige der letzten Ergebnisse (Punkte/Prozent)
+- Dynamisches Laden via `loadTests()`
 
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=testList` eingebunden
 - **Styling:** `css_native/style.css`
-- **Logik:** `js_native/app.js` (Funktion: `loadTests()`)
+- **Logik:** `js_native/app_main.js` (Funktion: `loadTests()`, `startConfiguredTest()`, `openCustomTestModal()`)
 - **Backend:** AJAX zu `/api/test/categories` und `/api/test/history`
 
 ## Wichtige Entscheidungen
@@ -34,11 +32,10 @@ Das Dashboard: Nach dem Login sieht der Benutzer hier eine Übersicht aller verf
 
 ## Beispiel-Workflow
 ```
-1. User ist eingeloggt & navigiert zu ?page=testList
-2. JSP prüft session.getAttribute("user") - OK
-3. JavaScript triggert loadTests()
-4. AJAX-Call zu /api/test/categories
-5. AJAX-Call zu /api/test/history
-6. JavaScript rendert Konfiguration + Historie
-7. User klickt "Starten" → navigate zu ?page=testRunner
+1. User navigiert zu ?page=testList
+2. JavaScript triggert loadTests()
+3. AJAX-Calls zu /api/test/categories + /api/test/history
+4. UI rendert Konfiguration, Historie und (falls Admin) Admin-Karte
+5. User klickt "Starten" → navigiert zu ?page=testRunner
+6. Optional: "Benutzerdefinierter Test" öffnet Modal, speichert config in localStorage
 ```

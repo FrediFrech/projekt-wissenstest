@@ -16,7 +16,8 @@ Konfigurierbarer Prüfungsmodus mit festen Parametern und klarer Bestehensgrenze
   - **Punkte** (z. B. 12 Punkte)
 
 ## Datenfluss
-1. Nutzer wählt Optionen im Modal.
+1. Nutzer klickt "Optionen wählen" und öffnet das Modal.
+2. Nutzer bestätigt den Start (Bestätigungsdialog).
 2. Konfiguration wird in `localStorage.testConfig` gespeichert.
 3. `testRunner` startet mit diesen Parametern.
 4. Die Ergebnis-Seite nutzt die Bestehensgrenze für die Pass/Fail-Anzeige.

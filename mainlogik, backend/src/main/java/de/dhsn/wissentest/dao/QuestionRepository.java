@@ -1,9 +1,11 @@
 /*
  * Datei: QuestionRepository.java
- * Diese Schnittstelle beschreibt in einfachen Worten, wie der Code mit Fragen in der Datenbank arbeitet.
- * Sie kapselt die typischen Aktionen wie Anlegen, Ändern, Löschen und Suchen von Fragen,
- * damit andere Klassen nur die Methoden aufrufen müssen und nicht wissen müssen, wie SQL genau aussieht.
- * Verbindungen: Wird von JdbcQuestionRepository implementiert und in AdminService sowie TestService verwendet.
+ *
+ * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
+ * Das ist der "Vertrag" für unsere Datenbank. Hier steht, welche Befehle es gibt 
+ * (z.B. "Finde Frage X", "Lösche Frage Y"), aber nicht WIE sie funktionieren.
+ * Das "Wie" steht in der Implementierung (`JdbcQuestionRepository`).
+ * Das nennt man "Interface" - eine der wichtigsten Regeln in sauberem Java-Code.
  */
 package de.dhsn.wissentest.dao;
 

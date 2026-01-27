@@ -25,8 +25,10 @@ de\dhsn\wissentest\model\QuestionResultDetail.class
 de\dhsn\wissentest\web\AdminServlet$QuestionView.class
 de\dhsn\wissentest\dao\JdbcClozeTokenDao.class
 de\dhsn\wissentest\web\ServletUtils$ErrorResponse.class
+de\dhsn\wissentest\web\AdminServlet$ImportResponse.class
 de\dhsn\wissentest\web\AdminServlet$UserPayload.class
 de\dhsn\wissentest\web\AdminServlet.class
+de\dhsn\wissentest\web\AdminServlet$ImportImageResponse.class
 de\dhsn\wissentest\model\AttemptResult.class
 de\dhsn\wissentest\web\AdminServlet$QuestionPayload.class
 de\dhsn\wissentest\web\TestServlet$QuestionView.class

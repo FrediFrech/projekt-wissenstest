@@ -83,7 +83,7 @@ ON CONFLICT (username) DO NOTHING;
 -- Beispiel 1: Multiple Choice
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Welche UML-Diagrammart beschreibt die Struktur von Klassen?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  SELECT 'MC', 'Welche UML-Diagrammart beschreibt die Struktur von Klassen?', 1, 2, '{"topic":"uml","class":"Klassendiagramm"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
@@ -126,7 +126,7 @@ WHERE NOT EXISTS (
 -- Beispiel 2: Lückentext
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'CLOZE', 'In UML beschreibt das ___ Diagramm die Abläufe zwischen Objekten.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  SELECT 'CLOZE', 'In UML beschreibt das ___ Diagramm die Abläufe zwischen Objekten.', 2, 3, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Lückentext'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'CLOZE'
@@ -155,7 +155,7 @@ ON CONFLICT (question_id, token_index) DO NOTHING;
 -- Beispiel 3: Multiple Choice
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Welche Aussage trifft auf ein Use-Case-Diagramm zu?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  SELECT 'MC', 'Welche Aussage trifft auf ein Use-Case-Diagramm zu?', 1, 2, '{"topic":"uml","class":"Use-Case"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
@@ -198,7 +198,7 @@ WHERE NOT EXISTS (
 -- Beispiel 4: Lückentext
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'CLOZE', 'Ein ___ Diagramm zeigt den Lebenszyklus eines Objekts mit Zuständen und Übergängen.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  SELECT 'CLOZE', 'Ein ___ Diagramm zeigt den Lebenszyklus eines Objekts mit Zuständen und Übergängen.', 2, 3, '{"topic":"uml","class":"Zustandsdiagramm"}', 'Lückentext'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'CLOZE'
@@ -227,7 +227,7 @@ ON CONFLICT (question_id, token_index) DO NOTHING;
 -- Beispiel 5: Multiple Choice (mittel/schwer)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Was beschreibt ein Sequenzdiagramm am genauesten?', 2, 3, '{"topic":"uml"}', 'Multiple Choice'
+  SELECT 'MC', 'Was beschreibt ein Sequenzdiagramm am genauesten?', 2, 3, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
@@ -270,14 +270,14 @@ WHERE NOT EXISTS (
 -- Sample attempt seed (optional)
 -- INSERT INTO attempts (user_id, total_points, max_points, difficulty) VALUES (1, 0, 0, 1);
 
--- Beispiel 6: Multiple Choice (Hard)
+-- Beispiel 6: Klassendiagramm (Schwer)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern?', 3, 5, '{"topic":"patterns"}', 'Multiple Choice'
+  SELECT 'MC', 'Welche Beziehung beschreibt "Komposition" im UML-Klassendiagramm am besten?', 3, 5, '{"topic":"uml","class":"Klassendiagramm"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
-      AND prompt = 'Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern?'
+      AND prompt = 'Welche Beziehung beschreibt "Komposition" im UML-Klassendiagramm am besten?'
       AND difficulty = 3
       AND category = 'Multiple Choice'
   )
@@ -288,7 +288,7 @@ q_id AS (
   UNION ALL
   SELECT id FROM questions
   WHERE type = 'MC'
-    AND prompt = 'Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern?'
+    AND prompt = 'Welche Beziehung beschreibt "Komposition" im UML-Klassendiagramm am besten?'
     AND difficulty = 3
     AND category = 'Multiple Choice'
   ORDER BY id DESC
@@ -298,10 +298,10 @@ ins AS (
   SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
   FROM q_id,
     (VALUES
-      ('MVC (Model View Controller)', true, 1.0),
-      ('Singleton', false, 0.0),
-      ('Factory Method', false, 0.0),
-      ('Observer', false, 0.0)
+      ('Starke Teil-Ganzes-Beziehung (Lebenszyklus der Teile ist an das Ganze gekoppelt)', true, 1.0),
+      ('Schwache Teil-Ganzes-Beziehung (Teile können unabhängig existieren)', false, 0.0),
+      ('Vererbung / Generalisierung zwischen Klassen', false, 0.0),
+      ('Beliebige Assoziation ohne Besitzverhältnis', false, 0.0)
     ) AS a(answer_text, is_correct, partial_value)
 )
 INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
@@ -313,14 +313,14 @@ WHERE NOT EXISTS (
     AND a2.answer_text = ins.answer_text
 );
 
--- Beispiel 7: Bild mit Antwort
+-- Beispiel 7: Bildfrage (IMAGE) mit Antwort
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category, image_url)
-  SELECT 'MC', 'Was zeigt dieses Diagramm?', 2, 4, '{"topic":"uml"}', 'Bild mit Antwort', '/assets/diagram_example.png'
+  SELECT 'IMAGE', 'Was zeigt dieses Bild?', 2, 4, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Bild mit Antwort', 'assets/questions/sequenzdiagram.png'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
-    WHERE type = 'MC'
-      AND prompt = 'Was zeigt dieses Diagramm?'
+    WHERE type = 'IMAGE'
+      AND prompt = 'Was zeigt dieses Bild?'
       AND difficulty = 2
       AND category = 'Bild mit Antwort'
   )
@@ -330,8 +330,8 @@ q_id AS (
   SELECT id FROM q
   UNION ALL
   SELECT id FROM questions
-  WHERE type = 'MC'
-    AND prompt = 'Was zeigt dieses Diagramm?'
+  WHERE type = 'IMAGE'
+    AND prompt = 'Was zeigt dieses Bild?'
     AND difficulty = 2
     AND category = 'Bild mit Antwort'
   ORDER BY id DESC
@@ -341,10 +341,9 @@ ins AS (
   SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
   FROM q_id,
     (VALUES
-      ('Klassendiagramm', true, 1.0),
-      ('Komponentendiagramm', false, 0.0),
-      ('Verteilungsdiagramm', false, 0.0),
-      ('Objektdiagramm', false, 0.0)
+      ('Klassendiagramm', false, 0.0),
+      ('Sequenzdiagramm', true, 1.0),
+      ('Paketdiagramm', false, 0.0)
     ) AS a(answer_text, is_correct, partial_value)
 )
 INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
@@ -356,10 +355,161 @@ WHERE NOT EXISTS (
     AND a2.answer_text = ins.answer_text
 );
 
--- Beispiel 8: Lückentext
+-- Fix existing Bildfrage prompt/image/answer (idempotent)
+WITH q AS (
+  SELECT id FROM questions
+  WHERE type = 'IMAGE'
+    AND category = 'Bild mit Antwort'
+    AND prompt IN ('Was zeigt dieses Bild? ÄÖÜ ß', 'Was zeigt dieses Bild?')
+  ORDER BY id DESC
+  LIMIT 1
+)
+UPDATE questions
+SET prompt = 'Was zeigt dieses Bild?',
+  image_url = 'assets/questions/sequenzdiagram.png',
+    meta = '{"topic":"uml","class":"Sequenzdiagramm"}'::jsonb
+WHERE id IN (SELECT id FROM q);
+
+-- Normalize legacy image rows with old image_url
+UPDATE questions
+SET prompt = 'Was zeigt dieses Bild?',
+    image_url = 'assets/questions/sequenzdiagram.png',
+    meta = '{"topic":"uml","class":"Sequenzdiagramm"}'::jsonb
+WHERE type = 'IMAGE'
+  AND category = 'Bild mit Antwort'
+  AND image_url = '/assets/diagram_example.png';
+
+WITH q AS (
+  SELECT id FROM questions
+  WHERE type = 'IMAGE'
+    AND category = 'Bild mit Antwort'
+    AND prompt = 'Was zeigt dieses Bild?'
+  ORDER BY id DESC
+  LIMIT 1
+)
+UPDATE answers
+SET is_correct = (answer_text = 'Sequenzdiagramm'),
+    partial_value = CASE WHEN answer_text = 'Sequenzdiagramm' THEN 1.0 ELSE 0.0 END
+WHERE question_id IN (SELECT id FROM q)
+  AND answer_text IN ('Klassendiagramm', 'Sequenzdiagramm', 'Paketdiagramm');
+
+-- Ensure legacy image rows have only the intended options
+WITH q AS (
+  SELECT id FROM questions
+  WHERE type = 'IMAGE'
+    AND category = 'Bild mit Antwort'
+    AND prompt = 'Was zeigt dieses Bild?'
+)
+DELETE FROM answers
+WHERE question_id IN (SELECT id FROM q)
+  AND answer_text NOT IN ('Klassendiagramm', 'Sequenzdiagramm', 'Paketdiagramm');
+
+-- Deduplicate the image question (keep newest)
+DELETE FROM questions
+WHERE type = 'IMAGE'
+  AND category = 'Bild mit Antwort'
+  AND prompt = 'Was zeigt dieses Bild?'
+  AND id NOT IN (
+    SELECT MAX(id) FROM questions
+    WHERE type = 'IMAGE'
+      AND category = 'Bild mit Antwort'
+      AND prompt = 'Was zeigt dieses Bild?'
+  );
+
+WITH q AS (
+  SELECT id FROM questions
+  WHERE type = 'IMAGE'
+    AND category = 'Bild mit Antwort'
+    AND prompt = 'Was zeigt dieses Bild?'
+  ORDER BY id DESC
+  LIMIT 1
+)
+DELETE FROM answers
+WHERE question_id IN (SELECT id FROM q)
+  AND answer_text NOT IN ('Klassendiagramm', 'Sequenzdiagramm', 'Paketdiagramm');
+
+-- Beispiel 8: Bild mit Lückentext (Klassendiagramm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category, image_url)
+  SELECT 'CLOZE', 'Dieses Bild zeigt ein ___.', 1, 2, '{"topic":"uml","class":"Klassendiagramm","image":true}', 'Bild mit Lückentext', 'assets/questions/klassendiagram.PNG'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'Dieses Bild zeigt ein ___.'
+      AND difficulty = 1
+      AND category = 'Bild mit Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'Dieses Bild zeigt ein ___.'
+    AND difficulty = 1
+    AND category = 'Bild mit Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'Klassendiagramm', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
+-- Fix existing Bild-Lückentext image URL (idempotent)
+WITH q AS (
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND category = 'Bild mit Lückentext'
+    AND prompt = 'Dieses Bild zeigt ein ___.'
+  ORDER BY id DESC
+  LIMIT 1
+)
+UPDATE questions
+SET image_url = 'assets/questions/klassendiagram.PNG'
+WHERE id IN (SELECT id FROM q);
+
+-- Normalize any remaining absolute /assets URLs to relative paths
+UPDATE questions
+SET image_url = REPLACE(image_url, '/assets/', 'assets/')
+WHERE image_url LIKE '/assets/%';
+
+-- Normalize legacy image exercise entries (remove umlaut test text and non-standard category)
+WITH q AS (
+  SELECT id
+  FROM questions
+  WHERE category = 'Bilder Übung'
+     OR prompt ILIKE '%ÄÖÜ%'
+     OR prompt ILIKE '%ß%'
+)
+UPDATE questions
+SET category = 'Bild mit Antwort',
+    prompt = 'Was zeigt dieses Bild?',
+    meta = '{"topic":"uml","class":"Sequenzdiagramm"}'::jsonb,
+    image_url = CASE
+        WHEN image_url IS NULL OR image_url = '' THEN 'assets/questions/sequenzdiagram.png'
+        WHEN image_url LIKE '/assets/%' THEN REPLACE(image_url, '/assets/', 'assets/')
+        ELSE image_url
+    END
+WHERE id IN (SELECT id FROM q);
+
+WITH q AS (
+  SELECT id
+  FROM questions
+  WHERE category = 'Bild mit Antwort'
+    AND prompt = 'Was zeigt dieses Bild?'
+)
+UPDATE answers
+SET is_correct = (answer_text = 'Sequenzdiagramm'),
+    partial_value = CASE WHEN answer_text = 'Sequenzdiagramm' THEN 1.0 ELSE 0.0 END
+WHERE question_id IN (SELECT id FROM q)
+  AND answer_text IN ('Klassendiagramm', 'Sequenzdiagramm', 'Paketdiagramm');
+
+-- Beispiel 9: Lückentext
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'CLOZE', 'Das UML Klassendiagramm zeigt die ___ zwischen den Klassen.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  SELECT 'CLOZE', 'Das UML Klassendiagramm zeigt die ___ zwischen den Klassen.', 2, 3, '{"topic":"uml","class":"Klassendiagramm"}', 'Lückentext'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'CLOZE'
@@ -385,10 +535,10 @@ SELECT q_id.id, 1, 'Beziehungen', 1.0
 FROM q_id
 ON CONFLICT (question_id, token_index) DO NOTHING;
 
--- Beispiel 9: Lückentext - Sequenz Diagramme
+-- Beispiel 10: Lückentext - Sequenz Diagramme
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'CLOZE', 'Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt.', 2, 4, '{"topic":"sequence-diagrams"}', 'Lückentext'
+  SELECT 'CLOZE', 'Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt.', 2, 4, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Lückentext'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'CLOZE'
@@ -424,14 +574,100 @@ SELECT ins.question_id, ins.token_index, ins.expected_text, ins.partial_value
 FROM ins
 ON CONFLICT (question_id, token_index) DO NOTHING;
 
--- Beispiel 10: Multiple Choice (Seed-Update Test)
+-- Beispiel 11: Use-Case (Mittel)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Welche Komponente rendert die JSP-Ansichten?', 1, 2, '{"topic":"jsp"}', 'Multiple Choice'
+  SELECT 'MC', 'Wann wird die Beziehung «include» in einem Use-Case-Diagramm typischerweise verwendet?', 2, 3, '{"topic":"uml","class":"Use-Case"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
-      AND prompt = 'Welche Komponente rendert die JSP-Ansichten?'
+      AND prompt = 'Wann wird die Beziehung «include» in einem Use-Case-Diagramm typischerweise verwendet?'
+      AND difficulty = 2
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Wann wird die Beziehung «include» in einem Use-Case-Diagramm typischerweise verwendet?'
+    AND difficulty = 2
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Wenn ein verpflichtender Teilablauf von mehreren Use Cases wiederverwendet wird', true, 1.0),
+      ('Wenn ein optionaler Ablauf nur bei Bedarf ergänzt wird', false, 0.0),
+      ('Wenn ein Akteur mehrere Use Cases erbt', false, 0.0),
+      ('Wenn ein Use Case außerhalb der Systemgrenze liegt', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 12: Use-Case (Schwer)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Was unterscheidet «extend» von «include» in Use-Case-Diagrammen am klarsten?', 3, 5, '{"topic":"uml","class":"Use-Case"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Was unterscheidet «extend» von «include» in Use-Case-Diagrammen am klarsten?'
+      AND difficulty = 3
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Was unterscheidet «extend» von «include» in Use-Case-Diagrammen am klarsten?'
+    AND difficulty = 3
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('«extend» ist optional/bedingt und erweitert einen Basis-Use-Case an Extension Points', true, 1.0),
+      ('«extend» bedeutet, dass der Basis-Use-Case zwingend aufgerufen wird', false, 0.0),
+      ('«include» wird nur zur Vererbung von Akteuren benutzt', false, 0.0),
+      ('«include» ist optional und wird nur in Ausnahmen ausgeführt', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 13: Sequenzdiagramm (Leicht)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Achse repräsentiert in einem Sequenzdiagramm typischerweise den Zeitverlauf?', 1, 2, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Achse repräsentiert in einem Sequenzdiagramm typischerweise den Zeitverlauf?'
       AND difficulty = 1
       AND category = 'Multiple Choice'
   )
@@ -442,7 +678,7 @@ q_id AS (
   UNION ALL
   SELECT id FROM questions
   WHERE type = 'MC'
-    AND prompt = 'Welche Komponente rendert die JSP-Ansichten?'
+    AND prompt = 'Welche Achse repräsentiert in einem Sequenzdiagramm typischerweise den Zeitverlauf?'
     AND difficulty = 1
     AND category = 'Multiple Choice'
   ORDER BY id DESC
@@ -452,8 +688,139 @@ ins AS (
   SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
   FROM q_id,
     (VALUES
-      ('Tomcat (Servlet Container)', true, 1.0),
-      ('PostgreSQL', false, 0.0)
+      ('Die vertikale Achse (von oben nach unten)', true, 1.0),
+      ('Die horizontale Achse (von links nach rechts)', false, 0.0),
+      ('Keine Achse – Zeit wird durch Farben dargestellt', false, 0.0),
+      ('Zeit wird nur durch Seitennummern dargestellt', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 14: Sequenzdiagramm (Schwer)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Wofür wird ein Combined Fragment «alt» in einem Sequenzdiagramm verwendet?', 3, 5, '{"topic":"uml","class":"Sequenzdiagramm"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Wofür wird ein Combined Fragment «alt» in einem Sequenzdiagramm verwendet?'
+      AND difficulty = 3
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Wofür wird ein Combined Fragment «alt» in einem Sequenzdiagramm verwendet?'
+    AND difficulty = 3
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Für alternative Abläufe (if/else) mit Guards', true, 1.0),
+      ('Für Wiederholungen einer Nachricht (loop)', false, 0.0),
+      ('Für parallele Ausführung (par)', false, 0.0),
+      ('Für die Definition von Klassenattributen', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 15: Zustandsdiagramm (Leicht)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Was beschreibt ein UML-Zustandsdiagramm (State Machine Diagram) primär?', 1, 2, '{"topic":"uml","class":"Zustandsdiagramm"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Was beschreibt ein UML-Zustandsdiagramm (State Machine Diagram) primär?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Was beschreibt ein UML-Zustandsdiagramm (State Machine Diagram) primär?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Zustände und Übergänge eines Objekts über seinen Lebenszyklus', true, 1.0),
+      ('Akteure und ihre Interaktionen mit dem System', false, 0.0),
+      ('Datenbanktabellen und deren Beziehungen', false, 0.0),
+      ('Die Verteilung von Software auf Servern', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 16: Zustandsdiagramm (Schwer)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Was ist eine "Entry"-Action in einem UML-Zustandsdiagramm?', 3, 5, '{"topic":"uml","class":"Zustandsdiagramm"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Was ist eine "Entry"-Action in einem UML-Zustandsdiagramm?'
+      AND difficulty = 3
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Was ist eine "Entry"-Action in einem UML-Zustandsdiagramm?'
+    AND difficulty = 3
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Eine Aktion, die beim Betreten eines Zustands automatisch ausgeführt wird', true, 1.0),
+      ('Eine Aktion, die den Startzustand definiert', false, 0.0),
+      ('Ein Ereignis, das immer einen Zustand beendet', false, 0.0),
+      ('Die Beschriftung einer Transition mit ihrer Guard', false, 0.0)
     ) AS a(answer_text, is_correct, partial_value)
 )
 INSERT INTO answers (question_id, answer_text, is_correct, partial_value)

@@ -1,0 +1,74 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "✨ UML Wissenstest" [ref=e4] [cursor=pointer]:
+      - /url: "?page=landingPage"
+      - generic [ref=e5]: ✨ UML Wissenstest
+    - generic [ref=e6]:
+      - link "Tests" [ref=e7] [cursor=pointer]:
+        - /url: "?page=testList"
+      - link "Pruefung (Exam)" [ref=e8] [cursor=pointer]:
+        - /url: "?page=examMode"
+      - link "Lernen" [ref=e9] [cursor=pointer]:
+        - /url: "?page=learnMode"
+      - link "Admin Panel" [ref=e10] [cursor=pointer]:
+        - /url: "?page=adminPanel"
+      - button "Logout" [ref=e11] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - heading "Dein Dashboard" [level=2] [ref=e14]
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - heading "Dein Rang" [level=3] [ref=e17]
+          - generic [ref=e18]: admin
+        - generic [ref=e19]:
+          - heading "Tests bestanden" [level=3] [ref=e20]
+          - generic [ref=e21]: "1"
+      - heading "Verfügbare Tests" [level=3] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Admin Panel 🔒" [level=3] [ref=e27]
+            - paragraph [ref=e28]: Verwaltung von Usern & Fragen
+          - link "Öffnen" [ref=e29] [cursor=pointer]:
+            - /url: "?page=adminPanel"
+        - generic [ref=e31]:
+          - generic [ref=e33]:
+            - heading "Allgemeiner Wissenstest" [level=3] [ref=e34]
+            - paragraph [ref=e35]: Konfiguriere deinen Test
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e38]: Kategorie
+              - combobox [ref=e39]:
+                - option "Alle Kategorien" [selected]
+                - option "Bild mit Antwort"
+                - option "Bild mit Lückentext"
+                - option "Lückentext"
+                - option "Multiple Choice"
+                - option "UML"
+            - generic [ref=e40]:
+              - generic [ref=e41]: Anzahl Fragen
+              - combobox [ref=e42]:
+                - option "5 Fragen"
+                - option "10 Fragen" [selected]
+                - option "20 Fragen"
+            - generic [ref=e43]:
+              - generic [ref=e44]: Modus
+              - combobox [ref=e45]:
+                - option "Leicht (Training)" [selected]
+                - option "Mittel (Prüfung)"
+                - option "Schwer (Experte)"
+            - button "Starten ▶" [ref=e46] [cursor=pointer]
+          - button "Benutzerdefinierter Test" [ref=e48] [cursor=pointer]
+        - generic [ref=e49]:
+          - heading "Deine letzten Ergebnisse" [level=3] [ref=e50]
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - generic [ref=e53]: Test (Schwierigkeit 1)
+              - generic [ref=e54]: 0% (0/13)
+            - generic [ref=e55]:
+              - generic [ref=e56]: Test (Schwierigkeit 1)
+              - generic [ref=e57]: 100% (4/4)
+```

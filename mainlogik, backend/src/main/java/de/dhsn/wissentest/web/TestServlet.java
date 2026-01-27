@@ -9,6 +9,7 @@ package de.dhsn.wissentest.web;
 import de.dhsn.wissentest.dao.*;
 import de.dhsn.wissentest.model.Attempt;
 import de.dhsn.wissentest.model.AttemptResult;
+import de.dhsn.wissentest.model.ClozeToken;
 import de.dhsn.wissentest.model.Question;
 import de.dhsn.wissentest.service.TestService;
 
@@ -51,7 +52,18 @@ public class TestServlet extends HttpServlet {
                 List<Question> all = testService.getAllQuestions();
                 List<LearnCard> cards = new java.util.ArrayList<>();
                 for(Question q : all) {
-                   cards.add(new LearnCard(q.getId(), q.getPrompt(), getCorrectAnswerText(q)));
+                   if (!isLearnEnabled(q)) {
+                       continue;
+                   }
+                   cards.add(new LearnCard(
+                           q.getId(),
+                           q.getPrompt(),
+                           getCorrectAnswerText(q),
+                           q.getType() == null ? null : q.getType().name(),
+                           q.getImageUrl(),
+                           q.getCategory(),
+                           q.getDifficulty()
+                   ));
                 }
                 ServletUtils.writeJson(resp, cards);
                 return;
@@ -169,7 +181,20 @@ public class TestServlet extends HttpServlet {
         int id;
         String q;
         String a;
-        LearnCard(int id, String q, String a) { this.id=id; this.q=q; this.a=a; }
+        String type;
+        String imageUrl;
+        String category;
+        int difficulty;
+
+        LearnCard(int id, String q, String a, String type, String imageUrl, String category, int difficulty) {
+            this.id = id;
+            this.q = q;
+            this.a = a;
+            this.type = type;
+            this.imageUrl = imageUrl;
+            this.category = category;
+            this.difficulty = difficulty;
+        }
     }
 
     private String getCorrectAnswerText(Question q) {
@@ -178,10 +203,69 @@ public class TestServlet extends HttpServlet {
              if (q.getType().name().equals("FREE")) {
                  return opts.stream().map(o -> o.getAnswerText()).reduce((a, b) -> a + " / " + b).orElse("Keine Musterlösung hinterlegt");
              }
-             return opts.stream().filter(o -> o.isCorrect()).map(o -> o.getAnswerText()).reduce((a, b) -> a + ", " + b).orElse("Keine Antwort");
+             String byCorrect = opts.stream()
+                     .filter(o -> o.isCorrect())
+                     .map(o -> o.getAnswerText())
+                     .reduce((a, b) -> a + ", " + b)
+                     .orElse("");
+             if (!byCorrect.isEmpty()) {
+                 return byCorrect;
+             }
+             String byPartial = opts.stream()
+                     .filter(o -> o.getPartialValue() > 0)
+                     .map(o -> o.getAnswerText())
+                     .reduce((a, b) -> a + ", " + b)
+                     .orElse("");
+             if (!byPartial.isEmpty()) {
+                 return byPartial;
+             }
+             return opts.stream().map(o -> o.getAnswerText()).findFirst().orElse("Keine Antwort");
         } else {
              // Cloze
-             return "Lückentext (siehe Kontext)";
+             List<ClozeToken> tokens = clozeTokenDao.findByQuestion(q.getId());
+             if (tokens == null || tokens.isEmpty()) {
+                 return "Keine Musterlösung hinterlegt";
+             }
+             tokens.sort(java.util.Comparator.comparingInt(ClozeToken::getTokenIndex));
+             return tokens.stream()
+                     .map(ClozeToken::getExpectedText)
+                     .filter(t -> t != null && !t.trim().isEmpty())
+                     .reduce((a, b) -> a + " | " + b)
+                     .orElse("Keine Musterlösung hinterlegt");
+        }
+    }
+
+    /**
+     * LearnMode should only show questions that are explicitly enabled.
+     * Stored in questions.meta JSON as {"learnEnabled": true/false}.
+     * Default: enabled (so legacy data still shows up).
+     */
+    private boolean isLearnEnabled(Question q) {
+        if (q == null) {
+            return true;
+        }
+        String meta = q.getMetaJson();
+        if (meta == null || meta.isBlank()) {
+            return true;
+        }
+        try {
+            java.util.Map<?, ?> map = JsonUtil.gson().fromJson(meta, java.util.Map.class);
+            if (map == null) {
+                return true;
+            }
+            Object v = map.get("learnEnabled");
+            if (v == null) {
+                return true;
+            }
+            if (v instanceof Boolean) {
+                return (Boolean) v;
+            }
+            if (v instanceof Number) {
+                return ((Number) v).intValue() != 0;
+            }
+            return Boolean.parseBoolean(String.valueOf(v));
+        } catch (Exception ignored) {
+            return true;
         }
     }
 }

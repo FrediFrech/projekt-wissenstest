@@ -16,6 +16,7 @@ Anzeige der Test-Ergebnisse mit Schulnoten-Logik und Navigation für Wiederholun
 - Anzeige der Note (1 - 6)
 - Bewertungs-Text (z. B. "Bestanden")
 - Optionaler Detailbereich je Frage (Antwort, Lösung, Punkte)
+- Toggle "Details anzeigen" blendet die Auswertung ein/aus
 
 ## Prüfungsmodus: Bestehensgrenze
 Wenn der Prüfungsmodus gestartet wurde, wird die **Bestehensgrenze** aus der Konfiguration gelesen:
@@ -26,7 +27,7 @@ Die Seite zeigt dann **Bestanden/Nicht bestanden** anhand dieser Grenze an.
 
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=result` eingebunden
-- **Datenfluss:** `js_native/app.js` speichert das Ergebnisobjekt in `sessionStorage`
+- **Datenfluss:** `js_native/app_main.js` speichert das Ergebnisobjekt in `sessionStorage`
 - **Config-Quelle:** `localStorage.testConfig` (enthält ggf. die Prüfungs-Bestehensgrenze)
 
 ## Beispiel-Workflow

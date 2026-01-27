@@ -1,4 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+   /*
+    * Component: TestList.jsp
+    *
+    * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
+    * Dies ist das "Dashboard". Es zeigt dir deine Statistiken (Rang, bestandene Tests)
+    * und eine Liste aller Prüfungen, die du starten kannst.
+    * Es ist der Startpunkt für jede "Ernstfall-Prüfung".
+    */
+%>
 <div class="glass-card animate-fade-in" style="max-width: 800px; margin: 2rem auto;">
     <h2 style="margin-bottom: 2rem;">Dein Dashboard</h2>
     

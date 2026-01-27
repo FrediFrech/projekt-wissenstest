@@ -27,7 +27,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die a
 
 | Datei | Zweck | Wiki-Link |
 |------|-------|-----------|
-| **js_native/app.js** | Business-Logic: Auth, Tests, AJAX-Calls | [app.js](jsp_native_app.md) |
+| **js_native/app_main.js** | Business-Logic: Auth, Tests, AJAX-Calls | [app_main.js](jsp_native_app_main.md) |
 | **css_native/style.css** | Global Styling: Glasmorphism, Animations, Layout | [style.css](css_native.md) |
 
 ---
@@ -53,7 +53,7 @@ index.jsp (Start)
    │  └─ FlipCard.jsp
 │
 └─ Loads JavaScript & CSS:
-   ├─ js_native/app.js (Business Logic)
+   ├─ js_native/app_main.js (Business Logic)
    └─ css_native/style.css (Styling)
 
 Backend (Java Servlets)

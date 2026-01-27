@@ -1,5 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% 
+   /* 
+    * File: native.jsp
+    * 
+    * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
+    * Dies ist die "Hauptseite" (Shell). Sie lädt immer, wenn ihr die App öffnet.
+    * Sie enthält das Menü (Navbar), lädt das CSS, und entscheidet dann,
+    * welche Unterseite (Lernmodus, Prüfung, Login) in den Hauptbereich geladen wird.
+    * Das passiert über den "?page=..." Parameter in der URL.
+    */
     boolean isLoggedIn = session.getAttribute("user") != null; 
     String userRole = (session.getAttribute("role") != null) ? session.getAttribute("role").toString() : "student";
     boolean isAdmin = "admin".equalsIgnoreCase(userRole);
@@ -82,6 +91,6 @@
         </main>
     </div>
 
-    <script src="${pageContext.request.contextPath}/js_native/app.js"></script>
+    <script src="${pageContext.request.contextPath}/js_native/app_main.js"></script>
 </body>
 </html>

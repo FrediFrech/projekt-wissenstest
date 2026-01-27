@@ -2,10 +2,14 @@
 <% 
    /* 
     * Component: TestRunner.jsp
-    * Counterpart: TestRunner.jsx
-    * Description: Der Kern-Quiz-Ablauf. Zeigt eine Frage nach der anderen an, speichert Antworten,
-    *              und navigiert am Ende zur Result-Seite.
-    * Technologie: Pure HTML + CSS3 Animationen + Vanilla JS (kein React)
+    * Counterpart: TestRunner.jsx (React Version - Legacy)
+    * 
+    * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
+    * Dies ist das Herzstück der Anwendung: Der "Prüfungsraum".
+    * Hier werden die Fragen nacheinander angezeigt, die Zeit läuft ab, und deine Antworten
+    * werden gesammelt. Am Ende schickt dieses Skript alles zur Bewertung an den Server.
+    * 
+    * Technologie: Pure HTML/CSS für das Layout, Vanilla JS für die Quiz-Logik (State Machine).
     */
 %>
 <div class="glass-card animate-fade-in" style="max-width: 800px; margin: 0 auto;">

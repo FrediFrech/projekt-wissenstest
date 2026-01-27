@@ -1,8 +1,11 @@
 
 # jsp_native/AdminPanel.jsp
 
+## Einfache Erklärung
+Das Admin Panel ist die "Schaltzentrale" für Lehrende. Hier verwaltest du Fragen, Benutzer und siehst Systemzahlen.
+
 ## Zweck
-Das **Admin Panel** ist die zentrale Verwaltungsstelle f&uuml;r Administratoren. Es vereint Benutzer-Management, Fragenpflege und System-Statistiken in einer Seite.
+Das **Admin Panel** ist die zentrale Verwaltungsstelle für Administratoren. Es vereint Benutzer-Management, Fragenpflege und System-Statistiken in einer Seite.
 
 ## Inhalt & Features
 1. **Dashboard-Statistiken**
@@ -15,12 +18,13 @@ Das **Admin Panel** ist die zentrale Verwaltungsstelle f&uuml;r Administratoren.
    - **Sortieren** nach ID, Prompt, Kategorie, Typ, Schwierigkeit oder Optionen.
    - **Filtern** mit Wildcard `*` auf Prompt/Kategorie (z.&nbsp;B. `*uml*`, `uml*`, `*diagramm`).
    - Typ- und Schwierigkeits-Filter f&uuml;r schnelle Eingrenzung.
+   - **Karteikarten-Flag**: Checkbox "Als Karteikarte anzeigen" pro Frage.
 4. **Fragen erstellen/bearbeiten**
    - Typen: **MC**, **CLOZE**, **FREE**, **IMAGE**.
    - **MC/IMAGE**: richtige Antworten mit `*` markieren.
    - **FREE**: mehrere korrekte L&ouml;sungen per Komma oder neue Zeile.
    - **CLOZE**: JSON-Array mit Alternativen (z.&nbsp;B. `[ ["Sequenz","Sequenzdiagramm"], ["Zeit"] ]`).
-   - **Bild-Frage**: Upload per Drag &amp; Drop oder Dateiauswahl, optional URL.
+   - **Bild-Frage**: Upload per Drag &amp; Drop, Dateiauswahl oder **Import aus Ordner** (assets/questions).
 5. **Benutzerverwaltung**
    - Liste aller Benutzer mit Rollen.
    - **Sortieren** nach Username/Rolle/ID.

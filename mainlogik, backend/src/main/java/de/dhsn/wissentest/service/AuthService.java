@@ -1,8 +1,11 @@
 /*
  * Datei: AuthService.java
- * Diese Service-Klasse bündelt die komplette Login- und Registrierung-Logik. Sie prüft, ob ein
- * Benutzername bereits existiert, erzeugt Hash + Salt und validiert die Zugangsdaten beim Login.
- * Verbindung: Nutzt UserDao und PasswordUtils; wird von AuthServlet aufgerufen.
+ * 
+ * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
+ * Dies ist der "Türsteher" der App. 
+ * Hier wird entschieden, wer rein darf (Login) und wer neu dazu kommt (Register).
+ * Er benutzt `UserDao`, um Daten zu holen, und `PasswordUtils`, um Passwörter sicher zu prüfen.
+ * Nichts passiert im Login-Bereich ohne diese Klasse.
  */
 package de.dhsn.wissentest.service;
 

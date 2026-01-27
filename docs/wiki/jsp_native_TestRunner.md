@@ -13,17 +13,15 @@ Das ist das Herzstück der Anwendung – hier läuft der echte Test ab. Die Seit
 
 ## Inhalt & Verantwortung
 ### Komponenten
-1. **Title & Timer:** Zeigt Test-Name und verstrichene Zeit
+1. **Title & Timer:** Zeigt Test-Name und Countdown (Timer läuft pro Test)
 2. **Progress Bar:** Visueller Fortschritt (0%-100%) beim Durchgehen der Fragen
 3. **Question Container:**
    - Frage-Text in `<h3>`
-   - Answer-Container mit dynamisch generierten Buttons
-   - "Nächste Frage" Button
-4. **Result View (versteckt):** Wird am Ende eingeblendet
-   - Finale Score-Anzeige
-   - Note/Bewertung
+   - Antwort-Container mit dynamisch generierten Optionen
+   - Buttons: **„Nächste Frage“** und **„Test abgeben“**
+4. **Result View (Legacy):** HTML-Block vorhanden, Ergebnis wird in der Praxis über `Result.jsp` angezeigt
 
-### Logik (in `js_native/app.js`)
+### Logik (in `js_native/app_main.js`)
 ```javascript
 initTest()          // Startet Quiz, lädt Fragen
 renderQuestion()    // Zeigt aktuelle Frage + Optionen
@@ -35,7 +33,7 @@ finishTest()        // Test abschließen & zu Result.jsp navigieren
 ## Verbindungen
 - **Router:** In `native.jsp` über `?page=testRunner` eingebunden
 - **Styling:** `css_native/style.css`
-- **Logik:** `js_native/app.js` (siehe `initTest()` und Quiz-Funktionen)
+- **Logik:** `js_native/app_main.js` (siehe `initTest()` und Quiz-Funktionen)
 - **Backend:** AJAX zu `/api/test/start` (POST, inkl. difficulty/limit/category)
 
 ## Wichtige Entscheidungen
@@ -44,15 +42,14 @@ finishTest()        // Test abschließen & zu Result.jsp navigieren
 - ✅ CSS3 Animationen für smooth UX
 - ✅ localStorage für Test‑Konfiguration
 - ✅ sessionStorage für Ergebnis‑Übergabe zu Result.jsp
+- ✅ Abbrechen-Button mit Bestätigungsdialog (`cancelTest()`)
 
 ## Workflow
-1. User klickt "Test Starten" auf TestList.jsp
-2. JSP lädt, DOMContentLoaded triggert JavaScript
-3. `initTest()` holt Fragen von Backend via `/api/test/start`
-4. `renderQuestion()` zeigt erste Frage mit Antwort-Buttons
-5. User klickt Antwort → `selectAnswer()` speichert & zeigt Feedback
-6. User klickt "Nächste Frage" → `nextQuestion()`
-   - Wenn mehr Fragen: `renderQuestion()` neu
-   - Wenn keine mehr: `finishTest()`
-7. `finishTest()` berechnet Score, speichert in sessionStorage
-8. Navigiert zu `?page=result`
+1. User klickt "Starten" auf TestList.jsp
+2. `initTest()` holt Fragen via `/api/test/start`
+3. `renderQuestion()` zeigt Frage + Antworten
+4. User wählt eine Antwort → `selectAnswer()`
+5. User klickt "Nächste Frage" → `nextQuestion()`
+6. Am Ende oder per "Test abgeben" → `finishTest()`
+7. Ergebnis wird in `sessionStorage.lastTestResult` gespeichert
+8. Redirect zu `?page=result`

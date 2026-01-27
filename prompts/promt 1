@@ -1,0 +1,85 @@
+. 
+
+---
+Analyse (26.01.2026)
+1) Lücken-Nummerierung: Die UI hat die Lücke mit tokenIndex+1 angezeigt, während die Tokens in der DB 1-basiert sind (z. B. token_index=1). Dadurch startete die Anzeige fälschlich bei „Lücke 2“. Fix: Anzeige nutzt nun tokenIndex direkt (Fallback auf index+1, falls tokenIndex fehlt).
+	- Datei: mainlogik, backend/src/main/webapp/js_native/app.js
+
+2) Bildfragen in der WAR: Statische Bilder in src/main/webapp werden in die WAR gepackt und von Tomcat ausgeliefert. Neuer Ablageordner:
+	- mainlogik, backend/src/main/webapp/assets/questions
+	Referenzierung in questions.image_url:
+	- Empfehlung: „assets/questions/<datei>“ (relativer Pfad) oder „/wissentest/assets/questions/<datei>“ (absolut mit Context-Path).
+
+3) Bildfragen aus der DB: question_images ist im Schema vorhanden und ImageServlet ist auf /api/images/* gemappt.
+	- Nutzung: Bild in question_images speichern, danach questions.image_url auf „/api/images/<id>“ setzen.
+	- Dateien: db/schema.sql, src/main/java/.../web/ImageServlet.java, src/main/java/.../dao/JdbcQuestionImageDao.java
+
+4) Fragenanzahl pro Schwierigkeit: Standard-Test setzt jetzt 5/10/10 (leicht/mittel/schwer).
+	- Stelle: getDefaultLimitForDifficulty() in mainlogik, backend/src/main/webapp/js_native/app.js
+	- Verwendung: startConfiguredTest() + initTest() (Fallback) + UI-Hinweis im Test-Config-Card.
+
+Umstellen der Fragenanzahl (zukünftig):
+- mainlogik, backend/src/main/webapp/js_native/app.js → Funktion getDefaultLimitForDifficulty(difficulty).
+
+Validierung (Beweis)
+- UAT (Playwright): mainlogik, backend/e2e_tests mit „npm test“ ausgeführt.
+  Ergebnis: 2 Tests bestanden.
+  ✓ System Workflow › Admin Question Management
+  ✓ System Workflow › Password Reset Process
+- Stabilisierung: e2e_tests/tests/full_workflow.spec.js wartet nach Admin-Login auf Redirect (toHaveURL), danach UAT stabil.
+
+Änderungen
+- mainlogik, backend/src/main/webapp/js_native/app.js: Lücken-Nummerierung korrigiert; Default-Fragenanzahl pro Schwierigkeit umgesetzt; UI-Hinweis ergänzt.
+- mainlogik, backend/e2e_tests/tests/full_workflow.spec.js: UAT stabilisiert (Login-Redirect abwarten).
+- mainlogik, backend/src/main/webapp/assets/questions: neuer Ordner für Bilddateien.
+
+---
+Analyse (26.01.2026 - Update)
+1) Lücken-Nummerierung: Anzeige nutzt jetzt tokenIndex direkt (1-basiert) mit Fallback auf idx+1, damit die erste Lücke als „Lücke 1“ startet.
+	- Datei: mainlogik, backend/src/main/webapp/js_native/app.js
+
+Validierung (Beweis)
+- UAT (Playwright): mainlogik, backend/e2e_tests mit „npm test“ ausgeführt.
+	Ergebnis: 2 Tests bestanden.
+	✓ System Workflow › Admin Question Management
+	✓ System Workflow › Password Reset Process
+- Playwright MCP (manueller Check): Test gestartet, erste Lücke zeigt „Lücke 1“.
+	Screenshot: .playwright-mcp/uat-cloze-luecke-1.png
+
+Änderungen
+- mainlogik, backend/src/main/webapp/js_native/app.js: Lücken-Label nutzt tokenIndex (1-basiert) und korrekten Fallback.
+
+---
+Analyse (26.01.2026 - Update 2)
+1) Ordner-Import in DB (Admin): Neue Admin-Funktion importiert Bilder aus `assets/questions` in die DB und liefert `/api/images/<id>` URLs zurück (ohne WAR-Bindung). Zusätzlich Multi-Upload per Datei-Auswahl bleibt nutzbar.
+	 - Dateien: mainlogik, backend/src/main/java/.../web/AdminServlet.java (Endpoint `/api/admin/images/import`), mainlogik, backend/src/main/webapp/jsp_native/AdminPanel.jsp (Button + UI-Status + Liste).
+
+2) Admin Upload-Flow korrigiert: Antwort-Objekte verwenden korrektes Feld `correct` (statt `isCorrect`), sodass richtige Antworten gespeichert und im Lernmodus angezeigt werden.
+	 - Datei: mainlogik, backend/src/main/webapp/jsp_native/AdminPanel.jsp
+
+3) Lernmodus: Fallback-Logik zeigt korrekte Antwort auch dann, wenn Alt-Daten `is_correct=false` aber `partial_value>0` haben.
+	 - Datei: mainlogik, backend/src/main/java/.../web/TestServlet.java
+
+4) Sonderzeichen/Encoding: Frontend-Strings in JS mit Unicode-Escapes/Entities stabilisiert, damit UI-Labels wie „Öffnen“, „Prüfung“, „Lücke“ korrekt gerendert werden.
+	 - Dateien: mainlogik, backend/src/main/webapp/js_native/app_main.js, index.jsp, native.jsp (Script-Quelle aktualisiert)
+
+Validierung (Beweis)
+- UAT (Playwright): mainlogik, backend/e2e_tests mit „npm test“ ausgeführt.
+	Ergebnis: 2 Tests bestanden.
+	✓ System Workflow › Admin Question Management
+	✓ System Workflow › Password Reset Process
+- Admin Import (Playwright MCP): Import aus `assets/questions` liefert 3 Bilder als DB-URLs.
+	Screenshot: .playwright-mcp/uat-02-admin-image-question-created.png (Import abgeschlossen (3))
+- Admin Upload (Playwright MCP): Multi-Upload von 3 Dateien funktioniert (Upload abgeschlossen (3/3)).
+	Screenshot: .playwright-mcp/uat-02-admin-image-question-created.png
+- Sonderzeichen im Test: Frage „Was zeigt dieses Bild? ÄÖÜ ß“ + Bild im TestRunner korrekt gerendert.
+	Screenshot: .playwright-mcp/uat-03-test-runner-image-question.png
+- Lernmodus: Antworten werden auf Karten korrekt angezeigt (inkl. Bildfrage und Sonderzeichen).
+	Screenshot: .playwright-mcp/uat-04-learn-mode-answers.png
+
+Änderungen
+- mainlogik, backend/src/main/java/de/dhsn/wissentest/web/AdminServlet.java: Import-Endpunkt für Bilder aus Ordner.
+- mainlogik, backend/src/main/webapp/jsp_native/AdminPanel.jsp: Import-Button, Multi-Upload, Status + Antwort-Flag fix.
+- mainlogik, backend/src/main/webapp/js_native/app_main.js: UI-Strings mit Unicode-Escapes; wird statt app.js geladen.
+- mainlogik, backend/src/main/webapp/index.jsp & native.jsp: Script-Referenz auf app_main.js.
+- mainlogik, backend/src/main/java/de/dhsn/wissentest/web/TestServlet.java: Lernmodus-Fallback (partial_value>0).

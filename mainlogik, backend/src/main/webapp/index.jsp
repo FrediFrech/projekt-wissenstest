@@ -84,6 +84,6 @@
         </main>
     </div>
 
-    <script src="${pageContext.request.contextPath}/js_native/app.js"></script>
+    <script src="${pageContext.request.contextPath}/js_native/app_main.js"></script>
 </body>
 </html>

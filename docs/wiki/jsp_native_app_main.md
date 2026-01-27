@@ -1,4 +1,4 @@
-# js_native/app.js
+# js_native/app_main.js
 
 ## Einfache Erklärung
 Dies ist das "Gehirn" der JSP-Native-Version. Diese JavaScript-Datei kümmert sich um alle dynamischen Aufgaben: Login, Tests laden, Fragen anzeigen, Antworten speichern, zur nächsten Frage navigieren und Ergebnisse anzeigen.

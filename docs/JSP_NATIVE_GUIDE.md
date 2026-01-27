@@ -47,7 +47,14 @@ Obwohl es "nur" JSP ist, haben wir moderne Features eingebaut:
 - **Glassmorphism:** Durchscheinende Karten-Optik
 - **Interaktivität:** Tests werden ohne Page-Reload durchgeführt (AJAX)
 - **Flip-Cards:** Auch in CSS nachgebaut (siehe Landing Page Demo)
+- **Lernmodus-Modal:** „Vergrößern“ zeigt die **Flip-Card groß** im Dialog; Klick dreht die Karte wie im Grid
 - **Responsive:** Funktioniert auf Mobile & Desktop
+
+### Lernmodus-Modal (kurz erklärt)
+- Klick auf „Vergrößern“ öffnet ein Dialogfenster.
+- Das Dialogfenster ist zentriert und zeigt eine **große Flip-Card** (Front/Back).
+- Optionales Bild erscheint auf der Vorderseite der Karte.
+- Lange Inhalte werden **im Modal** gescrollt – die Seite bleibt im Hintergrund fixiert.
 
 ## ⚖️ Architektur‑Hinweis
 Die Seiten werden serverseitig mit JSP gerendert. Dynamik (Tests laden, Antworten senden) läuft über AJAX‑Calls aus `js_native/app.js`.
@@ -57,5 +64,7 @@ Wenn du Änderungen machen willst:
 - GUI: `css_native/style.css`
 - Logik: `js_native/app.js`
 - Struktur: `jsp_native/*.jsp`
+
+**Tipp:** Der Lernmodus verwendet eigenes CSS im `jsp_native/LearnMode.jsp` für das Modal (Overlay, Scroll-Handling, Karten-Layout).
 
 Damit hast du eine **komplett konforme Lösung** ohne zusätzliche Frontend‑Build‑Schritte.

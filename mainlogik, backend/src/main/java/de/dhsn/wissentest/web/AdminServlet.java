@@ -24,8 +24,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @MultipartConfig(maxFileSize = 5_000_000, maxRequestSize = 6_000_000)
 public class AdminServlet extends HttpServlet {
@@ -76,6 +84,10 @@ public class AdminServlet extends HttpServlet {
             return;
         }
         String path = req.getPathInfo() == null ? "" : req.getPathInfo();
+        if (path.equals("/images/import")) {
+            handleImageImportFromFolder(req, resp);
+            return;
+        }
         if (path.equals("/images")) {
             handleImageUpload(req, resp);
             return;
@@ -264,6 +276,66 @@ public class AdminServlet extends HttpServlet {
         ServletUtils.writeJson(resp, new ImageResponse(id, url));
     }
 
+    private void handleImageImportFromFolder(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String folderParam = req.getParameter("folder");
+        String folder = (folderParam == null || folderParam.isBlank()) ? "/assets/questions" : folderParam;
+        String realPath = getServletContext().getRealPath(folder);
+        if (realPath == null) {
+            ServletUtils.writeError(resp, 500, "Import path not available");
+            return;
+        }
+        Path dir = Paths.get(realPath);
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            ServletUtils.writeError(resp, 404, "Import folder not found");
+            return;
+        }
+
+        List<Path> files;
+        try (Stream<Path> stream = Files.list(dir)) {
+            files = stream
+                    .filter(Files::isRegularFile)
+                    .filter(this::isImageFile)
+                    .sorted(Comparator.comparing(p -> p.getFileName().toString().toLowerCase(Locale.ROOT)))
+                    .collect(Collectors.toList());
+        }
+
+        List<ImportImageResponse> imported = new ArrayList<>();
+        for (Path file : files) {
+            String contentType = guessContentType(file);
+            if (contentType == null) {
+                continue;
+            }
+            byte[] data = Files.readAllBytes(file);
+            int id = imageDao.create(data, contentType);
+            String url = req.getContextPath() + "/api/images/" + id;
+            imported.add(new ImportImageResponse(id, url, file.getFileName().toString()));
+        }
+
+        ServletUtils.writeJson(resp, new ImportResponse(imported));
+    }
+
+    private boolean isImageFile(Path file) {
+        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
+        return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg")
+                || name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp")
+                || name.endsWith(".svg");
+    }
+
+    private String guessContentType(Path file) throws IOException {
+        String contentType = Files.probeContentType(file);
+        if (contentType != null && contentType.startsWith("image/")) {
+            return contentType;
+        }
+        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (name.endsWith(".png")) return "image/png";
+        if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+        if (name.endsWith(".gif")) return "image/gif";
+        if (name.endsWith(".webp")) return "image/webp";
+        if (name.endsWith(".bmp")) return "image/bmp";
+        if (name.endsWith(".svg")) return "image/svg+xml";
+        return null;
+    }
+
     private static class QuestionView {
         int id;
         String type;
@@ -300,6 +372,26 @@ public class AdminServlet extends HttpServlet {
         ImageResponse(int id, String url) {
             this.id = id;
             this.url = url;
+        }
+    }
+
+    private static class ImportImageResponse {
+        int id;
+        String url;
+        String name;
+
+        ImportImageResponse(int id, String url, String name) {
+            this.id = id;
+            this.url = url;
+            this.name = name;
+        }
+    }
+
+    private static class ImportResponse {
+        List<ImportImageResponse> images;
+
+        ImportResponse(List<ImportImageResponse> images) {
+            this.images = images;
         }
     }
 }
