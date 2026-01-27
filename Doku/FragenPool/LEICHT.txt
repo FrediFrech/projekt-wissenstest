@@ -1,0 +1,239 @@
+LEICHT:
+
+-------------------------------------------------------------------------------------------------
+
+MULTIPLE CHOICE:
+
+
+
+L-MC-1
+
+Welche UML-Diagrammart beschreibt die Struktur von Klassen?“
+(Diese Frage ist bereits enthalten) (1. Frage in der Liste)
+
+
+
+L-MC-2
+
+Welche Aufgabe hat ein Use-Case-Diagramm in UML?
+
+A) Es beschreibt die interne Struktur von Klassen
+B) Es stellt die Interaktion zwischen Benutzer und System dar
+C) Es zeigt die zeitliche Abfolge von Methodenaufrufen
+D) Es modelliert den Lebenszyklus eines Objekts
+
+✅ Richtige Antwort: B
+
+
+
+L-MC-3
+
+Welche Komponente gehört typischerweise zu einem Klassendiagramm?
+
+A) Akteur
+B) Zustand
+C) Methode
+D) Entscheidungsknoten
+
+✅ Richtige Antwort: C
+
+
+
+L-MC-4
+
+Welches UML-Diagramm wird verwendet, um den Ablauf von Aktivitäten darzustellen?
+
+A) Klassendiagramm
+B) Use-Case-Diagramm
+C) Aktivitätsdiagramm
+D) Deployment-Diagramm
+
+✅ Richtige Antwort: C
+
+
+
+L-MC-5
+
+Was stellt ein Akteur in einem Use-Case-Diagramm dar?
+
+A) Eine Klasse des Systems
+B) Einen internen Systemprozess
+C) Eine externe Rolle oder Benutzer des Systems
+D) Eine Datenbank
+
+✅ Richtige Antwort: C
+
+
+
+L-MC-6
+
+Welche Beziehung beschreibt eine „ist-ein“-Beziehung zwischen Klassen?
+
+A) Assoziation
+B) Aggregation
+C) Komposition
+D) Vererbung
+
+✅ Richtige Antwort: D
+
+
+
+L-MC-7
+
+Welches Element wird in UML zur Darstellung eines Startpunkts in einem Aktivitätsdiagramm verwendet?
+
+A) Rechteck
+B) Pfeil
+C) Gefüllter Kreis
+D) Raute
+
+✅ Richtige Antwort: C
+
+
+
+L-MC-8
+
+Wofür wird ein Deployment-Diagramm hauptsächlich eingesetzt?
+
+A) Darstellung der Benutzerinteraktionen
+B) Modellierung von Klassen und Attributen
+C) Abbildung der physischen Systemarchitektur
+D) Beschreibung von Zustandsübergängen
+
+✅ Richtige Antwort: C
+
+-------------------------------------------------------------------------------------------------
+
+LÜCKENTEXT:
+
+
+
+L-LT-1
+
+„In UML beschreibt das ___ Diagramm die Abläufe zwischen Objekten.“
+(Diese Frage ist bereits enthalten) (2. Frage in der Liste)
+
+
+
+L-LT-2
+
+„Ein ___ Diagramm zeigt den Lebenszyklus eines Objekts mit Zuständen und Übergängen.“
+(Diese Frage ist bereits enthalten) (4. Frage in der Liste)
+
+
+
+L-LT-3
+
+„Das UML-Klassendiagramm zeigt die ___ zwischen den Klassen.“
+(Diese Frage ist bereits enthalten) (8. Frage in der Liste)
+
+
+
+L-LT-4
+
+Ein Use-Case-Diagramm stellt die Interaktion zwischen dem System und den ___ dar.
+
+✅ Lösung: Akteuren
+
+
+
+L-LT-5
+
+Ein Klassendiagramm besteht unter anderem aus Klassen, Attributen und ___.
+
+✅ Lösung: Methoden
+
+
+
+L-LT-6
+
+Ein Aktivitätsdiagramm wird verwendet, um den ___ eines Prozesses darzustellen.
+
+✅ Lösung: Ablauf
+
+
+
+L-LT-7
+
+In UML werden Klassen in einem Klassendiagramm durch ___ dargestellt.
+
+✅ Lösung: Rechtecke
+
+
+
+L-LT-8
+
+Ein Deployment-Diagramm zeigt die ___ Verteilung eines Softwaresystems.
+
+✅ Lösung: physische   /   physikalische
+
+-------------------------------------------------------------------------------------------------
+
+BILD MIT FRAGE:
+
+
+
+L-B-1
+
+„Welche Diagrammart wird in der Abbildung dargestellt?“
+-> Bild eines Klassendiagramms
+(Diese Frage ist bereits enthalten) (7. Frage in der Liste) (Ich hab es ein bisschen umformuliert)
+
+
+
+L-B-2
+
+Welcher UML-Diagrammtyp ist in der Abbildung dargestellt?
+📝 Bild-Notiz: Ein Use-Case-Diagramm mit mindestens einem Akteur und zwei Use Cases.
+-> Use-Case-Diagramm
+
+
+
+L-B-3
+
+Welcher UML-Diagrammtyp zeigt den in der Abbildung dargestellten Ablauf?
+📝 Bild-Notiz: Aktivitätsdiagramm mit Startknoten, Aktionen und einem Endknoten.
+-> Aktivitätsdiagramm
+
+
+
+
+L-B-4
+
+Welche UML-Diagrammart zeigt die in der Abbildung dargestellte Abfolge?
+📝 Bild-Notiz: Sequenzdiagramm mit zwei oder drei Objekten und Nachrichtenpfeilen.
+-> Sequenzdiagramm
+
+
+
+L-B-5
+
+Welche Art von Beziehung zwischen den Klassen ist in der Abbildung dargestellt?
+📝 Bild-Notiz: Klassendiagramm mit Vererbungsbeziehung.
+-> Vererbungsbeziehungen
+
+
+
+L-B-6
+
+Welches UML-Diagramm stellt die in der Abbildung gezeigte Systemarchitektur dar?
+📝 Bild-Notiz: Deployment-Diagramm mit Nodes und Artefakten.
+-> Deployment-Diagramm
+
+
+
+L-B-7
+
+Wie bezeichnet man die Strichmännchen in der vorliegenden UML-Diagrammart?
+📝 Bild-Notiz: Use-Case-Diagramm mit Akteur (Strichmännchen).
+-> Akteur
+
+
+
+L-B-8
+
+Welche UML-Diagrammart zeigt den in der Abbildung dargestellten Zyklus?
+📝 Bild-Notiz: Zustandsdiagramm mit Zuständen und Übergängen.
+-> Zustandsdiagramm
+
+-------------------------------------------------------------------------------------------------
