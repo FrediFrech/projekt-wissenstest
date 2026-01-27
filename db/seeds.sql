@@ -465,5 +465,91 @@ WHERE NOT EXISTS (
     AND a2.answer_text = ins.answer_text
 );
 
+-- Beispiel 11: Multiple Choice (Use-Case-Diagramm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Es beschreibt die interne Struktur von Klassen', false, 0.0),
+      ('Es stellt die Interaktion zwischen Benutzer und System dar', true, 1.0),
+      ('Es zeigt die zeitliche Abfolge von Methodenaufrufen', false, 0.0),
+      ('Es modelliert den Lebenszyklus eines Objekts', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 12: Multiple Choice (Komponente Klassendiagraamm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Akteur', false, 0.0),
+      ('Zustand', false, 0.0),
+      ('Methode', true, 1.0),
+      ('Entscheidungsknoten', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
 
 -- End of seed file
