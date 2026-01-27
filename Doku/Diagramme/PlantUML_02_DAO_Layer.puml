@@ -1,0 +1,218 @@
+@startuml Wissenstest_02_DAO_Layer
+!theme plain
+skinparam classBackgroundColor #F0E8F8
+skinparam classBorderColor #6600CC
+skinparam classArrowColor #6600CC
+skinparam fontSize 11
+
+title Wissenstest - Klassendiagramm Teil 2: Data Access Object (DAO) Layer
+
+' ==================== DAO INTERFACES ====================
+interface UserDao {
+  +create(User): void
+  +read(int): User
+  +readByUsername(String): User
+  +readAll(): List<User>
+  +update(User): void
+  +delete(int): void
+  +findByRole(Role): List<User>
+  +findActive(): List<User>
+}
+
+interface QuestionDao {
+  +create(Question): void
+  +read(int): Question
+  +readAll(): List<Question>
+  +update(Question): void
+  +delete(int): void
+  +findByType(QuestionType): List<Question>
+  +findByDifficulty(String): List<Question>
+  +findByCreator(User): List<Question>
+}
+
+interface AnswerDao {
+  +create(AnswerOption): void
+  +read(int): AnswerOption
+  +readByQuestion(int): List<AnswerOption>
+  +update(AnswerOption): void
+  +delete(int): void
+}
+
+interface ClozeTokenDao {
+  +create(ClozeToken): void
+  +read(int): ClozeToken
+  +readByQuestion(int): List<ClozeToken>
+  +update(ClozeToken): void
+  +delete(int): void
+}
+
+interface TestDao {
+  +create(Test): void
+  +read(int): Test
+  +readAll(): List<Test>
+  +update(Test): void
+  +delete(int): void
+  +findByCreator(User): List<Test>
+}
+
+interface AttemptDao {
+  +create(Attempt): void
+  +read(int): Attempt
+  +readAll(): List<Attempt>
+  +update(Attempt): void
+  +delete(int): void
+  +findByUser(User): List<Attempt>
+  +findByTest(Test): List<Attempt>
+  +findByUserAndTest(User, Test): List<Attempt>
+}
+
+' ==================== DAO IMPLEMENTATIONS ====================
+class JdbcUserDao {
+  -dataSource: DataSource
+  --
+  +create(User): void
+  +read(int): User
+  +readByUsername(String): User
+  +readAll(): List<User>
+  +update(User): void
+  +delete(int): void
+  +findByRole(Role): List<User>
+  +findActive(): List<User>
+  -mapResultSetToUser(ResultSet): User
+  -executeQuery(String sql): List<User>
+}
+
+class JdbcQuestionDao {
+  -dataSource: DataSource
+  --
+  +create(Question): void
+  +read(int): Question
+  +readAll(): List<Question>
+  +update(Question): void
+  +delete(int): void
+  +findByType(QuestionType): List<Question>
+  +findByDifficulty(String): List<Question>
+  +findByCreator(User): List<Question>
+  -mapResultSetToQuestion(ResultSet): Question
+  -loadAnswerOptions(Question): void
+  -loadClozeTokens(Question): void
+}
+
+class JdbcAnswerDao {
+  -dataSource: DataSource
+  --
+  +create(AnswerOption): void
+  +read(int): AnswerOption
+  +readByQuestion(int): List<AnswerOption>
+  +update(AnswerOption): void
+  +delete(int): void
+  -mapResultSetToAnswer(ResultSet): AnswerOption
+}
+
+class JdbcClozeTokenDao {
+  -dataSource: DataSource
+  --
+  +create(ClozeToken): void
+  +read(int): ClozeToken
+  +readByQuestion(int): List<ClozeToken>
+  +update(ClozeToken): void
+  +delete(int): void
+  -mapResultSetToToken(ResultSet): ClozeToken
+}
+
+class JdbcTestDao {
+  -dataSource: DataSource
+  --
+  +create(Test): void
+  +read(int): Test
+  +readAll(): List<Test>
+  +update(Test): void
+  +delete(int): void
+  +findByCreator(User): List<Test>
+  -mapResultSetToTest(ResultSet): Test
+  -loadQuestionsForTest(Test): void
+  -saveTestQuestions(Test): void
+}
+
+class JdbcAttemptDao {
+  -dataSource: DataSource
+  --
+  +create(Attempt): void
+  +read(int): Attempt
+  +readAll(): List<Attempt>
+  +update(Attempt): void
+  +delete(int): void
+  +findByUser(User): List<Attempt>
+  +findByTest(Test): List<Attempt>
+  +findByUserAndTest(User, Test): List<Attempt>
+  -mapResultSetToAttempt(ResultSet): Attempt
+  -loadAnswersForAttempt(Attempt): void
+}
+
+class QuestionRepository {
+  -questionDao: QuestionDao
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  --
+  +findByFilter(type, difficulty): List<Question>
+  +findRandom(count): List<Question>
+  +findRandom(count, type): List<Question>
+  +findByTypeAndDifficulty(QuestionType, String): List<Question>
+  +searchByText(String keyword): List<Question>
+  +getQuestionStats(): Map<String, Integer>
+  +getQuestionsPerDifficulty(): Map<String, Integer>
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Implementation Relationships
+JdbcUserDao ..|> UserDao : <<implements>>
+JdbcQuestionDao ..|> QuestionDao : <<implements>>
+JdbcAnswerDao ..|> AnswerDao : <<implements>>
+JdbcClozeTokenDao ..|> ClozeTokenDao : <<implements>>
+JdbcTestDao ..|> TestDao : <<implements>>
+JdbcAttemptDao ..|> AttemptDao : <<implements>>
+
+' Repository relationships
+QuestionRepository --> QuestionDao : uses
+QuestionRepository --> AnswerDao : uses
+QuestionRepository --> ClozeTokenDao : uses
+
+' DataSource relationships
+JdbcUserDao --> DataSource : uses
+JdbcQuestionDao --> DataSource : uses
+JdbcAnswerDao --> DataSource : uses
+JdbcClozeTokenDao --> DataSource : uses
+JdbcTestDao --> DataSource : uses
+JdbcAttemptDao --> DataSource : uses
+
+note right of UserDao
+  Interface für
+  Benutzer-Verwaltung
+  
+  Definiert CRUD-Operationen
+  und Such-Methoden
+end note
+
+note right of JdbcUserDao
+  JDBC-Implementation
+  des UserDao Interfaces
+  
+  Verwendet PreparedStatements
+  für sichere SQL-Queries
+end note
+
+note right of QuestionRepository
+  Repository Pattern für
+  komplexere Queries
+  
+  Kombiniert mehrere DAOs
+  für erweiterte Funktionen
+end note
+
+note bottom of UserDao
+  CRUD = Create, Read, Update, Delete
+  Alle DAOs folgen diesem Pattern
+end note
+
+@enduml

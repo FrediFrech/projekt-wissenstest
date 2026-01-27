@@ -573,7 +573,6 @@ INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_valu
 SELECT ins.question_id, ins.token_index, ins.expected_text, ins.partial_value
 FROM ins
 ON CONFLICT (question_id, token_index) DO NOTHING;
-
 -- Beispiel 11: Use-Case (Mittel)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
@@ -832,5 +831,300 @@ WHERE NOT EXISTS (
     AND a2.answer_text = ins.answer_text
 );
 
+-- Beispiel 17: Use-Case-Diagramm (Aufgabe)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Es beschreibt die interne Struktur von Klassen', false, 0.0),
+      ('Es stellt die Interaktion zwischen Benutzer und System dar', true, 1.0),
+      ('Es zeigt die zeitliche Abfolge von Methodenaufrufen', false, 0.0),
+      ('Es modelliert den Lebenszyklus eines Objekts', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
 
+-- Beispiel 18: Multiple Choice (Komponente Klassendiagraamm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welche Komponente gehört typischerweise zu einem Klassendiagramm?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Akteur', false, 0.0),
+      ('Zustand', false, 0.0),
+      ('Methode', true, 1.0),
+      ('Entscheidungsknoten', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+-- Beispiel 19: Multiple Choice (UML-Diagramm Aktivitäten darstellen)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welches UML-Diagramm wird verwendet, um den Ablauf von Aktivitäten darzustellen?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welches UML-Diagramm wird verwendet, um den Ablauf von Aktivitäten darzustellen?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welches UML-Diagramm wird verwendet, um den Ablauf von Aktivitäten darzustellen?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Klassendiagramm', false, 0.0),
+      ('Use-Case-Diagramm', false, 0.0),
+      ('Aktivitätsdiagramm', true, 1.0),
+      ('Deployment-Diagramm', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+-- Beispiel 20: Multiple Choice (Use-Case-Diagramm Akteur)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Was stellt ein Akteur in einem Use-Case-Diagramm dar?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Was stellt ein Akteur in einem Use-Case-Diagramm dar?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Was stellt ein Akteur in einem Use-Case-Diagramm dar?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Eine Klasse des Systems', false, 0.0),
+      ('Einen internen Systemprozess', false, 0.0),
+      ('Eine externe Rolle oder Benutzer des Systems', true, 1.0),
+      ('Eine Datenbank', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+-- Beispiel 21: Multiple Choice (Beziehung zwischen Klassen)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welche Beziehung beschreibt eine „ist-ein“-Beziehung zwischen Klassen?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welche Beziehung beschreibt eine „ist-ein“-Beziehung zwischen Klassen?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welche Beziehung beschreibt eine „ist-ein“-Beziehung zwischen Klassen?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Assoziation', false, 0.0),
+      ('Aggregation', false, 0.0),
+      ('Komposition', false, 0.0),
+      ('Vererbung', false, 1.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+-- Beispiel 22: Multiple Choice (UML Startpunkt Aktivitätsdiagramm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Welches Element wird in UML zur Darstellung eines Startpunkts in einem Aktivitätsdiagramm verwendet?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Welches Element wird in UML zur Darstellung eines Startpunkts in einem Aktivitätsdiagramm verwendet?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Welches Element wird in UML zur Darstellung eines Startpunkts in einem Aktivitätsdiagramm verwendet?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Rechteck', false, 0.0),
+      ('Pfeil', false, 0.0),
+      ('Gefüllter Kreis', true, 1.0),
+      ('Raute', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
+
+-- Beispiel 23: Multiple Choice (UML Deployment-Diagramm)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Wofür wird ein Deployment-Diagramm hauptsächlich eingesetzt?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC'
+      AND prompt = 'Wofür wird ein Deployment-Diagramm hauptsächlich eingesetzt?'
+      AND difficulty = 1
+      AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC'
+    AND prompt = 'Wofür wird ein Deployment-Diagramm hauptsächlich eingesetzt?'
+    AND difficulty = 1
+    AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+),
+ins AS (
+  SELECT q_id.id AS question_id, a.answer_text, a.is_correct, a.partial_value
+  FROM q_id,
+    (VALUES
+      ('Darstellung der Benutzerinteraktionen', false, 0.0),
+      ('Modellierung von Klassen und Attributen', false, 0.0),
+      ('Abbildung der physischen Systemarchitektur', true, 1.0),
+      ('Beschreibung von Zustandsübergängen', false, 0.0)
+    ) AS a(answer_text, is_correct, partial_value)
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT ins.question_id, ins.answer_text, ins.is_correct, ins.partial_value
+FROM ins
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = ins.question_id
+    AND a2.answer_text = ins.answer_text
+);
 -- End of seed file
