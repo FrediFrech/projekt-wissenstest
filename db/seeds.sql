@@ -83,7 +83,7 @@ ON CONFLICT (username) DO NOTHING;
 -- Beispiel 1: Multiple Choice
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
-  SELECT 'MC', 'Welche UML-Diagrammart beschreibt die Struktur von Klassen?', 1, 2, '{"topic":"uml","class":"Klassendiagramm"}', 'Multiple Choice'
+  SELECT 'MC', 'Welche UML-Diagrammart beschreibt die Struktur von Klassen?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
   WHERE NOT EXISTS (
     SELECT 1 FROM questions
     WHERE type = 'MC'
@@ -573,6 +573,7 @@ INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_valu
 SELECT ins.question_id, ins.token_index, ins.expected_text, ins.partial_value
 FROM ins
 ON CONFLICT (question_id, token_index) DO NOTHING;
+
 -- Beispiel 11: Use-Case (Mittel)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
@@ -831,7 +832,7 @@ WHERE NOT EXISTS (
     AND a2.answer_text = ins.answer_text
 );
 
--- Beispiel 17: Use-Case-Diagramm (Aufgabe)
+-- Beispiel 17: Multiple Choice (Use-Case-Diagramm)
 WITH q AS (
   INSERT INTO questions (type, prompt, difficulty, points, meta, category)
   SELECT 'MC', 'Welche Aufgabe hat ein Use-Case-Diagramm in UML?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
@@ -1031,7 +1032,7 @@ ins AS (
       ('Assoziation', false, 0.0),
       ('Aggregation', false, 0.0),
       ('Komposition', false, 0.0),
-      ('Vererbung', false, 1.0)
+      ('Vererbung', true, 1.0)
     ) AS a(answer_text, is_correct, partial_value)
 )
 INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
@@ -1127,4 +1128,150 @@ WHERE NOT EXISTS (
   WHERE a2.question_id = ins.question_id
     AND a2.answer_text = ins.answer_text
 );
+
+-- Beispiel 24: Lückentext (Use-Case-Diagramm Interaktion)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'CLOZE', 'Ein Use-Case-Diagramm stellt die Interaktion zwischen dem System und den ___ dar.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'Ein Use-Case-Diagramm stellt die Interaktion zwischen dem System und den ___ dar.'
+      AND difficulty = 2
+      AND category = 'Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'Ein Use-Case-Diagramm stellt die Interaktion zwischen dem System und den ___ dar.'
+    AND difficulty = 2
+    AND category = 'Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'Akteuren', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
+-- Beispiel 25: Lückentext (Klassendiagramm Komponenten)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'CLOZE', 'Ein Klassendiagramm besteht unter anderem aus Klassen, Attributen und ___.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'Ein Klassendiagramm besteht unter anderem aus Klassen, Attributen und ___.'
+      AND difficulty = 2
+      AND category = 'Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'Ein Klassendiagramm besteht unter anderem aus Klassen, Attributen und ___.'
+    AND difficulty = 2
+    AND category = 'Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'Methoden', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
+-- Beispiel 26: Lückentext (Aktivitätsdiagramm Prozess)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'CLOZE', 'Ein Aktivitätsdiagramm wird verwendet, um den ___ eines Prozesses darzustellen.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'Ein Aktivitätsdiagramm wird verwendet, um den ___ eines Prozesses darzustellen.'
+      AND difficulty = 2
+      AND category = 'Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'Ein Aktivitätsdiagramm wird verwendet, um den ___ eines Prozesses darzustellen.'
+    AND difficulty = 2
+    AND category = 'Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'Ablauf', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
+-- Beispiel 27: Lückentext (Klassendiagramm Klassen)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'CLOZE', 'In UML werden Klassen in einem Klassendiagramm durch ___ dargestellt.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'In UML werden Klassen in einem Klassendiagramm durch ___ dargestellt.'
+      AND difficulty = 2
+      AND category = 'Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'In UML werden Klassen in einem Klassendiagramm durch ___ dargestellt.'
+    AND difficulty = 2
+    AND category = 'Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'Rechtecke', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
+-- Beispiel 28: Lückentext (Deployment-Diagramm Verteilung)
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'CLOZE', 'Ein Deployment-Diagramm zeigt die ___ Verteilung eines Softwaresystems.', 2, 3, '{"topic":"uml"}', 'Lückentext'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'CLOZE'
+      AND prompt = 'Ein Deployment-Diagramm zeigt die ___ Verteilung eines Softwaresystems.'
+      AND difficulty = 2
+      AND category = 'Lückentext'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'CLOZE'
+    AND prompt = 'Ein Deployment-Diagramm zeigt die ___ Verteilung eines Softwaresystems.'
+    AND difficulty = 2
+    AND category = 'Lückentext'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO cloze_answers (question_id, token_index, expected_text, partial_value)
+SELECT q_id.id, 1, 'physische', 1.0
+FROM q_id
+ON CONFLICT (question_id, token_index) DO NOTHING;
+
 -- End of seed file
