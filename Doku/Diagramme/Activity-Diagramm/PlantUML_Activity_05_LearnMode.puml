@@ -1,0 +1,207 @@
+@startuml Activity_LearnMode
+
+title Activity-Diagramm - Lernmodus-Flow
+
+start
+:Benutzer auf Student-Dashboard;
+:Menü-Optionen anzeigen;
+:- Tests durchführen;
+:- Lernmodus;
+:- Ergebnisse;
+:- Profil;
+
+:Benutzer klickt "Lernmodus";
+:Lernmodus-Seite wird geladen;
+
+:Session validieren;
+if (Benutzer authentifiziert?) then (Nein)
+    :Zur Login-Seite weiterleiten;
+    stop
+else (Ja)
+    :user_id aus Session lesen;
+endif
+
+:Lernmodus-Startseite anzeigen;
+:Text: "Wählen Sie Schwierigkeitslevel";
+:- Button: "Leicht (1)";
+:- Button: "Mittel (2)";
+:- Button: "Schwer (3)";
+:- Optional: Nach Kategorie filtern;
+
+:Benutzer wählt Schwierigkeit;
+:difficulty = 1/2/3;
+
+if (Kategorie-Filter?) then (Ja)
+    :Kategorie auswählen;
+    :- Allgemein;
+    :- UML-Basics;
+    :- Andere;
+else (Nein)
+    :Alle Kategorien;
+endif
+
+:Fragen laden;
+:SELECT * FROM questions;
+:WHERE difficulty = ?;
+:AND category = ? (optional);
+:ORDER BY RANDOM() LIMIT 10;
+
+if (Fragen vorhanden?) then (Nein)
+    :Meldung: "Keine Fragen verfügbar";
+    :Zurück zum Menü;
+    stop
+else (Ja)
+    :Fragen geladen;
+endif
+
+:Flip-Cards laden;
+:Fragen-Anzahl: 10 (oder mehr);
+:Aktuelle Frage: 1/10;
+
+:Flip-Card Interface anzeigen;
+:┌─────────────────────┐;
+:│  FLIP CARD 1/10      │;
+:├─────────────────────┤;
+:│                      │;
+:│  Klicken zum         │;
+:│  Umdrehen!          │;
+:│                      │;
+:│  [Frage/Prompt]      │;
+:│                      │;
+:└─────────────────────┘;
+
+:Benutzer sieht Frage;
+:Frage-Text anzeigen;
+:Benutzer liest Frage;
+:Benutzer versucht zu antworten (mental);
+
+:Benutzer klickt Karte zum Umdrehen;
+:CSS-Animation: Karte dreht sich;
+
+:Rückseite der Karte anzeigen;
+:┌─────────────────────┐;
+:│  FLIP CARD 1/10      │;
+:├─────────────────────┤;
+:│                      │;
+:│  [Antwort/Erklärung] │;
+:│                      │;
+:│  Buttons:            │;
+:│  [Nicht gelernt]     │;
+:│  [Gelernt]           │;
+:│                      │;
+:└─────────────────────┘;
+
+:Benutzer vergleicht:;
+:Eigene Antwort vs. Richtige Antwort;
+
+if (Antwortet richtig?) then (Ja - Gelernt)
+    :Button "Gelernt" klicken;
+    :Rückmeldung: "Gut gemacht!";
+    :Karte als "gelernt" markieren (grün);
+    :Karte aus aktiver Liste entfernen (optional);
+else (Nein - Nicht gelernt)
+    :Button "Nicht gelernt" klicken;
+    :Rückmeldung: "Mehr üben nötig";
+    :Karte als "nicht gelernt" markieren (rot);
+    :Karte später erneut anzeigen;
+endif
+
+:Fortschritt speichern;
+:- Benutzer-ID;
+:- Fragen-ID;
+:- Gelernt / Nicht gelernt;
+:- Timestamp;
+:(Optional in learn_progress-Tabelle);
+
+:Nächste Karte anzeigen;
+:Flip-Card Interface zurücksetzen;
+:Aktuelle Frage: 2/10;
+:Neue Frage laden;
+
+repeat
+    :Kartenrückseite: "Klicken zum Umdrehen!";
+    :Benutzer sieht Frage;
+    :Benutzer klickt Karte;
+    :Benutzer sieht Antwort;
+    :Benutzer markiert gelernt/nicht gelernt;
+    :Nächste Karte anzeigen;
+repeat while (Mehr Karten?) is (Ja)
+
+:Alle Karten angezeigt;
+:Lernmodus-Zusammenfassung anzeigen;
+
+:Zusammenfassung:;
+:┌──────────────────────────┐;
+:│  LERNMODUS ABGESCHLOSSEN │;
+:├──────────────────────────┤;
+:│  Gesamt Karten: 10       │;
+:│  Gelernt: 7 (70%)        │;
+:│  Nicht gelernt: 3 (30%) │;
+:│                          │;
+:│  Empfehlung:             │;
+:│  "Wiederholen Sie die    │;
+:│   nicht gelernten Karten" │;
+:│                          │;
+:│ [Nochmal üben] [Fertig]  │;
+:└──────────────────────────┘;
+
+:Fortschritt-Statistik;
+:Gesamt gelernte Fragen;
+:Fortschritt in Prozent;
+:Schwierigkeitslevel;
+
+if (Benutzer wählt) then (Nochmal üben)
+    :Nicht gelernte Karten neu laden;
+    :Shuffle erneut;
+    :Zurück zu: Flip-Card Interface;
+    
+    repeat
+        :Karten erneut durchgehen;
+    repeat while (Mehr Karten?) is (Ja)
+    
+else (Fertig)
+    :Zum Student-Dashboard;
+    :Lernmodus beenden;
+    :Session aktualisieren;
+endif
+
+:Optionale Funktionen:;
+:- Karte als "schwierig" markieren;
+:- Notizen zu Karte hinzufügen;
+:- Stapel speichern (Favoriten);
+:- Statistiken anzeigen;
+:- Timer für Lernsession;
+
+:Benutzer ist zurück auf Dashboard;
+stop
+
+note right
+  **Datenbankoperationen:**
+  
+  - **SELECT** aus questions
+  - **INSERT** in learn_progress
+    (optional):
+    - user_id
+    - question_id
+    - is_learned
+    - timestamp
+  
+  **Fragetypen im Lernmodus:**
+  
+  - MC: Frage + Antwortoptionen
+  - CLOZE: Lückentext mit
+    Lösung
+  
+  **Schwierigkeit:**
+  - 1 = Leicht
+  - 2 = Mittel
+  - 3 = Schwer
+  
+  **UI-Features:**
+  - CSS-Animation Flip-Effect
+  - Fortschrittsbalken
+  - Farbige Markierung
+  - Sound (optional)
+end note
+
+@enduml

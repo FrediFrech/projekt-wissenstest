@@ -1,0 +1,135 @@
+@startuml Deployment_05_Runtime
+
+title Deployment-Diagramm Teil 5 - Runtime Kommunikation
+
+participant "Browser\n(Client)" as BROWSER
+participant "Tomcat\n(Server)" as TOMCAT
+participant "JDBC Driver\n(PostgreSQL)" as JDBC
+participant "PostgreSQL\n(Database)" as DB
+
+== Student startet Test ==
+
+BROWSER ->> TOMCAT: POST /wiskentest/test/start\n(HTTP Request)
+activate TOMCAT
+
+TOMCAT ->> TOMCAT: TestServlet.doPost()
+TOMCAT ->> TOMCAT: TestService.startTest(userId)
+TOMCAT ->> TOMCAT: QuestionDao.getRandomQuestions()\n(Difficulty 1-3)
+
+TOMCAT ->> JDBC: SELECT * FROM questions\nWHERE difficulty=2\nORDER BY RANDOM() LIMIT 10
+activate JDBC
+
+JDBC ->> DB: SQL Query ausführen
+activate DB
+DB ->> DB: Query verarbeiten
+DB ->> DB: 10 Zeilen zurückgeben
+DB -->> JDBC: ResultSet
+deactivate DB
+
+JDBC -->> TOMCAT: Question-Objekte
+deactivate JDBC
+
+TOMCAT ->> TOMCAT: JSP.render() - Fragen anzeigen
+TOMCAT -->> BROWSER: HTML Response (Frage 1)
+deactivate TOMCAT
+
+== Student beantwortet Frage ==
+
+BROWSER ->> TOMCAT: POST /wiskentest/answer/submit\n(Antwort + Frage-ID)
+activate TOMCAT
+
+TOMCAT ->> TOMCAT: TestServlet.doPost()
+TOMCAT ->> TOMCAT: TestService.validateAnswer(answer)
+TOMCAT ->> TOMCAT: Berechne Punkte
+
+alt Antwort korrekt
+    TOMCAT ->> TOMCAT: points_awarded = 10
+else Antwort teilweise
+    TOMCAT ->> TOMCAT: points_awarded = 5
+else Antwort falsch
+    TOMCAT ->> TOMCAT: points_awarded = 0
+end
+
+TOMCAT ->> JDBC: INSERT INTO attempt_answers\n(attempt_id, question_id, given_answer, points_awarded)
+activate JDBC
+
+JDBC ->> DB: SQL INSERT
+activate DB
+DB ->> DB: Eintrag speichern
+DB -->> JDBC: OK
+deactivate DB
+
+JDBC -->> TOMCAT: Success
+deactivate JDBC
+
+TOMCAT -->> BROWSER: Nächste Frage (HTML)
+deactivate TOMCAT
+
+== Test beenden ==
+
+BROWSER ->> TOMCAT: POST /wiskentest/test/end
+activate TOMCAT
+
+TOMCAT ->> TOMCAT: TestService.endTest(attemptId)
+TOMCAT ->> TOMCAT: Gesamtpunkte berechnen
+TOMCAT ->> TOMCAT: Schulnote berechnen (1-6)
+
+TOMCAT ->> JDBC: UPDATE attempts SET\ntotal_points=?, max_points=?,\ngrade=?, duration_seconds=?
+activate JDBC
+
+JDBC ->> DB: SQL UPDATE
+activate DB
+DB ->> DB: Attempt aktualisieren
+DB -->> JDBC: OK
+deactivate DB
+
+JDBC -->> TOMCAT: Success
+deactivate JDBC
+
+TOMCAT ->> TOMCAT: JSP.render() - Ergebnisse
+TOMCAT -->> BROWSER: Ergebnisseite (HTML)
+deactivate TOMCAT
+
+== Admin erstellt Frage ==
+
+BROWSER ->> TOMCAT: POST /wiskentest/admin/question/create\n(Fragedetails)
+activate TOMCAT
+
+TOMCAT ->> TOMCAT: AdminServlet.doPost()
+TOMCAT ->> TOMCAT: AdminService.createQuestion()
+
+TOMCAT ->> JDBC: INSERT INTO questions\n(type, prompt, difficulty, created_by)
+activate JDBC
+
+JDBC ->> DB: SQL INSERT
+activate DB
+DB ->> DB: Frage speichern
+DB -->> JDBC: question_id = 42
+deactivate DB
+
+JDBC -->> TOMCAT: Question ID
+deactivate JDBC
+
+loop Für jede Antwort (MC)
+    TOMCAT ->> JDBC: INSERT INTO answers\n(question_id, answer_text, is_correct)
+    activate JDBC
+    JDBC ->> DB: SQL INSERT
+    DB -->> JDBC: OK
+    deactivate JDBC
+end
+
+TOMCAT -->> BROWSER: Bestätigung (HTML)
+deactivate TOMCAT
+
+note over BROWSER,DB
+  **Wichtige Punkte:**
+  
+  1. **HTTP Stateless**: Jeder Request ist unabhängig
+  2. **Sessions**: Cookies verknüpfen Requests
+  3. **Connection Pooling**: HikariCP recycelt DB-Verbindungen
+  4. **Transaction Management**: ACID-Properties
+  5. **Error Handling**: Try-Catch & Rollback
+  6. **Security**: SQL Injection Prevention (Prepared Statements)
+end note
+
+@enduml

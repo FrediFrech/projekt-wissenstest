@@ -1,0 +1,65 @@
+@startuml Deployment_01_HighLevel
+
+title Deployment-Diagramm Teil 1 - High-Level Übersicht
+
+package "Client Schicht" {
+    node "Browser (Student/Admin)" as CLIENT {
+        component "HTML5/CSS3/JavaScript" as FRONTEND
+    }
+}
+
+package "Webserver Schicht" {
+    node "Tomcat 8.5 / 11" as TOMCAT {
+        artifact "wissentest.war" as WAR
+    }
+}
+
+package "Datenbankserver Schicht" {
+    node "PostgreSQL 15" as DB {
+        database "wissentest" as WISSENTEST_DB
+    }
+}
+
+package "Konfiguration" {
+    artifact "db.properties" as DB_PROPS
+    artifact "web.xml" as WEB_XML
+    artifact "pom.xml" as POM
+}
+
+' Verbindungen
+CLIENT --> TOMCAT : "HTTP(S)\nPort 8080/8443"
+TOMCAT --> DB : "JDBC/TCP\nPort 5432"
+
+TOMCAT -.-> DB_PROPS : "Liest"
+TOMCAT -.-> WEB_XML : "Verwendet"
+TOMCAT -.-> POM : "Gebaut mit"
+
+note right of CLIENT
+  **Client-Technologien:**
+  - HTML5 DOM
+  - CSS3 (Flexbox, Grid)
+  - Vanilla JavaScript
+  - Fetch API / AJAX
+  - Session Cookies
+end note
+
+note right of TOMCAT
+  **Tomcat Server:**
+  - Java 17 JVM
+  - WAR-Deployment
+  - Port 8080 (HTTP)
+  - Port 8443 (HTTPS)
+  - Context: /wissentest
+end note
+
+note right of DB
+  **PostgreSQL Datenbank:**
+  - Host: localhost:5432
+  - Database: wissentest
+  - User: student
+  - Connection Pool: HikariCP
+  - 8 Tabellen
+  - Indexes & Constraints
+end note
+
+@enduml

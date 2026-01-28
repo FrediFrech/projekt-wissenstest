@@ -1,0 +1,207 @@
+@startuml Activity_Diagram_Wissenstest
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Activity-Diagramm - Projekt Wissenstest
+
+partition "Student Test-Durchführung" {
+    start
+    :Startseite öffnen;
+    :Mit Benutzer anmelden;
+    if (Login erfolgreich?) then (Nein)
+        :Fehlermeldung anzeigen;
+        stop
+    else (Ja)
+        :Session erstellen;
+    endif
+    
+    :Tests-Liste anzeigen;
+    :Test auswählen;
+    :Test starten;
+    :Session initialisieren;
+    
+    repeat
+        :Nächste Frage laden;
+        :Zufällige Frage auswählen;
+        :Frage anzeigen;
+        :Schüler beantwortet Frage;
+        :Antwort validieren;
+        :Punkte berechnen;
+        :Feedback anzeigen;
+        :Antwort speichern (attempt_answers);
+        repeat while (Mehr Fragen?) is (Ja)
+    
+    :Test beenden;
+    :Gesamtpunkte berechnen;
+    :Note berechnen (1-6);
+    :Attempt speichern (attempts);
+    :Ergebnisse anzeigen;
+    :Detailliertes Feedback generieren;
+    :Logout;
+    stop
+}
+
+partition "Admin Fragen-Verwaltung" {
+    start
+    :Admin öffnet Admin-Panel;
+    :Mit Admin-Account anmelden;
+    if (Admin-Login erfolgreich?) then (Nein)
+        :Zugriff verweigert;
+        stop
+    else (Ja)
+        :Admin-Dashboard laden;
+    endif
+    
+    repeat
+        :Admin-Menü anzeigen;
+        if (Admin-Aktion?) then (Frage erstellen)
+            :Formular für neue Frage;
+            :Fragetyp wählen (MC/CLOZE);
+            :Fragettext eingeben;
+            :Schwierigkeit wählen (1-3);
+            :Antwortoptionen eingeben;
+            if (Fragetyp = MC?) then (Ja)
+                :Korrekte Antwort markieren;
+            else (CLOZE)
+                :Lückentokens definieren;
+                :Expected Answers eingeben;
+            endif
+            :Frage speichern (questions table);
+            :Bestätigung anzeigen;
+        else if (Frage bearbeiten)
+            :Fragen-Liste anzeigen;
+            :Frage auswählen;
+            :Bearbeitungsformular laden;
+            :Änderungen vornehmen;
+            :Validierung;
+            :Frage aktualisieren;
+        else if (Frage löschen)
+            :Fragen-Liste anzeigen;
+            :Frage auswählen;
+            :Bestätigung erforderlich;
+            if (Bestätigung?) then (Ja)
+                :Frage löschen (CASCADE);
+                :Zugehörige Antworten löschen;
+            else (Nein)
+                :Abbruch;
+            endif
+        else if (Benutzer verwalten)
+            :Benutzerliste anzeigen;
+            :Benutzer aktivieren/deaktivieren;
+            :Passwort-Reset-Anfragen bearbeiten;
+        else if (Statistiken)
+            :Statistik-Dashboard laden;
+            :Benutzerergebnisse anzeigen;
+            :Test-Analysen generieren;
+        else (Logout)
+            :Session beenden;
+            stop
+        endif
+        repeat while (Weitere Aktionen?) is (Ja)
+    
+    stop
+}
+
+partition "Authentifizierungs-Flow" {
+    start
+    :Benutzer öffnet Anwendung;
+    if (Bereits angemeldet?) then (Ja)
+        :Direkter Zugriff auf Dashboard;
+    else (Nein)
+        :Zur Login-Seite weiterleiten;
+    endif
+    
+    :Benutzer gibt Credentials ein;
+    :Formular abgesendet;
+    :Username und Passwort validieren;
+    if (Benutzer existiert?) then (Nein)
+        :Fehlermeldung: Benutzer nicht gefunden;
+    else (Ja)
+        if (Passwort korrekt?) then (Nein)
+            :Fehlermeldung: Passwort falsch;
+        else (Ja)
+            :Rolle prüfen;
+            if (Rolle = Admin?) then (Ja)
+                :Admin-Dashboard laden;
+            else (Student)
+                :Student-Dashboard laden;
+            endif
+            :Session erstellen;
+            :Session-ID in Cookie speichern;
+        endif
+    endif
+    
+    stop
+}
+
+partition "Passwort-Reset-Flow" {
+    start
+    :Benutzer klickt "Passwort vergessen";
+    :Passwort-Reset-Formular anzeigen;
+    :Benutzer gibt Email/Username ein;
+    :Reset-Anfrage prüfen;
+    if (Benutzer existiert?) then (Ja)
+        :reset_requested = TRUE setzen;
+        :Bestätigungsmeldung anzeigen;
+        :Admin wird benachrichtigt;
+        :Admin prüft ausstehende Anfragen;
+        if (Admin genehmigt?) then (Ja)
+            :Neues temporäres Passwort generieren;
+            :Passwort in Benutzer-Tabelle aktualisieren;
+            :Bestätigung anzeigen;
+            :reset_requested = FALSE setzen;
+        else (Nein)
+            :Anfrage ablehnen;
+        endif
+    else (Nein)
+        :Fehlermeldung anzeigen;
+    endif
+    
+    stop
+}
+
+partition "Lernmodus-Flow" {
+    start
+    :Student klickt Lernmodus;
+    :Session validieren;
+    :Fragen zufällig auswählen;
+    :Schwierigkeit wählen (1-3);
+    :Flip-Cards laden;
+    
+    repeat
+        :Kartenrückseite anzeigen;
+        :Frage/Prompt zeigen;
+        :Student klickt zum Umdrehen;
+        :Antwort/Erklärung anzeigen;
+        :Student markiert als gelernt/nicht gelernt;
+        :Fortschritt speichern;
+        repeat while (Mehr Karten?) is (Ja)
+    
+    :Lernmodus beenden;
+    :Fortschritt zusammenfassen;
+    :Zurück zum Dashboard;
+    stop
+}
+
+note right
+  **Wichtige Systemprozesse:**
+  
+  1. **Zufällige Fragen-Auswahl**
+     - Bei Teststart
+     - Nach Schwierigkeit filtern
+     
+  2. **Punkteberechnung**
+     - Nach jeder Antwort
+     - Berücksichtigung von partial_value
+     
+  3. **Notenberechnung**
+     - Nach Testende
+     - Formel: (total_points / max_points) * 6
+     - Mapping auf Schulnoten (1-6)
+     
+  4. **Session-Management**
+     - Nach Login erstellen
+     - Bei Logout löschen
+     - Timeout-Handling
+end note
+
+@enduml

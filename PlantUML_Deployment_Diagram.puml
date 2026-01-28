@@ -1,0 +1,225 @@
+@startuml Deployment_Diagram_Wissenstest
+
+title Deployment-Diagramm - Projekt Wissenstest
+
+!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
+!include AWSPUML/General/GeneralSymbols.puml
+!include AWSPUML/Database/Database.puml
+
+package "Client Schicht" {
+    node "Browser (Student/Admin)" as CLIENT {
+        component "HTML5" as HTML
+        component "CSS3" as CSS
+        component "JavaScript (Vanilla)" as JS
+    }
+}
+
+package "Webserver Schicht" {
+    node "Tomcat 8.5 / 11" as TOMCAT {
+        artifact "wissentest.war" as WAR {
+            component "JSP Engine" as JSP
+            component "Servlet API" as SERVLET
+            component "Java 17 Laufzeit" as JRE
+            component "Static Content" as STATIC
+        }
+    }
+}
+
+package "Backend Anwendung (in Tomcat)" {
+    component "Web Layer" as WEB {
+        artifact "LoginServlet" as LOGIN_SERVLET
+        artifact "TestServlet" as TEST_SERVLET
+        artifact "AdminServlet" as ADMIN_SERVLET
+        artifact "LearnModeServlet" as LEARN_SERVLET
+    }
+    
+    component "Service Layer" as SERVICE {
+        artifact "AuthService" as AUTH_SERVICE
+        artifact "TestService" as TEST_SERVICE
+        artifact "ProgressionService" as PROG_SERVICE
+        artifact "AdminService" as ADMIN_SERVICE
+    }
+    
+    component "DAO Layer" as DAO {
+        artifact "UserDao" as USER_DAO
+        artifact "QuestionDao" as QUESTION_DAO
+        artifact "AttemptDao" as ATTEMPT_DAO
+        artifact "AnswerDao" as ANSWER_DAO
+        artifact "ClozeTokenDao" as CLOZE_DAO
+    }
+    
+    component "Model Layer" as MODEL {
+        artifact "User.java" as USER_MODEL
+        artifact "Question.java" as QUESTION_MODEL
+        artifact "Attempt.java" as ATTEMPT_MODEL
+        artifact "Answer.java" as ANSWER_MODEL
+    }
+}
+
+package "Datenbankserver Schicht" {
+    node "PostgreSQL 15 Server" as DB_SERVER {
+        database "Database: wissentest" as WISSENTEST_DB {
+            artifact "tables" as TABLES {
+                artifact "users" as USERS_TABLE
+                artifact "questions" as QUESTIONS_TABLE
+                artifact "answers" as ANSWERS_TABLE
+                artifact "cloze_answers" as CLOZE_TABLE
+                artifact "attempts" as ATTEMPTS_TABLE
+                artifact "attempt_answers" as ATTEMPT_ANSWERS_TABLE
+                artifact "question_images" as IMAGES_TABLE
+                artifact "config" as CONFIG_TABLE
+            }
+            artifact "indexes" as INDEXES
+            artifact "constraints" as CONSTRAINTS
+        }
+    }
+}
+
+package "Entwicklungs-Tools" {
+    node "Build & Deployment" as BUILD {
+        artifact "Maven" as MAVEN
+        artifact "Git" as GIT
+        artifact "IDE (IntelliJ/VS Code)" as IDE
+    }
+}
+
+package "Konfiguration & Properties" {
+    node "Config Files" as CONFIG {
+        artifact "db.properties" as DB_PROPS
+        artifact "pom.xml" as POM
+        artifact "web.xml" as WEB_XML
+        artifact "log4j.properties" as LOG_PROPS
+    }
+}
+
+' Verbindungen zwischen den Schichten
+
+CLIENT --> TOMCAT : "HTTP(S) Request"
+TOMCAT --> WEB : "JSP kompiliert zu Servlets"
+
+WEB --> SERVICE : "Business Logic"
+SERVICE --> DAO : "Data Access"
+DAO --> DB_SERVER : "JDBC Connection\n(PostgreSQL Driver)"
+
+DB_SERVER --> WISSENTEST_DB : "SQL Queries"
+
+TOMCAT -.-> CONFIG : "Liest Konfiguration"
+DB_SERVER -.-> DB_PROPS : "Verbindungsdaten"
+WEB_XML -.-> TOMCAT : "Deployment Descriptor"
+POM -.-> MAVEN : "Build Instructions"
+
+' Deployment-Details
+
+note right of TOMCAT
+  **Tomcat Deployment:**
+  
+  - Port: 8080 (HTTP)
+  - Port: 8443 (HTTPS)
+  - Context Root: /wiskentest
+  - WAR-Datei: wissentest.war
+  - JVM: Java 17
+  - Memory: -Xmx512m -Xms256m
+  
+  **JSP Verarbeitung:**
+  1. JSP wird zu Java-Code kompiliert
+  2. Java-Code wird zu Servlet-Klasse
+  3. Servlet wird instanziiert
+  4. Response wird zum Browser gesendet
+end note
+
+note right of DB_SERVER
+  **PostgreSQL Konfiguration:**
+  
+  - Host: localhost:5432
+  - Database: wissentest
+  - User: student
+  - Password: student
+  - Connection Pool: HikariCP
+  - Pool Size: 10
+  - Max Lifetime: 30 minutes
+  
+  **Datenbank-Features:**
+  - Constraints (FK, PK, CHECK)
+  - Indizes auf häufig
+    abfragten Spalten
+  - Timestamps mit TZ
+  - JSONB für Meta-Daten
+end note
+
+note right of WEB
+  **Servlet-basierte API:**
+  
+  POST /login
+  - Credentials validieren
+  - Session erstellen
+  
+  POST /test/start
+  - Test initialisieren
+  - Fragen laden
+  
+  POST /answer/submit
+  - Antwort speichern
+  - Punkte berechnen
+  
+  GET /admin/panel
+  - Admin-Dashboard
+  - Fragen verwalten
+end note
+
+note right of CLIENT
+  **Client-Technologien:**
+  
+  - HTML5 DOM
+  - CSS3 (Flexbox, Grid)
+  - Vanilla JavaScript (keine Frameworks)
+  - Fetch API für AJAX
+  - Local Storage (optional)
+  - Session Cookies
+  
+  **Browser-Support:**
+  - Chrome 90+
+  - Firefox 88+
+  - Safari 14+
+  - Edge 90+
+end note
+
+note bottom of BUILD
+  **Build & Deployment Prozess:**
+  
+  1. Maven: mvn clean package
+  2. Erstellt: wissentest.war
+  3. Kopiert in: $CATALINA_HOME/webapps/
+  4. Tomcat: Auto-deployment
+  5. Aktualisiert: /webapps/wissentest/
+  
+  **Git Workflow:**
+  - Feature-Branches
+  - Pull-Requests
+  - Code Review
+  - Merge zu Main
+end note
+
+' Netzwerk-Details
+
+note as NETWORK
+  **Netzwerk-Kommunikation:**
+  
+  1. **Client -> Tomcat:**
+     - HTTP/HTTPS
+     - Port 8080 / 8443
+     - Stateless (außer Sessions)
+  
+  2. **Tomcat -> PostgreSQL:**
+     - TCP/IP Connection
+     - Port 5432
+     - JDBC Driver (Postgresql)
+     - Connection Pooling
+  
+  3. **Sicherheit:**
+     - HTTPS für Client
+     - Firewalls für DB-Zugriff
+     - SQL Injection Prevention
+     - Session Tokens
+end note
+
+@enduml

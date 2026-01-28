@@ -1,0 +1,154 @@
+@startuml Activity_Student_Test
+
+title Activity-Diagramm - Student Test-Durchführung
+
+start
+:Startseite öffnen;
+:Mit Benutzer anmelden;
+
+if (Login erfolgreich?) then (Nein)
+    :Fehlermeldung anzeigen;
+    stop
+else (Ja)
+    :Session erstellen;
+    :Session-ID in Cookie speichern;
+endif
+
+:Zum Student-Dashboard weiterleiten;
+:Tests-Liste laden;
+:Verfügbare Tests anzeigen;
+:Student wählt Test aus;
+
+if (Test verständlich?) then (Nein)
+    :Testbeschreibung anzeigen;
+    :Hilfe anbieten;
+else (Ja)
+    :Weitermachen;
+endif
+
+:Test starten;
+:Session für Test initialisieren;
+:Fragen-Anzahl anzeigen (z.B. 10);
+:Schwierigkeitslevel des Tests anzeigen;
+:Startzeit speichern;
+
+repeat
+    :Testfortschritt anzeigen;
+    :Nächste Frage laden;
+    if (Zufälllige Frage vorhanden?) then (Nein)
+        :Fehlermeldung: Keine Fragen verfügbar;
+        :Test abbrechen;
+        stop
+    else (Ja)
+        :Weiter;
+    endif
+    
+    :Frage aus questions-Tabelle abrufen;
+    :Frage auf Seite anzeigen;
+    
+    if (Fragetyp = MC?) then (Ja)
+        :Antwortoptionen aus answers-Tabelle laden;
+        :Multiple-Choice-Optionen anzeigen;
+        :Student wählt eine oder mehrere Optionen;
+    else if (Fragetyp = CLOZE?)
+        :Lückentext-Template laden;
+        :cloze_answers abrufen;
+        :Lückentext mit Eingabefeldern anzeigen;
+        :Student füllt Lücken;
+    else
+        :Andere Fragetypen;
+    endif
+    
+    :Antwort validieren;
+    if (Antwort gültig?) then (Nein)
+        :Validierungsfehler anzeigen;
+        :Bis gültig erneut versuchen;
+    else (Ja)
+        :Weitermachen;
+    endif
+    
+    :Antwort mit erwarteter Antwort vergleichen;
+    :Punkte berechnen;
+    
+    if (Antwort korrekt?) then (Ja)
+        :Vollle Punkte vergeben;
+        :Feedback: "Korrekt!";
+    else (Teils)
+        :Teilpunkte vergeben (partial_value);
+        :Feedback: "Teilweise korrekt";
+    else (Nein)
+        :0 Punkte;
+        :Feedback: "Leider falsch";
+    endif
+    
+    :Richtige Antwort anzeigen;
+    :Erklärung/Hinweis anzeigen;
+    :Punkte für diese Frage speichern;
+    :Antwort in attempt_answers speichern;
+    
+    :Schüler kann Fortschritt sehen;
+    repeat while (Mehr Fragen?) is (Ja)
+    
+:Alle Fragen beantwortet;
+:Test beenden;
+:Endzeit speichern;
+:Dauer in Sekunden berechnen;
+
+:Gesamtpunkte zusammenrechnen;
+:Maximale Punkte berechnen;
+:Prozentzahl berechnen: (total_points / max_points) * 100;
+
+if (Prozentzahl >= 50%) then (Ja - Bestanden)
+    :Noten aus Prozentzahl berechnen (1-6);
+    :Feedback: Bestanden!;
+else (Nein - Nicht bestanden)
+    :Note 6 vergeben;
+    :Feedback: Nicht bestanden, bitte wiederholen;
+endif
+
+:Attempt in attempts-Tabelle speichern;
+:- user_id, total_points, max_points;
+:- difficulty, grade, duration_seconds;
+:- created_at;
+
+:Ergebnisseite anzeigen;
+:Erreichte Note;
+:Erreichte Punkte / Max Punkte;
+:Prozentuale Leistung;
+:Zeitaufwand;
+
+:Detailliertes Feedback generieren;
+:Für jede Frage: Benutzer-Antwort vs. Richtige Antwort;
+:Fortschritt zum Gesamtfortschritt addieren;
+
+:Button: "Ergebnisse exportieren";
+:Button: "Zurück zum Dashboard";
+:Button: "Test erneut versuchen";
+
+:Student klickt weitere Aktion;
+if (Logout?) then (Ja)
+    :Session beenden;
+    :Cookies löschen;
+    :Zur Login-Seite;
+else (Dashboard)
+    :Zum Dashboard;
+endif
+
+stop
+
+note right
+  **Datenbankoperationen:**
+  - **SELECT** aus questions (Fragetyp)
+  - **SELECT** aus answers/cloze_answers
+  - **INSERT** in attempt_answers
+  - **INSERT** in attempts
+  
+  **Berechnungen:**
+  - Punkte pro Frage
+  - Gesamtpunkte
+  - Prozentzahl
+  - Schulnote (1-6)
+  - Dauer in Sekunden
+end note
+
+@enduml
