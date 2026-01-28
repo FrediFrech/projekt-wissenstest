@@ -1,0 +1,149 @@
+@startuml Deployment_04_BuildPipeline
+
+title Deployment-Diagramm Teil 4 - Build & Deployment Pipeline
+
+package "Entwicklung" {
+    artifact "Source Code" as SRC {
+        component "Java Files" as JAVA
+        component "JSP Files" as JSP_FILES
+        component "CSS/JS Files" as ASSETS
+    }
+    
+    artifact "Git Repository" as GIT {
+        component "Main Branch" as MAIN
+        component "Feature Branches" as FEATURES
+    }
+}
+
+package "Build Prozess" {
+    artifact "Maven" as MAVEN {
+        component "pom.xml" as POM
+        component "Compile Phase" as COMPILE
+        component "Test Phase" as TEST
+        component "Package Phase" as PACKAGE
+    }
+}
+
+package "Build Artifacts" {
+    artifact "Target Directory" as TARGET {
+        component "wissentest.war" as WAR_FILE
+        component "test-results" as TEST_RESULTS
+    }
+}
+
+package "Deployment" {
+    node "Tomcat Server" as TOMCAT_DEPLOY {
+        artifact "webapps/" as WEBAPPS {
+            component "wiskentest/" as CONTEXT
+        }
+    }
+}
+
+package "Runtime" {
+    node "JVM Instance" as JVM {
+        component "ClassLoader" as LOADER
+        component "Thread Pool" as THREADS
+        component "Memory Heap" as HEAP
+    }
+}
+
+package "Datenbank" {
+    node "PostgreSQL" as PG {
+        database "wissentest DB" as PG_DB
+    }
+}
+
+' Workflow
+SRC --> GIT : "Push"
+GIT --> MAVEN : "Maven Build"
+
+MAVEN --> COMPILE : "Kompilierung"
+COMPILE --> TEST : "Unit Tests"
+TEST --> PACKAGE : "Package WAR"
+PACKAGE --> TARGET : "Erstellt WAR"
+
+TARGET --> TOMCAT_DEPLOY : "Auto-Deploy\n(CATALINA_HOME/webapps)"
+TOMCAT_DEPLOY --> JVM : "JVM startet"
+JVM --> PG : "JDBC Connections"
+
+note right of SRC
+  **Source Code Struktur:**
+  
+  src/main/java/
+    - Servlets
+    - Services
+    - DAOs
+    - Models
+  
+  src/main/webapp/
+    - JSP Files
+    - CSS/JS
+    - WEB-INF/web.xml
+  
+  src/test/java/
+    - JUnit Tests
+end note
+
+note right of MAVEN
+  **Maven Build Lifecycle:**
+  
+  1. Validate
+  2. Compile
+  3. Test (JUnit)
+  4. Package (WAR)
+  5. Verify
+  6. Install
+  7. Deploy
+  
+  **Abhängigkeiten:**
+  - Servlet API
+  - PostgreSQL Driver
+  - JUnit 5
+  - HikariCP
+end note
+
+note right of TARGET
+  **Build Output:**
+  
+  wissentest.war
+  - Alle kompilierten Classes
+  - JAR Abhängigkeiten
+  - JSP Files
+  - Static Assets
+  - web.xml Deployment Descriptor
+  
+  Größe: ~50-100 MB
+end note
+
+note right of TOMCAT_DEPLOY
+  **Tomcat Auto-Deploy:**
+  
+  1. WAR in webapps/ kopieren
+  2. Tomcat erkennt Datei
+  3. Unpacks wissentest.war
+  4. Erstellt /wiskentest/ Verzeichnis
+  5. Lädt Klassen über ClassLoader
+  6. Application ist verfügbar
+end note
+
+note right of JVM
+  **JVM Konfiguration:**
+  
+  JAVA_OPTS="-Xms256m -Xmx512m"
+  
+  - Min Heap: 256 MB
+  - Max Heap: 512 MB
+  - GC: Default (G1GC)
+  - Threads: Pool für Requests
+end note
+
+note bottom
+  **Gesamter Deployment-Flow:**
+  
+  Code → Git → Maven Build → WAR
+  → Tomcat Auto-Deploy → JVM
+  → Datenbank Verbindung
+  → Application Live!
+end note
+
+@enduml

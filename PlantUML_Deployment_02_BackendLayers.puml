@@ -1,0 +1,84 @@
+@startuml Deployment_02_BackendLayers
+
+title Deployment-Diagramm Teil 2 - Backend Application Layers
+
+package "Web Layer (JSP & Servlets)" {
+    component "LoginServlet" as LOGIN
+    component "TestServlet" as TEST
+    component "AdminServlet" as ADMIN
+    component "LearnModeServlet" as LEARN
+}
+
+package "Service Layer (Business Logic)" {
+    component "AuthService" as AUTH
+    component "TestService" as TEST_SVC
+    component "ProgressionService" as PROG
+    component "AdminService" as ADMIN_SVC
+}
+
+package "DAO Layer (Data Access)" {
+    component "UserDao" as USER_DAO
+    component "QuestionDao" as QUESTION_DAO
+    component "AttemptDao" as ATTEMPT_DAO
+    component "AnswerDao" as ANSWER_DAO
+    component "ClozeTokenDao" as CLOZE_DAO
+}
+
+package "Model Layer (Data Objects)" {
+    component "User" as USER_MODEL
+    component "Question" as QUESTION_MODEL
+    component "Attempt" as ATTEMPT_MODEL
+    component "Answer" as ANSWER_MODEL
+    component "AttemptAnswer" as ATTEMPT_ANSWER_MODEL
+}
+
+' Verbindungen
+LOGIN --> AUTH : "authenticate()"
+TEST --> TEST_SVC : "startTest()\nsubmitAnswer()"
+ADMIN --> ADMIN_SVC : "createQuestion()\neditQuestion()"
+LEARN --> TEST_SVC : "getQuestions()"
+
+AUTH --> USER_DAO : "findUser()"
+TEST_SVC --> QUESTION_DAO : "getRandomQuestions()"
+TEST_SVC --> ATTEMPT_DAO : "saveAttempt()"
+ADMIN_SVC --> ANSWER_DAO : "saveAnswers()"
+ADMIN_SVC --> CLOZE_DAO : "saveClozeTokens()"
+
+USER_DAO --> USER_MODEL : "returns"
+QUESTION_DAO --> QUESTION_MODEL : "returns"
+ATTEMPT_DAO --> ATTEMPT_MODEL : "returns"
+
+note top of LOGIN
+  **Servlet Handler:**
+  - HTTP Request verarbeiten
+  - Parameter validieren
+  - Service aufrufen
+  - Response rendern (JSP)
+end note
+
+note top of AUTH
+  **Auth Service:**
+  - Passwort validieren
+  - Session erstellen
+  - Rollen prüfen
+end note
+
+note top of USER_DAO
+  **DAO Implementierungen:**
+  - JDBC-Zugriff
+  - SQL-Ausführung
+  - ResultSet zu Objekten
+  - Connection Management
+end note
+
+note bottom
+  **Layered Architecture Pattern:**
+  
+  Requests fließen von oben nach unten:
+  Servlet → Service → DAO → DB
+  
+  Responses fließen von unten nach oben:
+  DB → DAO → Service → Servlet → JSP → Browser
+end note
+
+@enduml

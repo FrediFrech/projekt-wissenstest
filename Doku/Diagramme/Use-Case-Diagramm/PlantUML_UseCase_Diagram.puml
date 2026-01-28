@@ -1,0 +1,130 @@
+@startuml UseCase_Wissenstest_System
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Use-Case Diagramm - Projekt Wissenstest
+
+' Definiere die Aktoren
+actor "Student" as Student
+actor "Administrateur" as Admin
+actor "System" as System
+
+' Definiere das System
+rectangle Wissenstest_System {
+    ' Use Cases für Authentifizierung
+    usecase "Registrieren" as UC_Register
+    usecase "Login" as UC_Login
+    usecase "Logout" as UC_Logout
+    usecase "Passwort zurücksetzen" as UC_ResetPassword
+    
+    ' Use Cases für Test-Durchführung (Student)
+    usecase "Tests anzeigen" as UC_ShowTests
+    usecase "Test starten" as UC_StartTest
+    usecase "Fragen beantworten" as UC_AnswerQuestion
+    usecase "Test beenden" as UC_EndTest
+    usecase "Ergebnisse anzeigen" as UC_ViewResults
+    usecase "Note berechnen" as UC_CalculateGrade
+    
+    ' Use Cases für Lernmodus
+    usecase "Lernmodus starten" as UC_StartLearnMode
+    usecase "Flip-Cards üben" as UC_UseFlipCards
+    usecase "Fortschritt verfolgen" as UC_TrackProgress
+    
+    ' Use Cases für Admin - Fragen verwaltung
+    usecase "Fragen anzeigen" as UC_AdminViewQuestions
+    usecase "Frage erstellen" as UC_CreateQuestion
+    usecase "Frage bearbeiten" as UC_EditQuestion
+    usecase "Frage löschen" as UC_DeleteQuestion
+    usecase "Fragen filtern/sortieren" as UC_FilterQuestions
+    
+    ' Use Cases für Admin - Benutzerverwaltung
+    usecase "Benutzer anzeigen" as UC_AdminViewUsers
+    usecase "Benutzer aktivieren/deaktivieren" as UC_ToggleUserStatus
+    usecase "Passwort zurücksetzen anfragen" as UC_HandlePasswordReset
+    
+    ' Use Cases für Admin - Statistiken
+    usecase "Statistiken anzeigen" as UC_ViewStatistics
+    usecase "Benutzerergebnisse einsehen" as UC_ViewUserResults
+    usecase "Test-Analysen abrufen" as UC_AnalyzeTests
+    
+    ' Use Cases für System
+    usecase "Fragen zufällig auswählen" as UC_SelectRandomQuestions
+    usecase "Antworten validieren" as UC_ValidateAnswers
+    usecase "Punkte berechnen" as UC_CalculatePoints
+    usecase "Datenbank synchronisieren" as UC_SyncDatabase
+    usecase "Session verwalten" as UC_ManageSession
+}
+
+' Verbindungen: Student
+Student --> UC_Register
+Student --> UC_Login
+Student --> UC_Logout
+Student --> UC_ResetPassword
+Student --> UC_ShowTests
+Student --> UC_StartTest
+Student --> UC_AnswerQuestion
+Student --> UC_EndTest
+Student --> UC_ViewResults
+Student --> UC_StartLearnMode
+Student --> UC_UseFlipCards
+Student --> UC_TrackProgress
+
+' Verbindungen: Admin
+Admin --> UC_Login
+Admin --> UC_Logout
+Admin --> UC_AdminViewQuestions
+Admin --> UC_CreateQuestion
+Admin --> UC_EditQuestion
+Admin --> UC_DeleteQuestion
+Admin --> UC_FilterQuestions
+Admin --> UC_AdminViewUsers
+Admin --> UC_ToggleUserStatus
+Admin --> UC_HandlePasswordReset
+Admin --> UC_ViewStatistics
+Admin --> UC_ViewUserResults
+Admin --> UC_AnalyzeTests
+
+' Verbindungen: System (automatische Prozesse)
+UC_AnswerQuestion --> UC_ValidateAnswers
+UC_AnswerQuestion --> UC_SelectRandomQuestions
+UC_AnswerQuestion --> UC_CalculatePoints
+UC_EndTest --> UC_CalculateGrade
+UC_EndTest --> UC_CalculatePoints
+UC_ViewResults --> UC_CalculateGrade
+UC_CreateQuestion --> UC_SyncDatabase
+UC_EditQuestion --> UC_SyncDatabase
+UC_DeleteQuestion --> UC_SyncDatabase
+UC_ToggleUserStatus --> UC_SyncDatabase
+UC_StartTest --> UC_ManageSession
+UC_EndTest --> UC_ManageSession
+UC_Login --> UC_ManageSession
+UC_Logout --> UC_ManageSession
+
+' Zusätzliche Abhängigkeiten
+UC_StartTest --> UC_SelectRandomQuestions
+UC_AnswerQuestion --> UC_CalculatePoints
+
+note right of Student
+  **Student Profile:**
+  - Kann Tests durchführen
+  - Ergebnisse einsehen
+  - Lernmodus nutzen
+  - Profil verwalten
+end note
+
+note right of Admin
+  **Admin Profile:**
+  - Fragen verwalten (CRUD)
+  - Benutzer verwalten
+  - Statistiken anzeigen
+  - Passwort-Resets bearbeiten
+end note
+
+note right of System
+  **System Automatismen:**
+  - Zufällige Fragen-Auswahl
+  - Antwort-Validierung
+  - Punkt-/Notenberechnung
+  - Session-Management
+end note
+
+@enduml
