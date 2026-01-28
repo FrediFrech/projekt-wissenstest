@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
 <%
    /*
     * Component: Result.jsp
@@ -16,6 +16,7 @@
         <div class="glass-card" style="display:inline-block; padding: 2rem 3rem; margin-top: 1rem; border: 2px solid var(--border);">
              <div style="font-size:1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Note</div>
              <div id="resultGrade" style="font-size: 5rem; font-weight: 800; line-height: 1; margin: 0.5rem 0;">-</div>
+               <div id="gradeTextLabel" style="font-size: 1.5rem; color: var(--text-main); margin-top: -0.5rem; margin-bottom: 1rem;"></div>
              <div id="gradeInfo" style="font-size: 1.1rem; font-style:italic; color: var(--text-muted);">...</div>
         </div>
     </div>
@@ -52,7 +53,7 @@
         if (!attempt || !config) return null;
         const type = config.passThresholdType;
         const value = Number(config.passThresholdValue);
-        if (!Number.isFinite(value)) return null;
+        if (!Number.isFinite(value) || value <= 0) return null;
 
         const total = Number.isFinite(Number(attempt.totalPoints)) ? Number(attempt.totalPoints) : 0;
         const max = Number.isFinite(Number(attempt.maxPoints)) ? Number(attempt.maxPoints) : 0;
@@ -60,7 +61,7 @@
         if (type === 'points') {
             return {
                 passed: total >= value,
-                label: `${value} Punkte`
+                label: String(value) + ' Punkte'
             };
         }
 
@@ -68,8 +69,18 @@
         const pct = (total / max) * 100;
         return {
             passed: pct >= value,
-            label: `${value}%`
+            label: String(value) + '%'
         };
+    }
+
+    function escapeHtml(input) {
+        if (input === null || input === undefined) return '';
+        return String(input)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -97,36 +108,60 @@
             document.getElementById('resultScore').innerText = total + " / " + max + " Punkte";
 
             // Populate Grade
+            // Grade Mapping (German School Grades)
+            const gradeMap = {
+                "1": "Sehr Gut",
+                "2": "Gut",
+                "3": "Befriedigend",
+                "4": "Ausreichend",
+                "5": "Mangelhaft",
+                "6": "Ungenügend"
+            };
+
             const gradeEl = document.getElementById('resultGrade');
             const gradeVal = attempt.grade || "-";
-            gradeEl.innerText = gradeVal;
+            const gradeText = gradeMap[gradeVal] || "";
+
+            if(gradeEl) {
+                gradeEl.innerText = gradeVal;
+                
+                const gradeTextEl = document.getElementById('gradeTextLabel');
+                if (gradeTextEl) {
+                    gradeTextEl.innerText = gradeText;
+                }
+            } else {
+                console.error('Result.jsp: #resultGrade not found.');
+            }
 
             const passConfig = getPassConfig();
             const passInfo = evaluatePass(attempt, passConfig);
+            const gradeTextEl = document.getElementById('gradeTextLabel');
 
             if (passInfo) {
-                gradeEl.style.color = passInfo.passed ? "#10b981" : "#ef4444";
-                document.getElementById('gradeInfo').innerText = passInfo.passed
-                    ? `Bestanden (ab ${passInfo.label}).`
-                    : `Leider nicht bestanden (ab ${passInfo.label}).`;
+                if(gradeEl) gradeEl.style.color = passInfo.passed ? "#10b981" : "#ef4444";
+                if(gradeTextEl) gradeTextEl.style.color = passInfo.passed ? "#10b981" : "#ef4444";
+                
+                const infoEl = document.getElementById('gradeInfo');
+                if(infoEl) {
+                    infoEl.innerText = passInfo.passed
+                        ? ('Bestanden (ab ' + passInfo.label + ').')
+                        : ('Leider nicht bestanden (ab ' + passInfo.label + ').');
+                }
             } else {
                 // Colorize Grade (fallback)
                 const gradeNum = parseInt(gradeVal);
                 if(!isNaN(gradeNum)) {
                     if(gradeNum <= 2) {
                         gradeEl.style.color = "#10b981"; // Green
-                        document.getElementById('gradeInfo').innerText = "Exzellent!";
                     } else if(gradeNum <= 4) {
                         gradeEl.style.color = "#f59e0b"; // Orange
-                        document.getElementById('gradeInfo').innerText = "Bestanden.";
                     } else {
                          gradeEl.style.color = "#ef4444"; // Red
-                         document.getElementById('gradeInfo').innerText = "Leider nicht bestanden.";
                     }
                 } else {
                      gradeEl.style.color = "var(--text-main)";
-                     document.getElementById('gradeInfo').innerText = "";
                 }
+                document.getElementById('gradeInfo').innerText = "";
             }
 
             // Populate Details
@@ -137,28 +172,40 @@
                     const isCorrect = d.isCorrect;
                     const color = isCorrect ? "#10b981" : "#ef4444";
                     const symbol = isCorrect ? "✓" : "✗";
-                    
-                    html += `
-                    <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1);">
-                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: var(--text-main); display:flex; justify-content:space-between;">
-                            <span>#\${index+1} \${d.prompt}</span>
-                            <span style="color: \${color}">\${Math.round(d.pointsObtained*100)/100} / \${d.maxPoints} Pt.</span>
-                        </div>
-                        \${d.imageUrl ? `<img src="\${d.imageUrl}" style="max-width:100%; height:auto; border-radius:8px; margin-bottom:0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">` : ''}
-                        
-                        <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">
-                            <span style="color: var(--text-muted); width: 100px; display:inline-block;">Deine Antwort:</span> 
-                            <span style="color: \${color}; font-weight: bold;">\${d.userAnswer || '(Keine)'} \${symbol}</span>
-                        </div>
-                        
-                        \${!isCorrect ? `
-                        <div style="font-size: 0.9rem;">
-                            <span style="color: var(--text-muted); width: 100px; display:inline-block;">Lösung:</span> 
-                            <span style="color: #10b981;">\${d.correctAnswer || '-'}</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                    `;
+                    const normalize = (typeof normalizeText === 'function') ? normalizeText : (v) => v;
+                    const promptText = normalize(d.prompt || '');
+                    const userAnswerText = normalize(d.userAnswer || '(Keine)');
+                    const correctAnswerText = normalize(d.correctAnswer || '-');
+
+                    const pointsObtained = Number.isFinite(Number(d.pointsObtained))
+                        ? Math.round(Number(d.pointsObtained) * 100) / 100
+                        : 0;
+                    const maxPts = (d.maxPoints !== null && d.maxPoints !== undefined) ? d.maxPoints : '';
+                    const imageHtml = (d.imageUrl && String(d.imageUrl).trim() !== '')
+                        ? ('<img src="' + escapeHtml(d.imageUrl) + '" style="max-width:100%; height:auto; border-radius:8px; margin-bottom:0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">')
+                        : '';
+                    const solutionHtml = (!isCorrect)
+                        ? (
+                            '<div style="font-size: 0.9rem;">'
+                            + '<span style="color: var(--text-muted); width: 100px; display:inline-block;">Lösung:</span> '
+                            + '<span style="color: #10b981;">' + escapeHtml(correctAnswerText) + '</span>'
+                            + '</div>'
+                          )
+                        : '';
+
+                    html +=
+                        '<div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1);">'
+                        + '<div style="font-weight: bold; margin-bottom: 0.5rem; color: var(--text-main); display:flex; justify-content:space-between;">'
+                        + '<span>#' + (index + 1) + ' ' + escapeHtml(promptText) + '</span>'
+                        + '<span style="color: ' + color + '">' + pointsObtained + ' / ' + escapeHtml(maxPts) + ' Pt.</span>'
+                        + '</div>'
+                        + imageHtml
+                        + '<div style="font-size: 0.9rem; margin-bottom: 0.2rem;">'
+                        + '<span style="color: var(--text-muted); width: 100px; display:inline-block;">Deine Antwort:</span> '
+                        + '<span style="color: ' + color + '; font-weight: bold;">' + escapeHtml(userAnswerText) + ' ' + symbol + '</span>'
+                        + '</div>'
+                        + solutionHtml
+                        + '</div>';
                 });
                 detailsContainer.innerHTML = html;
             } else {

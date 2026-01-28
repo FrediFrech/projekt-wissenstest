@@ -91,6 +91,6 @@
         </main>
     </div>
 
-    <script src="${pageContext.request.contextPath}/js_native/app_main.js"></script>
+    <script src="${pageContext.request.contextPath}/js_native/app_main.js?v=20260128-2"></script>
 </body>
 </html>

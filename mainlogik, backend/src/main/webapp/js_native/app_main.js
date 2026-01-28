@@ -19,8 +19,58 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     if (body) options.body = JSON.stringify(body);
     
     const response = await fetch(`${API_BASE}${endpoint}`, options);
-    if (!response.ok) throw new Error('API Error');
-    return response.json();
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok) {
+        let message = 'API Error';
+        try {
+            if (contentType.includes('application/json')) {
+                const err = await response.json();
+                if (err && err.error) message = err.error;
+            } else {
+                const text = await response.text();
+                if (text) message = text;
+            }
+        } catch (e) {
+            // keep default message
+        }
+        throw new Error(message);
+    }
+    if (contentType.includes('application/json')) {
+        return response.json();
+    }
+    return response.text();
+}
+
+function normalizeText(value) {
+    if (value === null || value === undefined) return value;
+    return String(value)
+    .replace(/ÃƒÂ¤|Ã¤/g, 'ä')
+    .replace(/ÃƒÂ¶|Ã¶/g, 'ö')
+    .replace(/ÃƒÂ¼|Ã¼/g, 'ü')
+    .replace(/ÃƒÂŸ|ÃŸ/g, 'ß')
+    .replace(/ÃƒÂ„|Ã„/g, 'Ä')
+    .replace(/ÃƒÂ–|Ã–/g, 'Ö')
+    .replace(/ÃƒÂœ|Ãœ/g, 'Ü')
+    .replace(/Ã¢â‚¬â€œ/g, '–')
+    .replace(/Ã¢â‚¬â€/g, '”')
+    .replace(/Ã¢â‚¬â€ž/g, '„')
+    .replace(/Ã¢â‚¬â€˜/g, '‘')
+    .replace(/Ã¢â‚¬â€™/g, '’');
+}
+
+if (typeof window !== 'undefined') {
+    window.normalizeText = normalizeText;
+}
+
+function normalizeCategories(categories) {
+    const map = new Map();
+    (categories || []).forEach(c => {
+        const normalized = normalizeText(c);
+        if (!map.has(normalized)) {
+            map.set(normalized, normalized);
+        }
+    });
+    return Array.from(map.entries()).map(([label, value]) => ({ label, value }));
 }
 
 function isAttemptPassed(attempt) {
@@ -91,11 +141,12 @@ async function loadTests() {
          `;
     }
 
-    // Load available test (static for now)
-    let categories = [];
+        // Load available test (static for now)
+        let categories = [];
     try {
          categories = await apiCall('/test/categories');
     } catch(e) { console.error("Could not fetch categories", e); categories = ['Allgemein']; }
+        const categoryOptions = normalizeCategories(categories);
     
     // Create a configuration card
     const testHtml = `
@@ -113,7 +164,7 @@ async function loadTests() {
                             <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 0.4rem;">Kategorie</label>
                             <select name="category" class="form-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
                                 <option value="All">Alle Kategorien</option>
-                                ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
+                                ${categoryOptions.map(c => `<option value="${c.value}">${c.label}</option>`).join('')}
                             </select>
                         </div>
                          <div class="form-group">
@@ -180,7 +231,7 @@ async function loadTests() {
     const customSelect = document.getElementById('customCategories');
     if (customSelect) {
         customSelect.innerHTML = '<option value="All">Alle Kategorien</option>' +
-            categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            categoryOptions.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
     }
 }
 
@@ -323,7 +374,7 @@ function renderQuestion() {
 
     const questionText = document.getElementById('questionText');
     if (questionText) {
-        questionText.textContent = q.prompt || '';
+        questionText.textContent = normalizeText(q.prompt || '');
         if (q.imageUrl && q.imageUrl.trim() !== "") {
             const img = document.createElement('img');
             img.src = q.imageUrl;
@@ -396,7 +447,7 @@ function renderQuestion() {
             label.style.marginRight = '10px';
             label.textContent = String.fromCharCode(65 + idx);
             const text = document.createElement('span');
-            text.textContent = opt.answerText;
+            text.textContent = normalizeText(opt.answerText);
             btn.appendChild(label);
             btn.appendChild(text);
             

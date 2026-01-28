@@ -30,6 +30,7 @@ de\dhsn\wissentest\web\AdminServlet$UserPayload.class
 de\dhsn\wissentest\web\AdminServlet.class
 de\dhsn\wissentest\web\AdminServlet$ImportImageResponse.class
 de\dhsn\wissentest\model\AttemptResult.class
+de\dhsn\wissentest\service\TestService$ExamSegment.class
 de\dhsn\wissentest\web\AdminServlet$QuestionPayload.class
 de\dhsn\wissentest\web\TestServlet$QuestionView.class
 de\dhsn\wissentest\web\CharacterEncodingFilter.class

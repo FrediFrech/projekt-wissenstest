@@ -122,6 +122,83 @@ public class TestService {
         return selected;
     }
 
+    public static class ExamSegment {
+        public String category;
+        public String type; // MC, CLOZE, etc.
+        public int difficulty;
+        public int percent; // 0-100
+    }
+
+    public List<Question> startSegmentedTest(List<ExamSegment> segments, int totalLimit) {
+        if (totalLimit <= 0) totalLimit = 20;
+        List<Question> allQuestions = questionDao.findAll();
+        Set<Integer> selectedIds = new HashSet<>();
+        List<Question> result = new ArrayList<>();
+
+        // 1. Process explicit segments
+        for (ExamSegment seg : segments) {
+            if (seg.percent <= 0) continue;
+            int countEx = (int) Math.round((seg.percent / 100.0) * totalLimit);
+            if (countEx <= 0) continue;
+
+            List<Question> candidates = new ArrayList<>();
+            for (Question q : allQuestions) {
+                if (selectedIds.contains(q.getId())) continue;
+                
+                // Difficulty Filter (0 or null means 'Any' in some models, but usually 1-3)
+                if (seg.difficulty > 0 && q.getDifficulty() != seg.difficulty) continue;
+                
+                // Category Filter
+                boolean catMatch = (seg.category == null || seg.category.equals("All") || seg.category.isBlank()) 
+                                   || seg.category.equals(q.getCategory());
+                if (!catMatch) continue;
+
+                // Type Filter
+                boolean typeMatch = (seg.type == null || seg.type.equals("All") || seg.type.isBlank())
+                                    || (q.getType() != null && q.getType().name().equals(seg.type));
+                if (!typeMatch) continue;
+
+                candidates.add(q);
+            }
+            
+            Collections.shuffle(candidates);
+            for (int i = 0; i < countEx && i < candidates.size(); i++) {
+                 Question picked = candidates.get(i);
+                 result.add(picked);
+                 selectedIds.add(picked.getId());
+            }
+        }
+
+        // 2. Fill remainder if needed (randomly from remaining pool, or just stop?)
+        // Usually, if segments sum to 100%, we might miss a few due to rounding or lack of questions.
+        // Let's fill up to totalLimit with ANY non-selected question if we are under the limit.
+        // Or should we strict? The user requested specific percentages. 
+        // Best effort: fill randomly to meet limit.
+        if (result.size() < totalLimit) {
+             List<Question> remainingPool = new ArrayList<>();
+             for (Question q : allQuestions) {
+                 if (!selectedIds.contains(q.getId())) {
+                     remainingPool.add(q);
+                 }
+             }
+             Collections.shuffle(remainingPool);
+             while (result.size() < totalLimit && !remainingPool.isEmpty()) {
+                 Question p = remainingPool.remove(0);
+                 result.add(p);
+                 selectedIds.add(p.getId());
+             }
+        }
+
+        // Shuffle the final mix so segments aren't clumped
+        Collections.shuffle(result);
+        
+        // Hard limit check (in case rounding went over, though logic above shouldn't)
+        if (result.size() > totalLimit) {
+            return result.subList(0, totalLimit);
+        }
+        return result;
+    }
+
     public List<String> getAvailableCategories() {
         return questionDao.findAllCategories();
     }
@@ -151,9 +228,10 @@ public class TestService {
             detail.questionId = q.getId();
             detail.prompt = q.getPrompt();
             detail.imageUrl = q.getImageUrl();
-            detail.userAnswer = String.valueOf(answerPayload);
+            detail.userAnswer = toUserAnswerText(q, answerPayload);
             detail.correctAnswer = determineCorrectAnswerText(q);
-            detail.isCorrect = earned > 0;
+            // Mark as correct only if full points achieved (partial credit is not "fully correct")
+            detail.isCorrect = earned >= (qMax - 1e-9);
             detail.pointsObtained = earned;
             detail.maxPoints = qMax;
             details.add(detail);
@@ -173,13 +251,70 @@ public class TestService {
         
         return new AttemptResult(attempt, details);
     }
+
+    private String toUserAnswerText(Question q, Object answerPayload) {
+        if (answerPayload == null) {
+            return "";
+        }
+
+        // FREE text: keep as-is
+        if (q.getType() == QuestionType.FREE) {
+            return String.valueOf(answerPayload);
+        }
+
+        // CLOZE: expect list of strings (from JSON)
+        if (q.getType() == QuestionType.CLOZE) {
+            if (answerPayload instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Object> values = (List<Object>) answerPayload;
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < values.size(); i++) {
+                    if (i > 0) sb.append(" | ");
+                    sb.append(values.get(i) == null ? "" : String.valueOf(values.get(i)));
+                }
+                return sb.toString();
+            }
+            return String.valueOf(answerPayload);
+        }
+
+        // MC / IMAGE: payload is option-id (often parsed as Double)
+        if (q.getType() == QuestionType.MC || q.getType() == QuestionType.IMAGE) {
+            Integer selectedId = null;
+            if (answerPayload instanceof Number) {
+                selectedId = ((Number) answerPayload).intValue();
+            } else {
+                try {
+                    String s = String.valueOf(answerPayload).trim();
+                    if (s.endsWith(".0")) {
+                        s = s.substring(0, s.length() - 2);
+                    }
+                    selectedId = Integer.parseInt(s);
+                } catch (Exception ignored) {
+                    // fall through
+                }
+            }
+
+            if (selectedId != null) {
+                List<AnswerOption> opts = answerDao.findByQuestion(q.getId());
+                for (AnswerOption o : opts) {
+                    if (o.getId() == selectedId) {
+                        return o.getAnswerText();
+                    }
+                }
+            }
+            return String.valueOf(answerPayload);
+        }
+
+        return String.valueOf(answerPayload);
+    }
     
     private String determineCorrectAnswerText(Question q) {
         if (q.getType() == QuestionType.MC || q.getType() == QuestionType.IMAGE) {
             List<AnswerOption> opts = answerDao.findByQuestion(q.getId());
             StringBuilder sb = new StringBuilder();
             for(AnswerOption o : opts) {
-                if(o.isCorrect()) { // Use isCorrect boolean if available, or partialValue > 0
+                // Some seed data uses partial_value instead of is_correct
+                if(o.isCorrect() || o.getPartialValue() > 0) {
                     if(sb.length() > 0) sb.append(", ");
                     sb.append(o.getAnswerText());
                 }
@@ -302,11 +437,10 @@ public class TestService {
     }
 
     private double scoreCloze(int questionId, Object answerPayload, int maxPoints) {
-        if (answerPayload == null) {
+        List<String> tokens = normalizeClozePayload(answerPayload);
+        if (tokens.isEmpty()) {
             return 0.0;
         }
-        @SuppressWarnings("unchecked")
-        List<String> tokens = (List<String>) answerPayload;
         List<ClozeToken> expected = clozeTokenDao.findByQuestion(questionId);
         expected.sort(java.util.Comparator.comparingInt(ClozeToken::getTokenIndex));
         List<List<String>> alternatives = null;
@@ -328,6 +462,24 @@ public class TestService {
         }
         double ratio = expectedTotal == 0 ? 0 : total / expectedTotal;
         return ratio * maxPoints;
+    }
+
+    private List<String> normalizeClozePayload(Object answerPayload) {
+        if (answerPayload == null) {
+            return java.util.Collections.emptyList();
+        }
+        List<String> tokens = new java.util.ArrayList<>();
+        if (answerPayload instanceof List) {
+            for (Object o : (List<?>) answerPayload) {
+                tokens.add(o == null ? "" : String.valueOf(o));
+            }
+            return tokens;
+        }
+        if (answerPayload instanceof String) {
+            tokens.add(((String) answerPayload).trim());
+            return tokens;
+        }
+        return tokens;
     }
 
     private boolean isClozeAnswerCorrect(String expectedText, List<List<String>> alternatives, int index, String actual) {

@@ -133,35 +133,35 @@
     </div>
 
     <div class="glass-card" style="max-width: 980px; margin: 0 auto 2rem auto; background:#ffffff;">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <div class="form-group">
+        <div style="display:flex; flex-wrap:wrap; gap: 1rem; align-items:flex-end;">
+            <div class="form-group" style="flex: 2; min-width: 250px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Suche</label>
-                <input id="learnSearch" class="form-input" placeholder="Frage, Antwort oder Kategorie" />
+                <input id="learnSearch" class="form-input" placeholder="Frage, Antwort oder Kategorie" style="width:100%;" />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1; min-width: 120px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Typ</label>
-                <select id="learnTypeFilter" class="form-input">
+                <select id="learnTypeFilter" class="form-input" style="width:100%;">
                     <option value="All">Alle</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1; min-width: 150px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Kategorie</label>
-                <select id="learnCategoryFilter" class="form-input">
+                <select id="learnCategoryFilter" class="form-input" style="width:100%;">
                     <option value="All">Alle</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1; min-width: 100px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Schwierigkeit</label>
-                <select id="learnDifficultyFilter" class="form-input">
+                <select id="learnDifficultyFilter" class="form-input" style="width:100%;">
                     <option value="All">Alle</option>
                     <option value="1">Leicht</option>
                     <option value="2">Mittel</option>
                     <option value="3">Schwer</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1; min-width: 120px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Sortieren</label>
-                <select id="learnSortBy" class="form-input">
+                <select id="learnSortBy" class="form-input" style="width:100%;">
                     <option value="category">Kategorie</option>
                     <option value="type">Typ</option>
                     <option value="difficulty">Schwierigkeit</option>
@@ -170,9 +170,9 @@
                     <option value="random">Zufällig</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1; min-width: 120px;">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Gruppieren</label>
-                <select id="learnGroupBy" class="form-input">
+                <select id="learnGroupBy" class="form-input" style="width:100%;">
                     <option value="none">Keine</option>
                     <option value="category" selected>Kategorie</option>
                     <option value="type">Typ</option>
@@ -190,7 +190,7 @@
         <div id="learnStats" style="margin-top:0.75rem; color:var(--text-muted); font-size:0.9rem;"></div>
     </div>
 
-    <div id="cardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; align-items: stretch;">
+    <div id="cardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 4rem; align-items: stretch;">
         <!-- Cards will be injected here using FlipCard.jsp structure via JS -->
     </div>
 
@@ -290,7 +290,19 @@
             const types = Array.from(new Set(items.map(i => i?.type).filter(Boolean)))
                 .map(t => String(t))
                 .sort();
-            setSelectOptions(typeSelect, types, current);
+            // Use formatType for display but keep original value
+            typeSelect.innerHTML = '';
+            const optionAll = document.createElement('option');
+            optionAll.value = 'All';
+            optionAll.textContent = 'Alle';
+            typeSelect.appendChild(optionAll);
+            types.forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = formatType(val);
+                typeSelect.appendChild(opt);
+            });
+            typeSelect.value = valuesMatches(types, current) ? current : 'All';
         }
 
         if (categorySelect) {
@@ -301,6 +313,8 @@
             setSelectOptions(categorySelect, categories, current);
         }
     }
+
+    function valuesMatches(list, val) { return list.includes(val); }
 
     function setSelectOptions(select, values, current) {
         select.innerHTML = '';
@@ -322,6 +336,15 @@
         if (Number(value) === 2) return 'Mittel';
         if (Number(value) === 3) return 'Schwer';
         return 'Unbekannt';
+    }
+
+    function formatType(type) {
+        if (!type) return '';
+        if (type === 'MC') return 'Multiple Choice';
+        if (type === 'CLOZE') return 'Lückentext';
+        if (type === 'FREE') return 'Freitext';
+        if (type === 'IMAGE') return 'Bild-Frage';
+        return type;
     }
 
     function normalizeText(value) {
@@ -364,6 +387,8 @@
             return true;
         });
 
+        items = dedupeItems(items);
+
         if (sortBy === 'random') {
             items = shuffleArray(items);
         } else {
@@ -375,7 +400,8 @@
             });
         }
 
-        updateStats(items);
+        const totalUnique = dedupeItems(Array.isArray(learnQuestions) ? [...learnQuestions] : []).length;
+        updateStats(items, totalUnique, Array.isArray(learnQuestions) ? learnQuestions.length : 0);
 
         if (items.length === 0) {
             container.innerHTML = '<p>Keine passenden Fragen gefunden.</p>';
@@ -394,7 +420,7 @@
             groupItems.forEach(item => {
                 const qText = escapeHtml(item.q);
                 const aText = escapeHtml(item.a);
-                const typeLabel = escapeHtml(item.type || '');
+                const typeLabel = escapeHtml(formatType(item.type) || '');
                 const categoryLabel = escapeHtml(item.category || 'Ohne Kategorie');
                 const diffLabel = escapeHtml(formatDifficulty(item.difficulty));
                 const hasImage = item.imageUrl && String(item.imageUrl).trim() !== '';
@@ -481,16 +507,42 @@
         return groups;
     }
 
-    function updateStats(items) {
+    function updateStats(items, totalUnique, totalRaw) {
         const stats = document.getElementById('learnStats');
         if (!stats) return;
-        const total = Array.isArray(learnQuestions) ? learnQuestions.length : 0;
         const shown = items.length;
         const typeCounts = countBy(items, i => i?.type || 'Unbekannt');
         const summary = Object.entries(typeCounts)
-            .map(([k, v]) => escapeHtml(k) + ': ' + v)
+            .map(([k, v]) => escapeHtml(formatType(k)) + ': ' + v)
             .join(' · ');
-        stats.innerHTML = 'Zeige <strong>' + shown + '</strong> von <strong>' + total + '</strong> Fragen' + (summary ? ' · ' + summary : '');
+        const totalLabel = Number.isFinite(totalUnique) && totalUnique > 0 ? totalUnique : totalRaw;
+        const dupNote = totalRaw > totalUnique ? ' · Duplikate ausgeblendet: <strong>' + (totalRaw - totalUnique) + '</strong>' : '';
+        stats.innerHTML = 'Zeige <strong>' + shown + '</strong> von <strong>' + totalLabel + '</strong> Fragen' + dupNote + (summary ? ' · ' + summary : '');
+    }
+
+    function dedupeItems(items) {
+        const seen = new Set();
+        const result = [];
+        items.forEach(item => {
+            if (!item) return;
+            const key = buildDedupKey(item);
+            if (seen.has(key)) return;
+            seen.add(key);
+            result.push(item);
+        });
+        return result;
+    }
+
+    function buildDedupKey(item) {
+        const parts = [
+            item?.type ?? '',
+            item?.q ?? '',
+            item?.a ?? '',
+            item?.category ?? '',
+            item?.difficulty ?? '',
+            item?.imageUrl ?? ''
+        ];
+        return parts.map(p => String(p).trim().toLowerCase()).join('|');
     }
 
     function countBy(items, keyFn) {
@@ -517,7 +569,7 @@
         const title = document.getElementById('learnModalTitle');
         const cardContainer = document.getElementById('learnModalCardContainer');
 
-        const typeLabel = escapeHtml(item.type || '');
+        const typeLabel = escapeHtml(formatType(item.type));
         const categoryLabel = escapeHtml(item.category || 'Ohne Kategorie');
         const diffLabel = escapeHtml(formatDifficulty(item.difficulty));
 

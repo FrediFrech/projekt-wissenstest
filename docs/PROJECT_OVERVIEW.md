@@ -62,28 +62,28 @@ Tabellen: `users`, `questions`, `answers`, `cloze_answers`, `attempts`, `attempt
 - JUnit‑Tests im Backend (z.B. `ProgressionServiceTest`)
 - E2E‑Tests optional unter `e2e_tests/`
     *   **Login (Admin)**: `lehrer` / `student`
-    *   **Test-Suite**: Nutzt Playwright f�r E2E-Tests.
+  *   **Test-Suite**: Nutzt Playwright für E2E-Tests.
 
 ##  Projektbeschreibung
-Das **Projekt Wissenstest** ist eine web-basierte Lernplattform, die Sch�lern erm�glicht, ihr Wissen durch automatisierte Tests zu �berpr�fen. Die Plattform bietet verschiedene Fragetypen (Multiple Choice, L�ckentext), adaptive Schwierigkeitsanpassung und detailliertes Feedback. Administratoren k�nnen Tests verwalten, Fragen erstellen und Passwort-Reset-Anfragen bearbeiten.
+Das **Projekt Wissenstest** ist eine web-basierte Lernplattform, die Schülern ermöglicht, ihr Wissen durch automatisierte Tests zu überprüfen. Die Plattform bietet verschiedene Fragetypen (Multiple Choice, Lückentext), adaptive Schwierigkeitsanpassung und detailliertes Feedback. Administratoren können Tests verwalten, Fragen erstellen und Passwort-Reset-Anfragen bearbeiten.
 
-##  Kernfunktionalit�t
+##  Kernfunktionalität
 
-### F�r Sch�ler
+### Für Schüler
 - **Benutzerverwaltung:** Registrierung, Login, Profilinformationen, Passwort-Reset (Anfrage).
-- **Test-Durchf�hrung:** Zuf�llige Frageauswahl, verschiedene Fragetypen.
+- **Test-Durchführung:** Zufällige Frageauswahl, verschiedene Fragetypen.
 - **Echtzeit-Bewertung:** Sofortiges Feedback zu jeder Antwort.
 - **Notenberechnung:** Automatische Umrechnung der Punkte in Schulnoten (1-6).
-- **Lernmodus:** Interaktive Flip-Cards zum �ben und Wiederholen.
+- **Lernmodus:** Interaktive Flip-Cards zum Üben und Wiederholen.
 - **Fortschrittsanzeige:** Tracking von Testergebnissen.
 
-### F�r Administratoren
-- **Fragenverwaltung:** CRUD-Operationen f�r Test-Fragen (Listen, Erstellen, Bearbeiten, L�schen).
-- **Nutzerverwaltung:** Verwaltung von Sch�lern (aktiv/inaktiv) und Rollenzuweisung.
+### Für Administratoren
+- **Fragenverwaltung:** CRUD-Operationen für Test-Fragen (Listen, Erstellen, Bearbeiten, Löschen).
+- **Nutzerverwaltung:** Verwaltung von Schülern (aktiv/inaktiv) und Rollenzuweisung.
 - **Passwort-Reset:** Bearbeitung von Reset-Anfragen mit Neusetzung des Passworts.
 - **Statistiken:** Einsicht in Lernergebnisse und System-KPIs.
 
 ---
 
-##  Architektur-�bersicht
+##  Architektur-Übersicht
 

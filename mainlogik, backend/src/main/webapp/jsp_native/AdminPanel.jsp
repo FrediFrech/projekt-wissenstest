@@ -6,7 +6,7 @@
     * Description: Administration dashboard for managing questions and users.
     */
 %>
-<div class="glass-card animate-fade-in" style="max-width: 1000px; margin: 2rem auto;">
+<div class="glass-card animate-fade-in" style="max-width: 1600px; width: 98%; margin: 2rem auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h2 style="background: linear-gradient(to right, #ef4444, #b91c1c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Admin Panel &#128274;</h2>
             <div style="font-size: 0.9rem; color: var(--text-muted);">Verwaltungsoberfl&auml;che</div>
@@ -47,7 +47,7 @@
         
         <!-- Password Reset Requests -->
         <div id="pwResetSection" style="display:none;" class="animate-fade-in">
-             <div class="glass-card" style="background: #fff1f2; border: 1px solid #fecdd3;">
+             <div class="glass-card" style="background: #fff1f2; border: 1px solid #fecdd3; width: 100%;">
                 <h3 style="color:#be123c; margin-bottom:1rem;"> Passwort-Reset Anfragen</h3>
                 <table style="width:100%; text-align:left;">
                     <thead><tr><th>Username</th><th>Email</th><th>Action</th></tr></thead>
@@ -62,7 +62,7 @@
                 <h3>Fragenkatalog</h3>
                 <button onclick="openQuestionModal()" class="btn btn-primary" style="background:#ef4444;"> Frage erstellen</button>
             </div>
-            <div class="glass-card" style="background:#f8fafc; padding:1rem; margin-bottom:1rem;">
+            <div class="glass-card" style="background:#f8fafc; padding:1rem; margin-bottom:1rem; width: 100%;">
                 <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap:0.75rem; align-items:end;">
                     <div>
                         <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.35rem;">Filter (Wildcard *)</label>
@@ -72,10 +72,10 @@
                         <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.35rem;">Typ</label>
                         <select id="questionTypeFilter" class="form-input">
                             <option value="">Alle</option>
-                            <option value="MC">MC</option>
-                            <option value="CLOZE">CLOZE</option>
-                            <option value="FREE">FREE</option>
-                            <option value="IMAGE">IMAGE</option>
+                            <option value="MC">Multiple Choice</option>
+                            <option value="CLOZE">Lückentext</option>
+                            <option value="FREE">Freitext</option>
+                            <option value="IMAGE">Bild-Frage</option>
                         </select>
                     </div>
                     <div>
@@ -133,7 +133,7 @@
                  <h3>Benutzerverwaltung</h3>
                  <button onclick="document.getElementById('createUserModal').style.display='flex'" class="btn btn-ghost">Create User</button>
             </div>
-            <div class="glass-card" style="background:#f8fafc; padding:1rem; margin-bottom:1rem;">
+            <div class="glass-card" style="background:#f8fafc; padding:1rem; margin-bottom:1rem; width: 100%;">
                 <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:0.75rem; align-items:end;">
                     <div>
                         <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.35rem;">User Filter (Wildcard *)</label>
@@ -175,8 +175,8 @@
 
 <!-- Modals -->
 <!-- Question Modal -->
-<div id="questionModal" onclick="if(event.target === this) closeQuestionModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; overflow-y:auto;">
-    <div style="background:white; padding:2rem; border-radius:8px; width:600px; margin: 2rem 0; position:relative; max-height:90vh; overflow-y:auto;">
+<div id="questionModal" onclick="if(event.target === this) closeQuestionModal()" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; overflow-y:auto; padding:1rem; box-sizing:border-box;">
+    <div style="background:white; padding:2rem; border-radius:8px; width:min(600px, 95vw); margin: 2rem 0; position:relative; max-height:90vh; overflow-y:auto; box-sizing:border-box;">
         <h3 id="qModalTitle">Frage erstellen</h3>
         <button onclick="closeQuestionModal()" aria-label="Modal schlie&szlig;en" style="position:absolute; top:1rem; right:1rem; border:none; background:none; cursor:pointer; font-size:1.4rem;">&times;</button>
         <form onsubmit="handleSaveQuestion(event)" id="questionForm">
@@ -207,9 +207,9 @@
             </div>
             <div class="form-group" id="imageUrlGroup" style="display:none;">
                 <label>Bild (Upload oder URL)</label>
-                <div id="imageDropZone" style="border:2px dashed #cbd5f5; border-radius:8px; padding:1rem; text-align:center; color:#64748b; margin-bottom:0.75rem;">
-                    <strong>Drag & Drop</strong> oder <button type="button" class="btn btn-ghost" onclick="document.getElementById('qImageFile').click()">Dateien ausw&auml;hlen</button>
-                    <input type="file" id="qImageFile" accept="image/*" multiple style="display:none" onchange="handleImageFileChange(event)">
+                <div id="imageDropZone" style="border:2px dashed #cbd5f5; border-radius:8px; padding:1rem; text-align:center; color:#64748b; margin-bottom:0.75rem; position:relative;">
+                    <strong>Drag & Drop</strong> oder <label for="qImageFile" class="btn btn-ghost" style="display:inline-block; cursor:pointer;">Dateien ausw&auml;hlen</label>
+                    <input type="file" id="qImageFile" accept="image/*" multiple style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;" onchange="handleImageFileChange(event)">
                 </div>
                 <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
                     <button type="button" class="btn btn-ghost" onclick="importImagesFromFolder()">Import aus Ordner (assets/questions)</button>
@@ -222,7 +222,7 @@
             </div>
             <div class="form-group">
                  <label>Antworten / Config (JSON)</label>
-                 <small style="display:block; color:gray;" id="qConfigHelp">Bei MC: Kommagetrennt (Richtig*). Bei Cloze: Tokens.</small>
+                 <small style="display:block; color:gray;" id="qConfigHelp">Bei Multiple Choice: Kommagetrennt (Richtig*). Bei Lückentext: Tokens.</small>
                  <textarea name="answersRaw" id="qAnswersRaw" class="form-input" rows="3" placeholder="*Richtig, Falsch 1, Falsch 2"></textarea>
             </div>
              <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
@@ -241,7 +241,7 @@
 </div>
 
 <!-- Create User Modal -->
-<div id="createUserModal" onclick="if(event.target === this) closeCreateUserModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+<div id="createUserModal" onclick="if(event.target === this) closeCreateUserModal()" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
     <div style="background:white; padding:2rem; border-radius:8px; width:400px; position:relative;">
         <h3>Neuen User anlegen</h3>
         <button onclick="closeCreateUserModal()" aria-label="Modal schlie&szlig;en" style="position:absolute; top:1rem; right:1rem; border:none; background:none; cursor:pointer; font-size:1.4rem;">&times;</button>
@@ -255,7 +255,7 @@
 </div>
 
 <!-- Edit User Modal -->
-<div id="editUserModal" onclick="if(event.target === this) closeEditUserModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+<div id="editUserModal" onclick="if(event.target === this) closeEditUserModal()" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:1rem; box-sizing:border-box;">
     <div style="background:white; padding:2rem; border-radius:8px; width:400px; position:relative;">
         <h3 id="editUserTitle">User bearbeiten</h3>
         <button onclick="closeEditUserModal()" aria-label="Modal schlie&szlig;en" style="position:absolute; top:1rem; right:1rem; border:none; background:none; cursor:pointer; font-size:1.4rem;">&times;</button>
@@ -293,6 +293,14 @@
     let uploadedImages = [];
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Ensure overlays are not trapped inside width-limited/animated containers.
+        // (Transforms/backdrop filters on parents can break `position: fixed`.)
+        ['questionModal', 'createUserModal', 'editUserModal'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.parentNode !== document.body) {
+                document.body.appendChild(el);
+            }
+        });
         loadAdminStats();
         loadUsers();
         loadQuestions();
@@ -443,6 +451,15 @@
         return meta.learnEnabled !== false;
     }
 
+    function formatType(type) {
+        if (!type) return '';
+        if (type === 'MC') return 'Multiple Choice';
+        if (type === 'CLOZE') return 'Lückentext';
+        if (type === 'FREE') return 'Freitext';
+        if (type === 'IMAGE') return 'Bild-Frage';
+        return type;
+    }
+
     function renderUserTable(users) {
         const tbody = document.getElementById('userTableBody');
         if (!tbody) return;
@@ -485,8 +502,8 @@
              const learnEnabled = isLearnEnabledQuestion(q);
              row.innerHTML = `
                  <td style="padding:0.5rem; color:grey;">\${q.id}</td>
-                 <td style="padding:0.5rem; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">\${q.prompt}</td>
-                 <td style="padding:0.5rem;"><small style="background:#e5e7eb; padding:2px 4px; border-radius:4px;">\${q.type}</small></td>
+                 <td style="padding:0.5rem; max-width:none; white-space:normal;">\${q.prompt}</td>
+                 <td style="padding:0.5rem;"><small style="background:#e5e7eb; padding:2px 4px; border-radius:4px;">\${formatType(q.type)}</small></td>
                  <td style="padding:0.5rem;">\${q.difficulty}</td>
                  <td style="padding:0.5rem; text-align:center;">
                      <input type="checkbox" class="learnToggle" \${learnEnabled ? 'checked' : ''} aria-label="Als Karteikarte anzeigen" />
@@ -916,6 +933,15 @@
     function setupImageDropZone() {
         const dropZone = document.getElementById('imageDropZone');
         if (!dropZone) return;
+        // Allow clicking anywhere in the dropzone to open the file picker.
+        dropZone.addEventListener('click', (e) => {
+            const target = e && e.target ? e.target : null;
+            if (target && (target.closest('button') || target.closest('a') || target.closest('label') || target.closest('input'))) {
+                return;
+            }
+            const input = document.getElementById('qImageFile');
+            if (input) input.click();
+        });
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.style.borderColor = '#6366f1';

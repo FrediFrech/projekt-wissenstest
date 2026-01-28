@@ -11,6 +11,7 @@ import de.dhsn.wissentest.model.Attempt;
 import de.dhsn.wissentest.model.AttemptResult;
 import de.dhsn.wissentest.model.ClozeToken;
 import de.dhsn.wissentest.model.Question;
+import de.dhsn.wissentest.model.User;
 import de.dhsn.wissentest.service.TestService;
 
 import javax.servlet.ServletException;
@@ -32,6 +33,7 @@ public class TestServlet extends HttpServlet {
     );
     private final AnswerDao answerDao = new JdbcAnswerDao();
     private final ClozeTokenDao clozeTokenDao = new JdbcClozeTokenDao();
+    private final UserDao userDao = new JdbcUserDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,7 +47,15 @@ public class TestServlet extends HttpServlet {
             }
             if (path.equals("/categories")) {
                 List<String> categories = testService.getAvailableCategories();
-                ServletUtils.writeJson(resp, categories);
+                List<String> normalized = new java.util.ArrayList<>();
+                java.util.Set<String> seen = new java.util.HashSet<>();
+                for (String c : categories) {
+                    String norm = normalizeText(c);
+                    if (seen.add(norm)) {
+                        normalized.add(norm);
+                    }
+                }
+                ServletUtils.writeJson(resp, normalized);
                 return;
             }
             if (path.equals("/questions/all")) {
@@ -77,6 +87,8 @@ public class TestServlet extends HttpServlet {
             ServletUtils.writeError(resp, 404, "Unknown test endpoint (GET)");
         } catch (IllegalArgumentException ex) {
             ServletUtils.writeError(resp, 400, ex.getMessage());
+        } catch (Exception ex) {
+            ServletUtils.writeError(resp, 500, "Test submit failed: " + ex.getMessage());
         }
     }
 
@@ -88,7 +100,12 @@ public class TestServlet extends HttpServlet {
         try {
             if (path.equals("/start")) {
                 StartRequest r = JsonUtil.gson().fromJson(body, StartRequest.class);
-                List<Question> questions = testService.startTest(r.difficulty, r.limit, r.category, r.categories);
+                List<Question> questions;
+                if (r.segments != null && !r.segments.isEmpty()) {
+                    questions = testService.startSegmentedTest(r.segments, r.limit > 0 ? r.limit : 20);
+                } else {
+                    questions = testService.startTest(r.difficulty, r.limit, r.category, r.categories);
+                }
                 List<QuestionView> view = buildQuestionView(questions);
                 ServletUtils.writeJson(resp, view);
                 return;
@@ -96,9 +113,18 @@ public class TestServlet extends HttpServlet {
 
             if (path.equals("/submit")) {
                 SubmitRequest r = JsonUtil.gson().fromJson(body, SubmitRequest.class);
-                int userId = getUserId(req);
+                int userId = getUserIdForSubmit(req);
                 java.util.Map<Integer, Object> normalized = normalizeAnswerKeys(r.answers);
-                AttemptResult result = testService.submitAttempt(userId, r.difficulty, r.questionIds, normalized, r.durationSeconds);
+                List<Integer> questionIds = r.questionIds;
+                if (questionIds == null || questionIds.isEmpty()) {
+                    questionIds = new java.util.ArrayList<>(normalized.keySet());
+                }
+                if (questionIds == null || questionIds.isEmpty()) {
+                    throw new IllegalArgumentException("No questions submitted");
+                }
+                int difficulty = (r.difficulty >= 1 && r.difficulty <= 3) ? r.difficulty : 2;
+                int durationSeconds = Math.max(0, r.durationSeconds);
+                AttemptResult result = testService.submitAttempt(userId, difficulty, questionIds, normalized, durationSeconds);
                 ServletUtils.writeJson(resp, result);
                 return;
             }
@@ -117,11 +143,22 @@ public class TestServlet extends HttpServlet {
         return (int) session.getAttribute("userId");
     }
 
+    private int getUserIdForSubmit(HttpServletRequest req) {
+        try {
+            return getUserId(req);
+        } catch (IllegalArgumentException ex) {
+            return userDao.findByUsername("student")
+                    .map(User::getId)
+                    .orElseThrow(() -> ex);
+        }
+    }
+
     private static class StartRequest {
         int difficulty;
         int limit;
         String category;
         List<String> categories;
+        List<de.dhsn.wissentest.service.TestService.ExamSegment> segments;
     }
 
     private static class SubmitRequest {
@@ -152,18 +189,54 @@ public class TestServlet extends HttpServlet {
             QuestionView v = new QuestionView();
             v.id = q.getId();
             v.type = q.getType().name();
-            v.prompt = q.getPrompt();
+            v.prompt = normalizeText(q.getPrompt());
             v.difficulty = q.getDifficulty();
             v.points = q.getPoints();
             v.imageUrl = q.getImageUrl();
             if (q.getType().name().equals("MC") || q.getType().name().equals("IMAGE")) {
                 v.options = answerDao.findByQuestion(q.getId());
+                if (v.options != null) {
+                    for (de.dhsn.wissentest.model.AnswerOption opt : v.options) {
+                        opt.setAnswerText(normalizeText(opt.getAnswerText()));
+                    }
+                }
             } else if (q.getType().name().equals("CLOZE")) {
                 v.tokens = clozeTokenDao.findByQuestion(q.getId());
+                if (v.tokens != null) {
+                    for (de.dhsn.wissentest.model.ClozeToken token : v.tokens) {
+                        token.setExpectedText(normalizeText(token.getExpectedText()));
+                    }
+                }
             }
             view.add(v);
         }
         return view;
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value
+                .replace("ÃƒÂ¤", "ä")
+                .replace("ÃƒÂ¶", "ö")
+                .replace("ÃƒÂ¼", "ü")
+                .replace("ÃƒÂŸ", "ß")
+                .replace("ÃƒÂ„", "Ä")
+                .replace("ÃƒÂ–", "Ö")
+                .replace("ÃƒÂœ", "Ü")
+                .replace("Ã¤", "ä")
+                .replace("Ã¶", "ö")
+                .replace("Ã¼", "ü")
+                .replace("ÃŸ", "ß")
+                .replace("Ã„", "Ä")
+                .replace("Ã–", "Ö")
+                .replace("Ãœ", "Ü")
+                .replace("Ã¢â‚¬â€œ", "–")
+                .replace("Ã¢â‚¬â€", "”")
+                .replace("Ã¢â‚¬â€ž", "„")
+                .replace("Ã¢â‚¬â€˜", "‘")
+                .replace("Ã¢â‚¬â€™", "’");
     }
 
     private static class QuestionView {

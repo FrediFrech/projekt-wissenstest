@@ -23,7 +23,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container" style="padding-top: 1rem;">
+    <% 
+       String pageParamInfo = request.getParameter("page");
+       boolean isWidePage = "adminPanel".equals(pageParamInfo) || "learnMode".equals(pageParamInfo);
+       String containerStyle = "padding-top: 1rem;";
+       if (isWidePage) {
+           containerStyle += " max-width: 98%;";
+       }
+    %>
+    <div class="container" style="<%= containerStyle %>">
         <!-- Navigation -->
         <nav class="navbar" style="margin-bottom: 1rem;">
             <a href="?page=landingPage" style="text-decoration:none;">
@@ -84,6 +92,6 @@
         </main>
     </div>
 
-    <script src="${pageContext.request.contextPath}/js_native/app_main.js"></script>
+    <script src="${pageContext.request.contextPath}/js_native/app_main.js?v=20260128-2"></script>
 </body>
 </html>
