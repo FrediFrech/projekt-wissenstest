@@ -1,14 +1,13 @@
-# 📖 Dokumentation - JSP-Version
+## Kurzbeschreibung
+Moderne, Web‑basierte Lernplattform für UML‑Wissenstests. Server‑Rendering mit JSP, Logik in Java‑Servlets, Daten in PostgreSQL.
 
-Diese Dokumentation bezieht sich auf die **aktuelle JSP-basierte Version** des Projekts.
-
-## 🎯 Schnelleinstieg
+##  Schnelleinstieg
 
 1. **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** – Alles über das Projekt auf einen Blick
 2. **[JSP_COMPLIANCE_ANALYSIS.md](JSP_COMPLIANCE_ANALYSIS.md)** – Ist das Projekt konform?
 3. **[INDEX.md](INDEX.md)** – Kompletter Index aller Dokumente
 
-## 📂 Dokumenten-Kategorien
+## Dokumenten-Kategorien
 
 ### Compliance & Anforderungen
 - **[JSP_COMPLIANCE_ANALYSIS.md](JSP_COMPLIANCE_ANALYSIS.md)** – Compliance-Bewertung
@@ -17,7 +16,7 @@ Diese Dokumentation bezieht sich auf die **aktuelle JSP-basierte Version** des P
 
 ### Architektur & Design
 - **[ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)** – Backend-Klassendiagramme
-- **[JSP_NATIVE_GUIDE.md](JSP_NATIVE_GUIDE.md)** – JSP Frontend-Architektur ⭐
+- **[JSP_NATIVE_GUIDE.md](JSP_NATIVE_GUIDE.md)** – JSP Frontend-Architektur 
 - **[DATABASE_EXPLORER.md](DATABASE_EXPLORER.md)** – Datenbank-Schema & Diagramme
 
 ### Setup & Betrieb
@@ -28,7 +27,7 @@ Diese Dokumentation bezieht sich auf die **aktuelle JSP-basierte Version** des P
 ### Integration & Optionen
 - **[JSP_INTEGRATION_GUIDE.md](JSP_INTEGRATION_GUIDE.md)** – Legacy‑Hinweis (React‑Integration nicht aktiv)
 
-## 🗂️ Zusätzliche Ressourcen
+## Zusätzliche Ressourcen
 
 ### Wiki (Komponenten-Dokumentation)
 Siehe [wiki/](wiki/) für detaillierte Dokumentationen aller:
@@ -37,10 +36,7 @@ Siehe [wiki/](wiki/) für detaillierte Dokumentationen aller:
 - ✅ Datenbank-Schema und Queries
 - ✅ Test-Guides und Utilities
 
-### React‑Historie
-Die React‑Variante ist **nicht mehr Teil dieses Repos**. Das aktuelle Projekt nutzt ausschließlich JSP + Vanilla JS.
-
 ---
 
 **Letzte Aktualisierung:** Januar 2026  
-**Status:** JSP-Version vollständig dokumentiert ✅
+

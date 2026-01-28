@@ -3,8 +3,8 @@
    /* 
     * File: native.jsp
     * 
-    * EINFACHE ERKLÄRUNG FÜR STUDENTEN:
-    * Dies ist die "Hauptseite" (Shell). Sie lädt immer, wenn ihr die App öffnet.
+    *
+    * Dies ist die "Hauptseite".
     * Sie enthält das Menü (Navbar), lädt das CSS, und entscheidet dann,
     * welche Unterseite (Lernmodus, Prüfung, Login) in den Hauptbereich geladen wird.
     * Das passiert über den "?page=..." Parameter in der URL.
@@ -19,9 +19,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wissenstest Native</title>
-    <!-- High End CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css_native/style.css">
-    <!-- Google Fonts for High End Look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -42,7 +40,7 @@
                     <a href="?page=register" class="btn btn-primary">Registrieren</a>
                 <% } else { %>
                     <a href="?page=testList" class="btn btn-ghost">Tests</a>
-                    <a href="?page=examMode" class="btn btn-ghost" style="color: #dc2626;">Pruefung (Exam)</a>
+                    <a href="?page=examMode" class="btn btn-ghost" style="color: #dc2626;">Prüfung (Exam)</a>
                     <a href="?page=learnMode" class="btn btn-ghost">Lernen</a>
                     <% if ("admin".equals(userRole)) { %>
                         <a href="?page=adminPanel" class="btn btn-ghost">Admin</a>
@@ -52,7 +50,7 @@
             </div>
         </nav>
 
-        <!-- Dynamic Content Loading (SPA-like feel via JSP Includes) -->
+        <!-- Dynamic Content Loading  -->
         <main id="main-content">
             <% 
                String pageParam = request.getParameter("page");

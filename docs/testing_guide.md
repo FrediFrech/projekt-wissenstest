@@ -2,19 +2,19 @@
 # Testing Guide
 
 ## Backend Tests (JUnit)
-Das Backend verwendet JUnit 5 für Unit-Tests.
-- **Ausführen**: `mvn test` im `mainlogik, backend` Verzeichnis.
+Das Backend verwendet JUnit 5 fÃ¼r Unit-Tests.
+- **AusfÃ¼hren**: `mvn test` im `mainlogik, backend` Verzeichnis.
 
 ## End-to-End Tests (Playwright)
-Für Systemtests (User Flows) wird Playwright verwendet.
-- **Voraussetzung**: Backend läuft (Tomcat auf Port 8080).
+FÃ¼r Systemtests (User Flows) wird Playwright verwendet.
+- **Voraussetzung**: Backend lÃ¤uft (Tomcat auf Port 8080).
 - **Ort**: `mainlogik, backend/e2e_tests/`
 - **Installation**:
   ```bash
   cd "mainlogik, backend/e2e_tests"
   npm install
   ```
-- **Ausführen**:
+- **AusfÃ¼hren**:
   ```bash
   npx playwright test
   ```
