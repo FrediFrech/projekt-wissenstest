@@ -1,7 +1,7 @@
 # Projekt Wissenstest - UML Lernplattform
 
 ## 1. Projektziel
-Entwicklung einer Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendung ermöglicht Nutzeranmeldung, verarbeitet Formulareingaben und liest/schreibt Daten aus einer Server-Datenbank (Postgres/MS SQL).
+Entwicklung einer umfangreichen Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendung ermöglicht Nutzeranmeldung, verarbeitet Formulareingaben und liest/schreibt Daten aus einer Server-Datenbank (Postgres/MS SQL).
 
 ## 2. Technische Anforderungs-Checkliste
 
@@ -31,15 +31,9 @@ Entwicklung einer Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendu
 
 ### 📚 Dokumentation (WICHTIG!)
 
-🚀 **START HIER für Übersicht:**
+ **START HIER für Übersicht:**
 - **[Projekt-Übersicht & Funktionalität](docs/PROJECT_OVERVIEW.md)** – Alles auf einen Blick!
-- **[Dokumentations-Status](docs/DOCUMENTATION_STATUS.md)** – Was wurde alles dokumentiert?
 - **[Dokumentations-Index](docs/INDEX.md)** – Alle Dokumente & Navigation
-
-**Compliance-Frage (KRITISCH!):**
-- **[JSP Native Guide (KONFORM)](docs/JSP_NATIVE_GUIDE.md)** – Die konforme JSP-basierte Version.
-- **[JSP Integration Guide (Hybrid Lösung)](docs/JSP_INTEGRATION_GUIDE.md)** – Wie wir die konformität sichergestellt haben.
-- **[Compliance & JSP-Frage](docs/JSP_COMPLIANCE_ANALYSIS.md)** – Hintergrund-Analyse.
 
 **Technische Architektur:**
 - [Backend Klassendiagramme](docs/ARCHITECTURE_DIAGRAMS.md) – DAO/Service/Servlet-Pattern
@@ -49,7 +43,7 @@ Entwicklung einer Webanwendung im Rahmen des Moduls Softwareprojekt. Die Anwendu
 **Setup & Tests:**
 - [PostgreSQL Setup](docs/POSTGRES_SETUP.md) – Lokale DB + PgAdmin4
 - [JUnit Testing Guide](docs/wiki/testing_guide.md) – Integration Tests schreiben
-- [Schnellstart Backend/Frontend](docs/wiki/start_local.md)
+- [Schnellstart](docs/JSP_STARTUP_GUIDE.md) – Detailliertes Setup
 
 ### Datenbank Setup
 1. PostgreSQL installieren & konfigurieren (siehe `POSTGRES_SETUP.md`)
@@ -82,25 +76,29 @@ projekt-wissenstest/
 │   ├── PROJECT_OVERVIEW.md           ⭐ START HERE!
 │   ├── JSP_COMPLIANCE_ANALYSIS.md    ⚠️ Compliance?
 │   ├── ARCHITECTURE_DIAGRAMS.md      Backend Klassen
-│   ├── FRONTEND_ARCHITECTURE.md      React Komponenten
+│   ├── JSP_NATIVE_GUIDE.md           JSP Frontend-Architektur
 │   ├── DATABASE_EXPLORER.md          ER-Diagramm
 │   ├── POSTGRES_SETUP.md             DB Setup
-│   └── wiki/                         Komponenten-Doku
+│   └── wiki/                         Komponenten-Doku (60+ Dateien)
 │
 ├── mainlogik, backend/               ☕ Java Backend
-│   ├── src/main/java/.../web        Servlets
-│   ├── src/main/java/.../service    Business-Logik
-│   ├── src/main/java/.../dao        JDBC DAOs
-│   ├── src/main/java/.../model      Datenmodelle
+│   ├── src/main/java/.../web        Servlets (9 Dateien)
+│   ├── src/main/java/.../service    Business-Logik (4 Dateien)
+│   ├── src/main/java/.../dao        JDBC DAOs (14 Dateien)
+│   ├── src/main/java/.../model      Datenmodelle (10 Dateien)
+│   ├── src/main/webapp/jsp_native   JSP Komponenten (11 Dateien)
 │   └── src/test/java/               JUnit Tests
 │
-├── alte_react_version/               🗂️ Archivierte React Version
-│   ├── frondend/                     Alte React-Dateien
-│   └── frontend_docs/                Alte React-Dokumentation
+├── startup/                          🚀 Start-Skripte
+│   └── start_project.ps1            One-Click Setup
 │
 ├── db/                               🗄️ Datenbank
 │   ├── schema.sql                   Tabellen
 │   └── seeds.sql                    Test-Daten
+│
+├── Doku/                             📄 Formelle Dokumentation
+│   ├── Diagramme/                   PlantUML Diagramme
+│   └── FragenPool/                  Fragen-Vorlagen
 ```
 
 ---
@@ -114,4 +112,3 @@ projekt-wissenstest/
 | **Datenbank** | PostgreSQL 15 | ✅ Konform |
 | **Testing** | JUnit 5 | ✅ Konform |
 
-Mehr Details: [docs/JSP_COMPLIANCE_ANALYSIS.md](docs/JSP_COMPLIANCE_ANALYSIS.md)

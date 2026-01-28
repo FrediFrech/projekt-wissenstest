@@ -21,7 +21,6 @@
 2. **[JSP_STARTUP_GUIDE.md](JSP_STARTUP_GUIDE.md)** – 🚀 Detaillierter JSP-Startup (Vollständig)
 3. **[POSTGRES_SETUP.md](POSTGRES_SETUP.md)** – PostgreSQL lokal installieren
 4. **[wiki/testing_guide.md](wiki/testing_guide.md)** – JUnit Tests schreiben
-5. **[wiki/start_local.md](wiki/start_local.md)** – Backend + Frontend starten (Kurzversion)
 
 ---
 
@@ -67,6 +66,8 @@
 - `dao_JdbcAnswerDao.java.md` – Antworten-Implementierung
 - `dao_ClozeTokenDao.java.md` – Lückentext-Interface
 - `dao_JdbcClozeTokenDao.java.md` – Lückentext-Implementierung
+- `dao_QuestionImageDao.java.md` – Bild-Interface (NEU)
+- `dao_JdbcQuestionImageDao.java.md` – Bild-Implementierung (NEU)
 
 #### Models
 - `model_User.java.md` – Benutzer-Datenmodell
@@ -75,13 +76,18 @@
 - `model_AnswerOption.java.md` – Antwort-Option
 - `model_Attempt.java.md` – Test-Versuch
 - `model_AttemptAnswer.java.md` – Gegebene Antwort
+- `model_AttemptResult.java.md` – Test-Ergebnis Wrapper (NEU)
 - `model_ClozeToken.java.md` – Lückenelement
+- `model_QuestionImage.java.md` – Fragebild (NEU)
+- `model_QuestionResultDetail.java.md` – Fragen-Einzelergebnis (NEU)
 
 #### Web/Servlets
 - `web_AuthServlet.java.md` – Login/Registrierung HTTP
 - `web_TestServlet.java.md` – Test-HTTP Handler
 - `web_AdminServlet.java.md` – Admin-HTTP Handler
 - `web_CorsFilter.java.md` – Cross-Origin Filter
+- `web_CharacterEncodingFilter.java.md` – UTF-8 Filter (NEU)
+- `web_ImageServlet.java.md` – Bildauslieferung (NEU)
 - `web_JsonUtil.java.md` – JSON-Serialisierung
 - `web_ServletUtils.java.md` – Servlet Hilfsmethoden
 - `web_HealthServlet.java.md` – Health Check
@@ -100,19 +106,21 @@
 - `jsp_native_Result.md` – Ergebnis-Anzeige (JSP)
 - `jsp_native_AdminPanel.md` – Admin-Dashboard (JSP)
 - `jsp_native_FlipCard.md` – Flip-Card Komponente (JSP Fragment)
+- `jsp_native_LearnMode.md` – Lernmodus (JSP)
+- `jsp_native_AccessDenied.md` – Zugriff verweigert Seite (NEU)
 
 #### JSP Native Frontend (Komplette Dokumentation)
 - `JSP_NATIVE_COMPONENTS.md` – Komplette Komponenten-Übersicht ⭐ START HERE
-- `jsp_native_app.md` – Vanilla JS Business-Logic
+- `jsp_native_app_main.md` – Vanilla JS Business-Logic
 
 #### Datenbank
 - `db_schema.sql.md` – Tabellen-Definitionen
 - `db_seeds.sql.md` – Test-Daten
 
-#### Utilities
-- `start_local.md` – Schnellstart-Anleitung
+#### Sonstige Wiki-Dokumente
 - `testing_guide.md` – JUnit Integration Test Guide
 - `verbindungen_uebersicht.md` – Verbindungs-Übersicht
+- `DOKUMENTATION_ABSCHLUSS.md` – Projektabschluss & UAT-Protokoll
 
 ---
 
@@ -138,7 +146,7 @@
 **Frontend-Entwickler:**
 1. [wiki/JSP_NATIVE_COMPONENTS.md](wiki/JSP_NATIVE_COMPONENTS.md) – Komponenten-Baum (JSP)
 2. [wiki/jsp_native_*](wiki/) – JSP Komponenten-Details
-3. [wiki/jsp_native_app.md](wiki/jsp_native_app.md) – JS‑Logik
+3. [wiki/jsp_native_app_main.md](wiki/jsp_native_app_main.md) – JS‑Logik
 
 **DevOps/Datenbank-Admin:**
 1. [DATABASE_EXPLORER.md](DATABASE_EXPLORER.md) – ER-Diagramm
@@ -148,7 +156,7 @@
 **Tester/QA:**
 1. [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) – Funktionen
 2. [wiki/testing_guide.md](wiki/testing_guide.md) – Wie testet man?
-3. [wiki/start_local.md](wiki/start_local.md) – Lokales Setup
+3. [JSP_STARTUP_GUIDE.md](JSP_STARTUP_GUIDE.md) – Lokales Setup
 
 ---
 

@@ -1,14 +1,11 @@
-# Native JSP/HTML5 Frontend - Die "Safe Alternative"
 
-Dieses Projekt nutzt eine **vollständig JSP‑konforme Frontend‑Variante**.
-
-## 🛡️ Was ist das?
+## Was ist das?
 Das Frontend nutzt nur:
 - **JSP** (JavaServer Pages) für die Struktur
 - **CSS3** (modernes Flexbox/Grid, Animations) für das "High-End" Design
 - **Vanilla JavaScript** (keine Frameworks) für die Logik
 
-## ✅ Komponenten-Struktur (JSP)
+##  Komponenten-Struktur (JSP)
 Die JSP‑Variante besteht aus einem Router (`index.jsp`/`native.jsp`) und klar getrennten Komponenten unter `jsp_native/`.
 
 ### Datei-Mapping
@@ -27,21 +24,21 @@ Die JSP‑Variante besteht aus einem Router (`index.jsp`/`native.jsp`) und klar 
 | `jsp_native/FlipCard.jsp` | Fragment | Karteikarte |
 | `jsp_native/ExamMode.jsp` | Page | Prüfungsmodus |
 
-## 📂 Dateistruktur
+##  Dateistruktur
 Die Dateien liegen in `mainlogik, backend/src/main/webapp/`:
 - `native.jsp` – Einstiegspunkt
 - `jsp_native/` – Die oben genannten Komponenten
 - `css_native/style.css` – High-End Design (Glassmorphism, Gradients)
 - `js_native/app.js` – Logik (AJAX Calls zum Java Backend, Routing)
 
-## 🚀 Wie nutze ich es?
+##  Wie nutze ich es?
 Du musst nichts bauen oder installieren (kein npm nötig!).
 1. Starte den Tomcat Server (Java Backend).
 2. Öffne im Browser:
    `http://localhost:8080/wissentest/`
 3. Optional: `native.jsp` als direkter Router.
 
-## ✨ Features
+##  Features
 Obwohl es "nur" JSP ist, haben wir moderne Features eingebaut:
 - **Animationen:** Fade-Ins, Slide-Downs beim Laden (CSS Keyframes)
 - **Glassmorphism:** Durchscheinende Karten-Optik
@@ -56,10 +53,10 @@ Obwohl es "nur" JSP ist, haben wir moderne Features eingebaut:
 - Optionales Bild erscheint auf der Vorderseite der Karte.
 - Lange Inhalte werden **im Modal** gescrollt – die Seite bleibt im Hintergrund fixiert.
 
-## ⚖️ Architektur‑Hinweis
+##  Architektur‑Hinweis
 Die Seiten werden serverseitig mit JSP gerendert. Dynamik (Tests laden, Antworten senden) läuft über AJAX‑Calls aus `js_native/app.js`.
 
-## 🛠️ Anpassung
+##  Anpassung
 Wenn du Änderungen machen willst:
 - GUI: `css_native/style.css`
 - Logik: `js_native/app.js`
