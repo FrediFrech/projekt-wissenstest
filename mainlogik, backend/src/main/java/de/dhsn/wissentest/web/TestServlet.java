@@ -29,7 +29,8 @@ public class TestServlet extends HttpServlet {
             new JdbcAnswerDao(),
             new JdbcClozeTokenDao(),
             new JdbcAttemptDao(),
-            new JdbcUserDao()
+        new JdbcUserDao(),
+        new JdbcConfigDao()
     );
     private final AnswerDao answerDao = new JdbcAnswerDao();
     private final ClozeTokenDao clozeTokenDao = new JdbcClozeTokenDao();
@@ -56,6 +57,14 @@ public class TestServlet extends HttpServlet {
                     }
                 }
                 ServletUtils.writeJson(resp, normalized);
+                return;
+            }
+            if (path.equals("/recommend")) {
+                int userId = getUserId(req);
+                int recommended = testService.resolveAutoDifficulty(userId);
+                java.util.Map<String, Object> payload = new java.util.HashMap<>();
+                payload.put("recommendedDifficulty", recommended);
+                ServletUtils.writeJson(resp, payload);
                 return;
             }
             if (path.equals("/questions/all")) {
@@ -101,7 +110,12 @@ public class TestServlet extends HttpServlet {
             if (path.equals("/start")) {
                 StartRequest r = JsonUtil.gson().fromJson(body, StartRequest.class);
                 List<Question> questions;
-                if (r.segments != null && !r.segments.isEmpty()) {
+                if (r.autoMode) {
+                    int userId = getUserId(req);
+                    int difficulty = testService.resolveAutoDifficulty(userId);
+                    int limit = r.limit > 0 ? r.limit : 10;
+                    questions = testService.startTest(difficulty, limit, r.category, r.categories);
+                } else if (r.segments != null && !r.segments.isEmpty()) {
                     questions = testService.startSegmentedTest(r.segments, r.limit > 0 ? r.limit : 20);
                 } else {
                     questions = testService.startTest(r.difficulty, r.limit, r.category, r.categories);
@@ -125,6 +139,8 @@ public class TestServlet extends HttpServlet {
                 int difficulty = (r.difficulty >= 1 && r.difficulty <= 3) ? r.difficulty : 2;
                 int durationSeconds = Math.max(0, r.durationSeconds);
                 AttemptResult result = testService.submitAttempt(userId, difficulty, questionIds, normalized, durationSeconds);
+                int recommendedDifficulty = testService.resolveAutoDifficulty(userId);
+                result.setRecommendedDifficulty(recommendedDifficulty);
                 ServletUtils.writeJson(resp, result);
                 return;
             }
@@ -159,6 +175,7 @@ public class TestServlet extends HttpServlet {
         String category;
         List<String> categories;
         List<de.dhsn.wissentest.service.TestService.ExamSegment> segments;
+        boolean autoMode;
     }
 
     private static class SubmitRequest {

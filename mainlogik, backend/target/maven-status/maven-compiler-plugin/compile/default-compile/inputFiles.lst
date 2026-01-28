@@ -20,6 +20,8 @@ C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\ma
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\QuestionType.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\ServletUtils.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\model\User.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\ConfigDao.java
+C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\JdbcConfigDao.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\CharacterEncodingFilter.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\web\JsonUtil.java
 C:\Users\Micro\Projekt Wissenstest\projekt-wissenstest\mainlogik, backend\src\main\java\de\dhsn\wissentest\dao\QuestionImageDao.java

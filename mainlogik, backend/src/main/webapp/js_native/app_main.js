@@ -90,6 +90,19 @@ function isAttemptPassed(attempt) {
     return false;
 }
 
+function difficultyLabel(difficulty) {
+    switch (Number(difficulty)) {
+        case 1:
+            return 'Leicht';
+        case 2:
+            return 'Mittel';
+        case 3:
+            return 'Schwer';
+        default:
+            return 'Unbekannt';
+    }
+}
+
 // Auth Logic
 async function handleLogin(event) {
     event.preventDefault();
@@ -119,6 +132,7 @@ async function loadTests() {
     if (!container) return;
 
     const passedCountEl = document.getElementById('dashboardPassedCount');
+    const recommendedEl = document.getElementById('dashboardRecommendedDifficulty');
 
     // Update Rank
     if(document.getElementById('dashboardRank') && window.USER_ROLE) {
@@ -178,6 +192,7 @@ async function loadTests() {
                         <div class="form-group">
                             <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 0.4rem;">Modus</label>
                             <select name="difficulty" class="form-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                                <option value="auto">Auto (Empfohlen)</option>
                                 <option value="1">Leicht (Training)</option>
                                 <option value="2">Mittel (Pr\u00fcfung)</option>
                                 <option value="3">Schwer (Experte)</option>
@@ -225,6 +240,17 @@ async function loadTests() {
         console.error("Failed to load history", e);
         if (passedCountEl) passedCountEl.innerText = '0';
     }
+
+    if (recommendedEl) {
+        recommendedEl.innerText = '...';
+        try {
+            const rec = await apiCall('/test/recommend');
+            recommendedEl.innerText = difficultyLabel(rec && rec.recommendedDifficulty);
+        } catch (e) {
+            console.error('Failed to load recommended difficulty', e);
+            recommendedEl.innerText = '-';
+        }
+    }
     
     container.innerHTML = adminHtml + testHtml + historyHtml;
 
@@ -238,10 +264,14 @@ async function loadTests() {
 function startConfiguredTest(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
+    const difficultyRaw = formData.get('difficulty');
+    const autoMode = difficultyRaw === 'auto';
+    const difficulty = autoMode ? 2 : parseInt(difficultyRaw, 10);
     const config = {
         category: formData.get('category'),
         limit: parseInt(formData.get('limit')),
-        difficulty: parseInt(formData.get('difficulty'))
+        difficulty: Number.isFinite(difficulty) ? difficulty : 2,
+        autoMode
     };
     // Store config in localStorage to pass it to the TestRunner page
     localStorage.setItem('testConfig', JSON.stringify(config));
@@ -264,7 +294,9 @@ function startCustomTest(event) {
     const selected = categorySelect ? Array.from(categorySelect.selectedOptions).map(o => o.value) : [];
     const categories = selected.filter(v => v && v !== 'All');
     const limit = parseInt(document.getElementById('customLimit')?.value || '10', 10);
-    const difficulty = parseInt(document.getElementById('customDifficulty')?.value || '2', 10);
+    const difficultyRaw = document.getElementById('customDifficulty')?.value || '2';
+    const autoMode = difficultyRaw === 'auto';
+    const difficulty = autoMode ? 2 : parseInt(difficultyRaw, 10);
     const durationMinutes = parseInt(document.getElementById('customMinutes')?.value || '10', 10);
 
     const config = {
@@ -272,6 +304,7 @@ function startCustomTest(event) {
         categories: categories.length > 0 ? categories : null,
         limit: Number.isFinite(limit) ? limit : 10,
         difficulty: Number.isFinite(difficulty) ? difficulty : 2,
+        autoMode,
         durationMinutes: Number.isFinite(durationMinutes) ? durationMinutes : 10
     };
 

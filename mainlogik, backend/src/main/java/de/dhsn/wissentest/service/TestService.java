@@ -9,6 +9,7 @@ package de.dhsn.wissentest.service;
 import de.dhsn.wissentest.dao.AnswerDao;
 import de.dhsn.wissentest.dao.AttemptDao;
 import de.dhsn.wissentest.dao.ClozeTokenDao;
+import de.dhsn.wissentest.dao.ConfigDao;
 import de.dhsn.wissentest.dao.QuestionRepository;
 import de.dhsn.wissentest.dao.UserDao;
 import de.dhsn.wissentest.model.*;
@@ -21,20 +22,30 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TestService {
+    private static final String CONFIG_PROMOTE_THRESHOLD = "progress.promote_threshold";
+    private static final String CONFIG_DEMOTE_THRESHOLD = "progress.demote_threshold";
+    private static final String CONFIG_WINDOW_SIZE = "progress.window_size";
+    private static final int MIN_DIFFICULTY = 1;
+    private static final int MAX_DIFFICULTY = 3;
+    private static final int DEFAULT_DIFFICULTY = 2;
+
     private final QuestionRepository questionDao;
     private final AnswerDao answerDao;
     private final ClozeTokenDao clozeTokenDao;
     private final AttemptDao attemptDao;
     private final UserDao userDao;
+    private final ConfigDao configDao;
 
-    public TestService(QuestionRepository questionDao, AnswerDao answerDao, ClozeTokenDao clozeTokenDao, AttemptDao attemptDao, UserDao userDao) {
+    public TestService(QuestionRepository questionDao, AnswerDao answerDao, ClozeTokenDao clozeTokenDao, AttemptDao attemptDao, UserDao userDao, ConfigDao configDao) {
         this.questionDao = questionDao;
         this.answerDao = answerDao;
         this.clozeTokenDao = clozeTokenDao;
         this.attemptDao = attemptDao;
         this.userDao = userDao;
+        this.configDao = configDao;
     }
 
     public List<Question> getAllQuestions() {
@@ -252,6 +263,29 @@ public class TestService {
         return new AttemptResult(attempt, details);
     }
 
+    public int resolveAutoDifficulty(int userId) {
+        ProgressionService progression = createProgressionService();
+        int windowSize = Math.max(1, progression.getWindowSize());
+        List<Attempt> recent = attemptDao.findRecentByUser(userId, windowSize);
+
+        if (recent == null || recent.isEmpty()) {
+            return randomDifficulty();
+        }
+
+        Attempt latest = recent.get(0);
+        int baseDifficulty = clampDifficulty(latest.getDifficulty());
+        double lastRatio = ratioForAttempt(latest);
+        double averageRatio = averageRatio(recent);
+
+        if (progression.shouldPromote(lastRatio)) {
+            baseDifficulty += 1;
+        } else if (progression.shouldDemote(averageRatio)) {
+            baseDifficulty -= 1;
+        }
+
+        return clampDifficulty(baseDifficulty);
+    }
+
     private String toUserAnswerText(Question q, Object answerPayload) {
         if (answerPayload == null) {
             return "";
@@ -369,6 +403,76 @@ public class TestService {
 
     public List<Attempt> getHistory(int userId) {
         return attemptDao.findByUser(userId);
+    }
+
+    private ProgressionService createProgressionService() {
+        double promoteThreshold = getConfigDouble(CONFIG_PROMOTE_THRESHOLD, 0.70);
+        double demoteThreshold = getConfigDouble(CONFIG_DEMOTE_THRESHOLD, 0.40);
+        int windowSize = getConfigInt(CONFIG_WINDOW_SIZE, 3);
+        return new ProgressionService(promoteThreshold, demoteThreshold, windowSize);
+    }
+
+    private double getConfigDouble(String key, double defaultValue) {
+        if (configDao == null) {
+            return defaultValue;
+        }
+        return configDao.findValue(key)
+                .map(String::trim)
+                .flatMap(value -> {
+                    try {
+                        return java.util.Optional.of(Double.parseDouble(value.replace(',', '.')));
+                    } catch (NumberFormatException ex) {
+                        return java.util.Optional.empty();
+                    }
+                })
+                .orElse(defaultValue);
+    }
+
+    private int getConfigInt(String key, int defaultValue) {
+        if (configDao == null) {
+            return defaultValue;
+        }
+        return configDao.findValue(key)
+                .map(String::trim)
+                .flatMap(value -> {
+                    try {
+                        return java.util.Optional.of(Integer.parseInt(value));
+                    } catch (NumberFormatException ex) {
+                        return java.util.Optional.empty();
+                    }
+                })
+                .orElse(defaultValue);
+    }
+
+    private int clampDifficulty(int difficulty) {
+        if (difficulty < MIN_DIFFICULTY || difficulty > MAX_DIFFICULTY) {
+            return DEFAULT_DIFFICULTY;
+        }
+        return difficulty;
+    }
+
+    private int randomDifficulty() {
+        return ThreadLocalRandom.current().nextInt(MIN_DIFFICULTY, MAX_DIFFICULTY + 1);
+    }
+
+    private double ratioForAttempt(Attempt attempt) {
+        if (attempt == null || attempt.getMaxPoints() <= 0) {
+            return 0.0;
+        }
+        return attempt.getTotalPoints() / attempt.getMaxPoints();
+    }
+
+    private double averageRatio(List<Attempt> attempts) {
+        if (attempts == null || attempts.isEmpty()) {
+            return 0.0;
+        }
+        double sum = 0.0;
+        int count = 0;
+        for (Attempt attempt : attempts) {
+            sum += ratioForAttempt(attempt);
+            count += 1;
+        }
+        return count == 0 ? 0.0 : sum / count;
     }
 
     private double scoreQuestion(Question question, Object answerPayload) {
