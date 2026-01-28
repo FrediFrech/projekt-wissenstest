@@ -1,0 +1,77 @@
+@startuml Activity_Diagram_Wissenstest
+
+title Activity-Diagramm - Projekt Wissenstest
+
+skinparam linetype ortho
+skinparam shadowing false
+
+partition "Student Test-Durchführung" {
+    start
+    :Startseite öffnen;
+    :Anmelden (POST /api/auth/login);
+    :Test starten (POST /api/test/start);
+    :Fragen als JSON erhalten;
+    :Antworten client-seitig sammeln (kein Request pro Frage);
+    :Test abgeben (POST /api/test/submit);
+    :AttemptResult (Punkte/Note/Details) anzeigen;
+    :Logout;
+    stop
+}
+
+partition "Admin Fragen-Verwaltung" {
+    start
+    :Admin öffnet Admin-Panel;
+    :Anmelden (POST /api/auth/login);
+    :Rolle prüfen (Session role=admin);
+    :Fragen laden/ändern (GET/POST/PUT/DELETE /api/admin/questions);
+    :Benutzer verwalten (GET/POST/PUT/DELETE /api/admin/users);
+    :Reset-Requests prüfen (GET /api/admin/users/requests);
+    :Optional - Stats (GET /api/admin/stats);
+    :Logout;
+    stop
+}
+
+partition "Authentifizierungs-Flow" {
+    start
+    :Login (POST /api/auth/login);
+    :Session setzen (userId, username, role);
+    stop
+}
+
+partition "Passwort-Reset-Flow" {
+    start
+    :User stellt Reset-Request (POST /api/auth/reset-request);
+    :Admin sieht Requests (GET /api/admin/users/requests);
+    :Admin setzt neues Passwort (PUT /api/admin/users);
+    :resetRequested wird zurückgesetzt;
+    stop
+}
+
+partition "Lernmodus-Flow" {
+    start
+    :Student klickt Lernmodus;
+    :GET /api/test/questions/all;
+    :Backend filtert questions.meta.learnEnabled;
+    :LearnCards (Frage+Lösung) laden;
+    
+    repeat
+        :Frage/Antwort anzeigen (read-only);
+        :Client-seitiger Fortschritt (lokal);
+    repeat while (Mehr Karten?) is (Ja)
+    
+    :Lernmodus beenden;
+    :Zurück zum Dashboard;
+    stop
+}
+
+note right
+    **Details zu den einzelnen Flows sind ausgelagert (druckfreundlich):**
+    - PlantUML_Activity_01_StudentTest.puml
+    - PlantUML_Activity_02_AdminQuestions.puml
+    - PlantUML_Activity_03_Authentication.puml
+    - PlantUML_Activity_04_PasswordReset.puml
+    - PlantUML_Activity_05_LearnMode.puml
+    - Sequenzdiagramme: PlantUML_Sequence_*.puml
+end note
+
+@enduml

@@ -1,0 +1,77 @@
+@startuml Activity_Authentication
+
+title Activity-Diagramm - Login-Flow
+
+|Frontend|
+start
+:Benutzer öffnet Login-Seite;
+:Login-Formular anzeigen;
+:Benutzername + Passwort eingeben;
+:Login-Button klicken;
+
+|Backend|
+:POST /api/auth/login empfangen;
+:JSON Body parsen: {username, password};
+
+:validateLoginInput() aufrufen;
+if (Input gültig?) then (Nein)
+    :IllegalArgumentException;
+    |Frontend|
+    :Fehlermeldung: "Invalid credentials";
+    stop
+else (Ja)
+endif
+
+:userDao.findByUsername(username);
+if (Benutzer gefunden?) then (Nein)
+    :IllegalArgumentException;
+    |Frontend|
+    :Fehlermeldung: "Invalid credentials";
+    stop
+else (Ja)
+endif
+
+:PasswordUtils.verifyPassword();
+note right
+  SHA-256 mit Salt
+  10.000 Iterationen
+  Hash-Vergleich
+end note
+
+if (Passwort korrekt?) then (Nein)
+    :IllegalArgumentException;
+    |Frontend|
+    :Fehlermeldung: "Invalid credentials";
+    stop
+else (Ja)
+endif
+
+:HttpSession erstellen;
+:session.setAttribute("userId", user.getId());
+:session.setAttribute("role", user.getRole());
+
+:JSON Response senden;
+:{ id, username, role };
+
+|Frontend|
+:Response verarbeiten;
+:sessionStorage speichern;
+:Redirect zu Dashboard;
+
+if (role = "admin"?) then (Ja)
+    :Admin-Panel anzeigen;
+else (Nein)
+    :Student-Dashboard anzeigen;
+endif
+
+stop
+
+note right
+  **Sicherheit:**
+  - Generische Fehlermeldungen
+  - SHA-256 + Salt Hashing
+  - Standard HttpSession
+  - Keine Email-Benachrichtigung
+end note
+
+@enduml

@@ -1,135 +1,130 @@
 @startuml Deployment_05_Runtime
 
-title Deployment-Diagramm Teil 5 - Runtime Kommunikation
+title Deployment-Diagramm Teil 5 - Runtime Kommunikation (API)
 
 participant "Browser\n(Client)" as BROWSER
 participant "Tomcat\n(Server)" as TOMCAT
-participant "JDBC Driver\n(PostgreSQL)" as JDBC
+participant "JDBC Driver" as JDBC
 participant "PostgreSQL\n(Database)" as DB
 
-== Student startet Test ==
+== Test starten (Fragen holen) ==
 
-BROWSER ->> TOMCAT: POST /wiskentest/test/start\n(HTTP Request)
+BROWSER ->> TOMCAT: POST /api/test/start\nJSON {difficulty, limit, category, autoMode, ...}
 activate TOMCAT
 
-TOMCAT ->> TOMCAT: TestServlet.doPost()
-TOMCAT ->> TOMCAT: TestService.startTest(userId)
-TOMCAT ->> TOMCAT: QuestionDao.getRandomQuestions()\n(Difficulty 1-3)
+TOMCAT ->> TOMCAT: TestServlet.doPost() [path=/start]
+TOMCAT ->> TOMCAT: TestService.startTest(...)
+TOMCAT ->> TOMCAT: QuestionRepository.findByDifficulty(...)
 
-TOMCAT ->> JDBC: SELECT * FROM questions\nWHERE difficulty=2\nORDER BY RANDOM() LIMIT 10
+TOMCAT ->> JDBC: SELECT ... FROM questions\nWHERE difficulty=? ORDER BY random() LIMIT ?
 activate JDBC
 
 JDBC ->> DB: SQL Query ausführen
 activate DB
-DB ->> DB: Query verarbeiten
-DB ->> DB: 10 Zeilen zurückgeben
 DB -->> JDBC: ResultSet
 deactivate DB
 
-JDBC -->> TOMCAT: Question-Objekte
+JDBC -->> TOMCAT: List<Question>
 deactivate JDBC
 
-TOMCAT ->> TOMCAT: JSP.render() - Fragen anzeigen
-TOMCAT -->> BROWSER: HTML Response (Frage 1)
+TOMCAT -->> BROWSER: 200 OK\nJSON QuestionView[]
 deactivate TOMCAT
 
-== Student beantwortet Frage ==
+== Antworten bearbeiten (client-seitig) ==
 
-BROWSER ->> TOMCAT: POST /wiskentest/answer/submit\n(Antwort + Frage-ID)
+note over BROWSER
+    Antworten werden während des Tests client-seitig gesammelt\n(kein Request pro Frage).
+end note
+
+== Test abgeben (Bewertung + Persistenz) ==
+
+BROWSER ->> TOMCAT: POST /api/test/submit\nJSON {difficulty, questionIds, answers, durationSeconds}
 activate TOMCAT
 
-TOMCAT ->> TOMCAT: TestServlet.doPost()
-TOMCAT ->> TOMCAT: TestService.validateAnswer(answer)
-TOMCAT ->> TOMCAT: Berechne Punkte
+TOMCAT ->> TOMCAT: TestServlet.doPost() [path=/submit]
+TOMCAT ->> TOMCAT: TestService.submitAttempt(...)
 
-alt Antwort korrekt
-    TOMCAT ->> TOMCAT: points_awarded = 10
-else Antwort teilweise
-    TOMCAT ->> TOMCAT: points_awarded = 5
-else Antwort falsch
-    TOMCAT ->> TOMCAT: points_awarded = 0
-end
-
-TOMCAT ->> JDBC: INSERT INTO attempt_answers\n(attempt_id, question_id, given_answer, points_awarded)
+TOMCAT ->> JDBC: SELECT answers/cloze_answers\nfür questionIds (Lösungen + partialValue)
 activate JDBC
+JDBC ->> DB: SQL SELECT
+activate DB
+DB -->> JDBC: ResultSets
+deactivate DB
+JDBC -->> TOMCAT: Lösungssätze
+deactivate JDBC
 
+TOMCAT ->> JDBC: INSERT INTO attempts (...)\n(total_points, max_points, grade, duration_seconds)
+activate JDBC
 JDBC ->> DB: SQL INSERT
 activate DB
-DB ->> DB: Eintrag speichern
-DB -->> JDBC: OK
+DB -->> JDBC: attempt_id
 deactivate DB
-
-JDBC -->> TOMCAT: Success
+JDBC -->> TOMCAT: attempt_id
 deactivate JDBC
 
-TOMCAT -->> BROWSER: Nächste Frage (HTML)
-deactivate TOMCAT
+loop pro Frage
+    TOMCAT ->> JDBC: INSERT INTO attempt_answers (...)\n(question_id, given_answer, points_awarded)
+    activate JDBC
+    JDBC ->> DB: SQL INSERT
+    activate DB
+    DB -->> JDBC: OK
+    deactivate DB
+    JDBC -->> TOMCAT: OK
+    deactivate JDBC
+end
 
-== Test beenden ==
-
-BROWSER ->> TOMCAT: POST /wiskentest/test/end
-activate TOMCAT
-
-TOMCAT ->> TOMCAT: TestService.endTest(attemptId)
-TOMCAT ->> TOMCAT: Gesamtpunkte berechnen
-TOMCAT ->> TOMCAT: Schulnote berechnen (1-6)
-
-TOMCAT ->> JDBC: UPDATE attempts SET\ntotal_points=?, max_points=?,\ngrade=?, duration_seconds=?
-activate JDBC
-
-JDBC ->> DB: SQL UPDATE
-activate DB
-DB ->> DB: Attempt aktualisieren
-DB -->> JDBC: OK
-deactivate DB
-
-JDBC -->> TOMCAT: Success
-deactivate JDBC
-
-TOMCAT ->> TOMCAT: JSP.render() - Ergebnisse
-TOMCAT -->> BROWSER: Ergebnisseite (HTML)
+TOMCAT -->> BROWSER: 200 OK\nJSON AttemptResult\n(+ recommendedDifficulty)
 deactivate TOMCAT
 
 == Admin erstellt Frage ==
 
-BROWSER ->> TOMCAT: POST /wiskentest/admin/question/create\n(Fragedetails)
+BROWSER ->> TOMCAT: POST /api/admin/questions\nJSON QuestionPayload (+ answers/tokens)
 activate TOMCAT
+TOMCAT ->> TOMCAT: AdminServlet.doPost() [path=/questions]\n(require role=admin)
+TOMCAT ->> TOMCAT: AdminService.create...Question(...)
 
-TOMCAT ->> TOMCAT: AdminServlet.doPost()
-TOMCAT ->> TOMCAT: AdminService.createQuestion()
-
-TOMCAT ->> JDBC: INSERT INTO questions\n(type, prompt, difficulty, created_by)
+TOMCAT ->> JDBC: INSERT INTO questions (...)
 activate JDBC
-
 JDBC ->> DB: SQL INSERT
 activate DB
-DB ->> DB: Frage speichern
-DB -->> JDBC: question_id = 42
+DB -->> JDBC: question_id
 deactivate DB
-
-JDBC -->> TOMCAT: Question ID
+JDBC -->> TOMCAT: question_id
 deactivate JDBC
 
-loop Für jede Antwort (MC)
-    TOMCAT ->> JDBC: INSERT INTO answers\n(question_id, answer_text, is_correct)
-    activate JDBC
-    JDBC ->> DB: SQL INSERT
-    DB -->> JDBC: OK
-    deactivate JDBC
+alt MC/FREE/IMAGE
+    loop pro AnswerOption
+        TOMCAT ->> JDBC: INSERT INTO answers (...)
+        activate JDBC
+        JDBC ->> DB: SQL INSERT
+        activate DB
+        DB -->> JDBC: OK
+        deactivate DB
+        JDBC -->> TOMCAT: OK
+        deactivate JDBC
+    end
+else CLOZE
+    loop pro ClozeToken
+        TOMCAT ->> JDBC: INSERT INTO cloze_answers (...)
+        activate JDBC
+        JDBC ->> DB: SQL INSERT
+        activate DB
+        DB -->> JDBC: OK
+        deactivate DB
+        JDBC -->> TOMCAT: OK
+        deactivate JDBC
+    end
 end
 
-TOMCAT -->> BROWSER: Bestätigung (HTML)
+TOMCAT -->> BROWSER: 200 OK\nJSON {id}
 deactivate TOMCAT
 
 note over BROWSER,DB
-  **Wichtige Punkte:**
+    **Hinweise:**
   
-  1. **HTTP Stateless**: Jeder Request ist unabhängig
-  2. **Sessions**: Cookies verknüpfen Requests
-  3. **Connection Pooling**: HikariCP recycelt DB-Verbindungen
-  4. **Transaction Management**: ACID-Properties
-  5. **Error Handling**: Try-Catch & Rollback
-  6. **Security**: SQL Injection Prevention (Prepared Statements)
+    1. API-Endpunkte liegen unter /api/* (siehe web.xml)
+    2. Bewertung/Notenberechnung erfolgt beim Submit (/api/test/submit)
+    3. SQL erfolgt via PreparedStatements (JDBC)
 end note
 
 @enduml

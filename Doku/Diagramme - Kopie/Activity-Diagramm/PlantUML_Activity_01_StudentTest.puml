@@ -1,0 +1,127 @@
+@startuml Activity_Student_Test
+
+title Activity-Diagramm - Test-Durchführung
+
+|Frontend|
+start
+:Student ist eingeloggt;
+:Dashboard anzeigen;
+
+:Test-Konfiguration wählen;
+if (Modus?) then (Auto)
+    :autoMode = true;
+    :GET /api/test/recommend;
+    |Backend|
+    :testService.resolveAutoDifficulty(userId);
+    :Letzte N Versuche laden;
+    if (Historie vorhanden?) then (Ja)
+        :lastRatio berechnen;
+        if (lastRatio >= 0.70?) then (Ja)
+            :difficulty + 1 (Aufstieg);
+        else if (avgRatio <= 0.40?)
+            :difficulty - 1 (Abstieg);
+        else
+            :difficulty beibehalten;
+        endif
+    else (Nein)
+        :Zufällige Schwierigkeit (1-3);
+    endif
+    :difficulty auf 1-3 begrenzen;
+    |Frontend|
+else (Manuell)
+    :Schwierigkeit auswählen (1-3);
+    :Kategorie auswählen;
+    :Fragenanzahl auswählen;
+endif
+
+:Test starten Button klicken;
+|Backend|
+:POST /api/test/start empfangen;
+:JSON parsen: {difficulty, limit, category, autoMode};
+
+if (autoMode = true?) then (Ja)
+    :difficulty = resolveAutoDifficulty(userId);
+endif
+
+:testService.startTest(difficulty, limit, category);
+:Fragen aus DB laden (RANDOM);
+:Antwortoptionen/Tokens laden;
+:JSON Response: [{id, prompt, type, options/tokens}];
+
+|Frontend|
+:Fragen in sessionStorage speichern;
+:TestRunner anzeigen;
+:Timer starten;
+
+repeat
+    :Aktuelle Frage anzeigen;
+    
+    if (Typ = MC oder IMAGE?) then (Ja)
+        :Radio-Buttons für Optionen;
+        :Student wählt Option;
+    else if (Typ = CLOZE?)
+        :Eingabefelder für Lücken;
+        :Student füllt Lücken aus;
+    else (FREE)
+        :Freitext-Eingabe;
+        :Student tippt Antwort;
+    endif
+    
+    :Antwort speichern (lokal);
+    :Nächste Frage Button;
+    
+repeat while (Weitere Fragen?) is (Ja)
+
+:Test beenden Button;
+:Timer stoppen;
+:durationSeconds berechnen;
+
+|Backend|
+:POST /api/test/submit empfangen;
+:JSON parsen: {difficulty, questionIds, answers, durationSeconds};
+
+:testService.submitAttempt() aufrufen;
+
+partition "Scoring-Logik" {
+    :Für jede Frage:;
+    
+    if (MC/IMAGE?) then
+        :scoreMultipleChoice();
+        :Prüfe ob gewählte Option korrekt;
+        :Teilpunkte via partialValue;
+    else if (CLOZE?)
+        :scoreCloze();
+        :Vergleiche jeden Token;
+        :Case-insensitive + Alternativen;
+    else (FREE)
+        :scoreFreeText();
+        :Exakter Textvergleich;
+    endif
+    
+    :Punkte summieren;
+}
+
+:calculateGrade(total, max, difficulty);
+note right
+  **Notenberechnung:**
+  Diff 1: 90%=1, 70%=2, 50%=3...
+  Diff 2: 93%=1, 73%=2, 53%=3...
+  Diff 3: 90%=1, 70%=2, 50%=3...
+end note
+
+:Attempt in DB speichern;
+:attemptDao.createAttempt();
+:attemptDao.saveAttemptAnswers();
+
+:recommendedDifficulty berechnen;
+:AttemptResult zurückgeben;
+
+|Frontend|
+:Result in sessionStorage;
+:Redirect zu Ergebnisseite;
+:Note, Punkte, Details anzeigen;
+:Empfohlene nächste Schwierigkeit;
+
+stop
+
+@enduml

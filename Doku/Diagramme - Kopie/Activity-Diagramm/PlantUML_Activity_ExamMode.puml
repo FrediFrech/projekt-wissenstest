@@ -1,0 +1,130 @@
+@startuml Activity_ExamMode
+
+title Aktivitätsdiagramm - Prüfungs-Flow (Exam-Modus)
+
+skinparam activityBackgroundColor #f0f0f0
+skinparam activityBorderColor #333333
+
+|Student|
+start
+
+:Exam-Modus auswählen;
+:Schwierigkeit wählen (1-3);
+:Anzahl Fragen wählen;
+
+|#LightBlue|TestServlet|
+:POST /api/test/start empfangen;
+:TestService.startTest() aufrufen;
+
+|#LightGreen|TestService|
+:Fragen nach Schwierigkeit laden;
+note right
+  SELECT * FROM questions
+  WHERE difficulty = ?
+  ORDER BY RANDOM()
+  LIMIT ?
+end note
+
+:Antwortoptionen laden;
+:Fragen an Frontend senden;
+
+|Student|
+:TestRunner.jsp angezeigt;
+
+note right
+  **Exam-Modus Features:**
+  - Timer aktiv (falls konfiguriert)
+  - Keine Zwischenergebnisse
+  - Alle Fragen auf einmal
+  - Navigation zwischen Fragen
+end note
+
+repeat
+  :Frage bearbeiten;
+  
+  if (Fragetyp?) then
+    if (MC) then
+      :Antwortoption auswählen;
+    elseif (CLOZE) then
+      :Lücken ausfüllen;
+    elseif (FREE) then
+      :Freitext eingeben;
+    else (IMAGE)
+      :Bild analysieren und\nantworten;
+    endif
+  endif
+  
+  :Zur nächsten Frage;
+  
+repeat while (Noch unbeantwortete Fragen?) is (ja)
+-> nein;
+
+:Test abgeben;
+
+|#LightBlue|TestServlet|
+:POST /api/test/submit empfangen;
+:TestService.submitAttempt() aufrufen;
+
+|#LightGreen|TestService|
+
+:Gesamtpunkte initialisieren;
+note right: totalPoints = 0, maxPoints = 0
+
+repeat
+  :Frage bewerten;
+  
+  switch (Fragetyp)
+  case (MC)
+    :partialValue der gewählten\nOption addieren;
+  case (CLOZE)
+    :Jeden Token prüfen\n(exakt oder Alternativen);
+  case (FREE)
+    :Exakter Textvergleich;
+  case (IMAGE)
+    :wie MC (AnswerOption wählen);
+  endswitch
+  
+  :Punkte zu total addieren;
+  :Max-Punkte addieren;
+  
+repeat while (Weitere Fragen?)
+
+:Quote berechnen;
+note right: ratio = totalPoints / maxPoints
+
+:Note berechnen;
+note right
+  **Notenberechnung (Ist-Code, TestService.calculateGrade):**
+  Diff 1: 90%=1, 70%=2, 50%=3, 30%=4, 10%=5, sonst 6
+  Diff 2: 93%=1, 73%=2, 53%=3, 33%=4, 13%=5, sonst 6
+  Diff 3: 90%=1, 70%=2, 50%=3, 30%=4, 15%=5, sonst 6
+end note
+
+:Attempt in DB speichern;
+:AttemptAnswers speichern;
+
+|#LightBlue|TestServlet|
+:AttemptResult an Frontend;
+
+|Student|
+:Result.jsp angezeigt;
+
+note right
+  **Ergebnisanzeige:**
+  - Gesamtpunktzahl
+  - Note
+  - Detailansicht pro Frage
+  - Richtige Antworten
+end note
+
+:Ergebnis reviewen;
+
+if (Neuer Test?) then (ja)
+  :TestList.jsp öffnen;
+  stop
+else (nein)
+  :Abmelden oder Dashboard;
+  stop
+endif
+
+@enduml

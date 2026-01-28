@@ -1,0 +1,166 @@
+@startuml Wissenstest_05_Utility_Architecture
+!theme plain
+skinparam classBackgroundColor #F8E8F8
+skinparam classBorderColor #AA00AA
+skinparam classArrowColor #AA00AA
+skinparam fontSize 11
+
+title Wissenstest - Klassendiagramm Teil 5: Utility Classes und Architektur-Übersicht
+
+' ==================== UTILITY CLASSES ====================
+class DbConnectionManager {
+  <<utility>>
+  -{static} PROPERTIES_FILE: String
+  -{static} dataSource: HikariDataSource
+  --
+  -DbConnectionManager()
+  +{static} getDataSource(): DataSource
+}
+
+class PasswordUtils {
+  <<utility>>
+  -{static} DEFAULT_ITERATIONS: int
+  --
+  -PasswordUtils()
+  +{static} generateSaltHex(): String
+  +{static} hashPassword(String password, String saltHex): String
+  +{static} hashPassword(String password, String saltHex, int iterations): String
+  +{static} verifyPassword(String password, String saltHex, String expectedHashHex): boolean
+  -{static} toHex(byte[] bytes): String
+}
+
+' ==================== ARCHITECTURE OVERVIEW ====================
+package "Presentation Layer" {
+  class JSP_Templates {
+    index.jsp
+    login.jsp
+    register.jsp
+    testRunner.jsp
+    adminPanel.jsp
+    learnMode.jsp
+    flipCard.jsp
+  }
+  
+  class JavaScript_Assets {
+    app.js
+    testRunner.js
+    admin.js
+    flipcard.js
+  }
+}
+
+package "Web/Servlet Layer" {
+  class AuthServlet_Ref {
+    /api/auth/*
+  }
+  class TestServlet_Ref {
+    /api/test/*
+  }
+  class AdminServlet_Ref {
+    /api/admin/*
+  }
+  class ImageServlet_Ref {
+    /api/images/*
+  }
+  class HealthServlet_Ref {
+    /health
+  }
+}
+
+package "Service Layer" {
+  class AuthService_Ref {
+    Authentication
+    Password Management
+  }
+  class TestService_Ref {
+    Dynamic Test Generation
+    Test Execution
+    Scoring & Grading
+  }
+  class ProgressionService_Ref {
+    Auto-Mode Schwellwertprüfung
+    shouldPromote(ratio)
+    shouldDemote(ratio)
+  }
+  class AdminService_Ref {
+    Fragen-Management (CRUD)
+    Optionen/Tokens verwalten
+  }
+}
+
+package "DAO Layer" {
+  class UserDao_Ref {
+    JdbcUserDao
+  }
+  class AnswerDao_Ref {
+    JdbcAnswerDao
+  }
+  class ClozeTokenDao_Ref {
+    JdbcClozeTokenDao
+  }
+  class AttemptDao_Ref {
+    JdbcAttemptDao
+  }
+  class QuestionRepository_Ref {
+    JdbcQuestionRepository
+  }
+}
+
+package "Data Layer" {
+  class PostgreSQL {
+    users
+    questions
+    answers
+    cloze_answers
+    attempts
+    attempt_answers
+    question_images
+    config
+  }
+}
+
+' ==================== RELATIONSHIPS ====================
+
+DbConnectionManager --> HikariDataSource : manages
+
+note right of DbConnectionManager
+  Utility Class (keine Singleton-Instanz):
+  - Nur statische Methoden
+  - Verwaltet HikariCP Connection Pool
+  - Lädt Konfiguration aus db.properties
+  
+  Eigenschaften:
+  - Lazy Initialization
+  - Thread-safe durch synchronized
+end note
+
+note right of PasswordUtils
+  Sicherheits-Utilities:
+  - SHA-256 Hashing mit Salt
+  - Iteratives Hashing (10.000x)
+  - Hex-Encoding für Salt und Hash
+  - Sichere Salt-Generierung (SecureRandom)
+end note
+
+note bottom of DbConnectionManager
+  Verwendete Technologien:
+  - HikariCP Connection Pool
+  - PostgreSQL JDBC Driver
+  - Properties-File Konfiguration
+  - Thread-Safe Static Initialization
+end note
+
+note bottom
+  **WICHTIG:**
+  Es gibt KEINE folgenden Klassen im System:
+  - Logger (eigene Klasse)
+  - ConfigManager
+  - ValidationUtils
+  - ExceptionHandler
+  - ErrorResponse
+  
+  Logging erfolgt über java.util.logging
+  oder Servlet-Container Logging.
+end note
+
+@enduml

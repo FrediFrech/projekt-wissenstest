@@ -1,0 +1,88 @@
+@startuml Sequence_Test
+
+title Sequenzdiagramm - Test-Flow (Auto-Modus)
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Student" as User
+participant "Frontend" as FE
+participant "TestServlet" as TS
+participant "TestService" as Service
+participant "ProgressionService" as PS
+database "PostgreSQL" as DB
+
+== Test starten (Auto-Modus) ==
+
+User -> FE : Auto-Modus auswählen
+FE -> TS : POST /api/test/start\n{autoMode: true, limit: 10}
+
+TS -> Service : resolveAutoDifficulty(userId)
+Service -> DB : SELECT * FROM attempts\nWHERE user_id = ?\nORDER BY created_at DESC\nLIMIT 3
+DB --> Service : List<Attempt>
+
+alt Keine Historie
+    Service -> Service : randomDifficulty(1-3)
+else Historie vorhanden
+    Service -> Service : lastRatio = total/max
+    Service -> PS : shouldPromote(lastRatio)
+    PS --> Service : true/false (>= 0.70)
+    
+    alt Aufstieg
+        Service -> Service : difficulty + 1
+    else kein Aufstieg
+        Service -> PS : shouldDemote(avgRatio)
+        PS --> Service : true/false (<= 0.40)
+        alt Abstieg
+            Service -> Service : difficulty - 1
+        end
+    end
+    
+    Service -> Service : clamp(1, 3)
+end
+
+Service --> TS : difficulty
+
+TS -> Service : startTest(difficulty, 10)
+Service -> DB : SELECT * FROM questions\nWHERE difficulty = ?\nORDER BY RANDOM()\nLIMIT 10
+DB --> Service : List<Question>
+
+Service -> DB : SELECT * FROM answers\nWHERE question_id IN (...)
+DB --> Service : List<AnswerOption>
+
+Service --> TS : List<Question>
+TS --> FE : JSON [{id, prompt, type, options}]
+FE --> User : TestRunner anzeigen
+
+== Fragen beantworten ==
+
+loop Für jede Frage
+    User -> FE : Antwort auswählen
+    FE -> FE : answers[qId] = answer
+end
+
+== Test abgeben ==
+
+User -> FE : Test beenden
+FE -> TS : POST /api/test/submit\n{difficulty, questionIds, answers, duration}
+
+TS -> Service : submitAttempt(...)
+
+loop Für jede Frage
+    Service -> Service : scoreQuestion()
+    note right
+      MC: partialValue der gewählten Option
+      CLOZE: Token-Vergleich mit Alternativen
+      FREE: Exakter Textvergleich
+    end note
+end
+
+Service -> Service : calculateGrade(total, max, difficulty)
+Service -> DB : INSERT INTO attempts
+Service -> DB : INSERT INTO attempt_answers
+
+Service --> TS : AttemptResult
+TS --> FE : JSON {attempt, details, recommendedDifficulty}
+FE --> User : Ergebnisseite
+
+@enduml

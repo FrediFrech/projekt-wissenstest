@@ -1,0 +1,61 @@
+@startuml Activity_LearnMode
+
+title Activity-Diagramm - LearnMode (API + UI)
+
+|Client (Browser)|
+start
+:Benutzer öffnet "Lernmodus";
+:Frontend fordert Lernkarten an;
+:GET /api/test/questions/all;
+
+|TestServlet|
+:Request entgegennehmen;
+:TestService.getAllQuestions();
+:Filter: isLearnEnabled(question.meta.learnEnabled);
+:Für jede Question:
+    - prompt
+    - type
+    - imageUrl
+    - category
+    - difficulty
+    - korrekte Lösung (AnswerDao/ClozeTokenDao);
+
+|DB|
+:SELECT questions;
+:SELECT answers / cloze_answers
+(abhängig vom Fragetyp);
+
+|TestServlet|
+:Antwort: 200 OK + JSON[List<LearnCard>];
+
+|Client (Browser)|
+if (Request erfolgreich?) then (Nein)
+    :Fehlermeldung anzeigen;
+    stop
+else (Ja)
+    :LearnCards anzeigen;
+endif
+
+repeat
+    :Frage anzeigen;
+    :Karte umdrehen -> Antwort anzeigen;
+    :Benutzer markiert
+    "gelernt" / "nicht gelernt";
+    :Status lokal speichern
+    (Client-State, z.B. im Speicher);
+repeat while (Weitere Karten?) is (Ja)
+
+:Lernmodus beenden oder neu starten;
+stop
+
+note right
+    **Wichtig (Ist-Implementierung):**
+    - Endpoint: GET /api/test/questions/all
+    - Kein Attempt/Ergebnis wird persistiert.
+    - Der Endpoint prüft in der aktuellen
+        Implementierung keine Session.
+    - learnEnabled kommt aus questions.meta JSON
+        (Default: enabled).
+end note
+
+@enduml

@@ -1,0 +1,117 @@
+@startuml UseCase_Wissenstest_System
+
+title Use-Case Diagramm - Projekt Wissenstest
+
+left to right direction
+
+' ==================== ACTORS ====================
+actor "Student" as Student
+actor "Admin" as Admin
+
+' ==================== SYSTEM ====================
+rectangle "Wissenstest System" {
+    
+    ' --- Authentifizierung ---
+    package "Authentifizierung" {
+        usecase "Registrieren" as UC_Register
+        usecase "Login" as UC_Login
+        usecase "Logout" as UC_Logout
+        usecase "Passwort-Reset anfragen" as UC_ResetRequest
+    }
+    
+    ' --- Test-Durchführung (Student) ---
+    package "Test-Durchführung" {
+        usecase "Schwierigkeit wählen" as UC_ChooseDifficulty
+        usecase "Auto-Modus nutzen" as UC_AutoMode
+        usecase "Test starten" as UC_StartTest
+        usecase "Fragen beantworten" as UC_Answer
+        usecase "Ergebnis anzeigen" as UC_ViewResult
+        usecase "Historie einsehen" as UC_History
+    }
+    
+    ' --- Lernmodus ---
+    package "Lernmodus" {
+        usecase "FlipCards nutzen" as UC_FlipCards
+    }
+    
+    ' --- Admin: Fragen ---
+    package "Fragenverwaltung" {
+        usecase "Fragen anzeigen" as UC_ListQuestions
+        usecase "Frage erstellen" as UC_CreateQuestion
+        usecase "Frage bearbeiten" as UC_EditQuestion
+        usecase "Frage löschen" as UC_DeleteQuestion
+        usecase "Bilder importieren" as UC_ImportImages
+    }
+    
+    ' --- Admin: Benutzer ---
+    package "Benutzerverwaltung" {
+        usecase "Benutzer anzeigen" as UC_ListUsers
+        usecase "Passwort zurücksetzen" as UC_ResetPassword
+        usecase "Benutzer löschen" as UC_DeleteUser
+        usecase "Reset-Anfragen bearbeiten" as UC_HandleResets
+    }
+    
+    ' --- Admin: Statistiken ---
+    package "Statistiken" {
+        usecase "System-Stats anzeigen" as UC_Stats
+    }
+}
+
+' ==================== STUDENT CONNECTIONS ====================
+Student --> UC_Register
+Student --> UC_Login
+Student --> UC_Logout
+Student --> UC_ResetRequest
+
+Student --> UC_ChooseDifficulty
+Student --> UC_AutoMode
+Student --> UC_StartTest
+Student --> UC_Answer
+Student --> UC_ViewResult
+Student --> UC_History
+
+Student --> UC_FlipCards
+
+' ==================== ADMIN CONNECTIONS ====================
+Admin --> UC_Login
+Admin --> UC_Logout
+
+Admin --> UC_ListQuestions
+Admin --> UC_CreateQuestion
+Admin --> UC_EditQuestion
+Admin --> UC_DeleteQuestion
+Admin --> UC_ImportImages
+
+Admin --> UC_ListUsers
+Admin --> UC_ResetPassword
+Admin --> UC_DeleteUser
+Admin --> UC_HandleResets
+
+Admin --> UC_Stats
+
+' ==================== INCLUDES/EXTENDS ====================
+UC_StartTest ..> UC_ChooseDifficulty : <<include>>
+UC_AutoMode ..> UC_StartTest : <<extend>>
+UC_Answer ..> UC_StartTest : <<include>>
+UC_ViewResult ..> UC_Answer : <<include>>
+
+note right of Student
+  **Student kann:**
+  - Tests mit manueller
+    oder Auto-Schwierigkeit
+  - Lernmodus (FlipCards)
+  - Eigene Historie sehen
+end note
+
+note right of Admin
+  **Admin kann:**
+  - CRUD für Fragen (MC, CLOZE, FREE, IMAGE)
+  - Benutzer verwalten
+  - Passwort-Resets bearbeiten
+  - System-Statistiken
+  
+  **KEINE Test-Entity!**
+  Tests = dynamische Fragenauswahl
+end note
+
+@enduml

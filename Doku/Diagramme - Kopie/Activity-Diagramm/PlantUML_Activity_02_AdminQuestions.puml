@@ -1,0 +1,219 @@
+@startuml Activity_Admin_QuestionManagement
+
+title Activity-Diagramm - Admin Fragen-Verwaltung
+
+start
+:Admin öffnet Admin-Panel;
+:Mit Admin-Account anmelden;
+if (Admin-Login erfolgreich?) then (Nein)
+    :Zugriff verweigert;
+    :Fehlermeldung;
+    stop
+else (Ja)
+    :Admin-Dashboard laden;
+endif
+
+:Benutzerolle prüfen (role = "admin");
+:Admin-Panel-Menü anzeigen;
+
+repeat
+    :Admin-Menü-Optionen:;
+    :1. Fragen verwalten;
+    :2. Benutzer verwalten;
+    :3. Statistiken;
+    :4. Logout;
+    
+    if (Admin wählt) then (Fragen verwalten)
+        
+        repeat
+            :Fragen-Management-Seite;
+            :Alle Fragen aus questions-Tabelle laden;
+            :Fragen-Anzahl anzeigen;
+            
+            if (Aktion?) then (Neue Frage erstellen)
+                :Erstellen-Formular anzeigen;
+                :Fragetyp wählen (MC / CLOZE / FREE / IMAGE);
+                :Fragetext (prompt) eingeben;
+                :Kategorie wählen (optional);
+                :Schwierigkeit wählen (1=Leicht, 2=Mittel, 3=Schwer);
+                :Punkte pro Frage eingeben;
+                
+                if (Fragetyp = MC?) then (Ja)
+                    :Antwort 1 eingeben (answerText);
+                    :Korrektheit-Checkbox (correct);
+                    :Optional: partialValue eingeben;
+                    repeat
+                        :Weitere Antwort hinzufügen;
+                    repeat while (Admin möchte mehr Antworten?) is (Ja)
+                    
+                else if (Fragetyp = CLOZE?)
+                    :Lückentext-Template eingeben;
+                    :Lücken mit [BLANK] markieren;
+                    :Token 1: expectedText;
+                    :tokenIndex und partialValue;
+                    repeat
+                        :Weiteres Token hinzufügen;
+                    repeat while (Admin möchte mehr Tokens?) is (Ja)
+                    
+                else if (Fragetyp = FREE?)
+                    :Freitext-Frage eingeben;
+                    :Musterlösung(en) als AnswerOption speichern
+                    (FREE nutzt ebenfalls die answers-Tabelle);
+                    
+                else (Fragetyp = IMAGE)
+                    :Bild-basierte Frage eingeben;
+                    :Bild hochladen;
+                endif
+                
+                :Bild hochladen (optional);
+                if (Bild hochgeladen?) then (Ja)
+                    :Bild in question_images speichern;
+                    :imageUrl setzen;
+                else (Nein)
+                    :Keine Bild-URL;
+                endif
+                
+                :Formular validieren;
+                if (Validierung erfolgreich?) then (Ja)
+                    :Frage in questions-Tabelle INSERT;
+                    :- type, prompt, difficulty, points;
+                    :- category, imageUrl, metaJson;
+                    
+                    if (Fragetyp = MC?) then (Ja)
+                        :Antwortoptionen in answers-Tabelle INSERT;
+                        :- questionId, answerText;
+                        :- correct, partialValue;
+                    else if (Fragetyp = CLOZE?)
+                        :Tokens in cloze_answers-Tabelle INSERT;
+                        :- questionId, tokenIndex;
+                        :- expectedText, partialValue;
+                    endif
+                    
+                    :Bestätigungsmeldung;
+                    :Frage erfolgreich erstellt;
+                else (Validierung fehlgeschlagen)
+                    :Fehlertext anzeigen;
+                    :Zurück zum Formular;
+                endif
+                
+            else if (Frage bearbeiten)
+                :Fragen-Liste anzeigen;
+                :Admin sucht Frage (Filter/Suchfeld);
+                :Frage auswählen;
+                :Bearbeitungsformular laden;
+                :Aktuelle Werte ausfüllen;
+                :Admin ändert prompt/Antworten;
+                :Validierung;
+                if (Validierung erfolgreich?) then (Ja)
+                    :Frage in questions-Tabelle UPDATE;
+                    if (MC-Antworten geändert?) then (Ja)
+                        :Alte Antworten aus answers löschen;
+                        :Neue Antworten INSERT;
+                    else if (CLOZE-Tokens geändert?)
+                        :Alte Tokens aus cloze_answers löschen;
+                        :Neue Tokens INSERT;
+                    endif
+                    :Bestätigung;
+                else (Validierung fehlgeschlagen)
+                    :Fehler anzeigen;
+                endif
+                
+            else if (Frage löschen)
+                :Fragen-Liste anzeigen;
+                :Frage auswählen;
+                :Bestätigung erforderlich;
+                if (Admin bestätigt?) then (Ja)
+                    :Frage aus questions-Tabelle DELETE;
+                    :CASCADE: Antworten aus answers löschen;
+                    :CASCADE: Tokens aus cloze_answers löschen;
+                    :attempt_answers.question_id wird
+                    bei Question-DELETE auf NULL gesetzt;
+                    :Bestätigung;
+                else (Nein)
+                    :Abbruch;
+                endif
+                
+            else if (Filter/Sortierung)
+                :Filtermöglichkeiten;
+                :Nach Schwierigkeit filtern (1, 2, 3);
+                :Nach Fragetyp filtern (MC, CLOZE, FREE, IMAGE);
+                :Nach Kategorie filtern;
+                :Suchfeld (Wildcard *);
+                :Gefilterte Fragen anzeigen;
+                
+            else (Zurück)
+                :Zum Fragen-Menü;
+            endif
+            
+            repeat while (Weitere Fragen-Aktionen?) is (Ja)
+        
+    else if (Benutzer verwalten)
+        :Benutzerliste laden;
+        :Alle Benutzer anzeigen;
+        
+        if (Aktion?) then (Benutzer-Rolle ändern)
+            :Benutzer wählen;
+            :Rolle ändern (student/admin);
+            :Änderung in users-Tabelle speichern;
+        else if (Passwort-Reset-Anfrage bearbeiten)
+            :Reset-Anfragen filtern (resetRequested = TRUE);
+            :Anfragen-Liste anzeigen;
+            :Anfrage auswählen;
+            if (Admin genehmigt?) then (Ja)
+                :Neues Passwort generieren;
+                :PasswordUtils.generateSaltHex();
+                :PasswordUtils.hashPassword();
+                :passwordHash & passwordSalt aktualisieren;
+                :resetRequested = FALSE setzen;
+                :Benutzer benachrichtigen;
+            else (Nein)
+                :Anfrage ablehnen;
+            endif
+        else
+            :Zurück;
+        endif
+        
+    else if (Statistiken)
+        :Statistik-Dashboard laden;
+        :Benutzerzahlen;
+        :Fragen-Statistiken;
+        :Versuch-Statistiken (attempts);
+        :Durchschnittliche Noten;
+        :Schwierigkeitsverteilung;
+        :Erfolgsquoten;
+        
+    else (Logout)
+        :Session beenden;
+        stop
+    endif
+    
+    repeat while (Weitere Admin-Aktionen?) is (Ja)
+
+stop
+
+note right
+  **Datenbankoperationen:**
+  - **SELECT** aus questions
+    - **INSERT** in questions, answers, cloze_answers
+    - **UPDATE** in questions, answers, cloze_answers
+  - **DELETE** aus questions (CASCADE)
+  - **SELECT** aus users
+  - **UPDATE** in users
+  
+  **Rollen-Check:**
+  - role = "admin" (String, kein Enum!)
+  
+  **Fragetypen:**
+  - MC, CLOZE, FREE, IMAGE
+  
+  **Schwierigkeit:**
+  - int: 1, 2, 3
+  
+  **Validierungen:**
+  - prompt nicht leer
+  - Antworten bei MC
+  - Tokens bei CLOZE
+  - Schwierigkeit 1-3
+end note
+
+@enduml

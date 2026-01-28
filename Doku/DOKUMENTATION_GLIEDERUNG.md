@@ -92,15 +92,16 @@ Das Projekt entstand im Rahmen des Moduls "Softwareprojekt" mit dem Ziel, eine W
 - **Profilinformationen:** Benutzer können ihre Daten einsehen
 
 #### 3.2.2 Test- und Fragenmanagement
-- **Testverwaltung:**
-  - Erstellen, Bearbeiten und Löschen von Tests
-  - Zuweisung von Fragen zu Tests
-  - Konfiguration von Testeinstellungen (Zeitlimit, Bestehensgrenze, etc.)
+- **Test-Konfiguration (dynamisch, ohne persistente Test-Entität):**
+  - Tests werden zur Laufzeit gestartet (z. B. Difficulty, Limit, Kategorie/Segmente)
+  - Es gibt **keine** separate `tests`-Tabelle; Ergebnisse werden als `attempts` gespeichert
   
-- **Fragenmanagement:**
+- **Fragenmanagement (Admin):**
   - Verschiedene Fragetypen:
     - **Multiple Choice (MC):** Mehrere Antwortmöglichkeiten mit einer korrekten Antwort
     - **Lückentext (Cloze):** Sätze mit Lücken, die ergänzt werden müssen
+    - **Free:** Freitext (Musterlösung als AnswerOption)
+    - **Image:** Bildfrage (Antwortoptionen + Bild-URL)
   - Schwierigkeitsstufen (Einfach, Mittel, Schwierig)
   - Verwaltung von Antwortmöglichkeiten
   - Kategorisierung und Filtermöglichkeiten
@@ -225,17 +226,21 @@ Die Anwendung wird mit folgenden Technologien entwickelt:
   - Login/Logout
   - Test durchführen
   - Testergebnisse ansehen
-  - Test administrieren
+  - Fragen administrieren (Admin)
   - Benutzerverwaltung
 
 ### 4.2 Klassendiagramm
 - **Grafische Darstellung**
 - **Kurzbeschreibung der Klassen:**
-  - User (Student, Teacher, Admin)
+  - User (role: student/admin)
   - Question (unterschiedliche Typen)
-  - Test
+  - QuestionType (Enum: MC, CLOZE, FREE, IMAGE)
+  - QuestionImage (gespeicherte Uploads)
+  - AnswerOption (MC-Antworten)
+  - ClozeToken (CLOZE-Erwartungen)
   - Attempt (Testversuch)
-  - Answer (Antworten)
+  - AttemptAnswer (Antwort pro Frage innerhalb eines Attempts)
+  - AttemptResult / QuestionResultDetail (Auswertung)
   - Service-Klassen (AuthService, TestService, etc.)
   - DAO-Klassen (Datenzugriff)
 - **Beziehungen und Kardinalitäten**
@@ -243,180 +248,153 @@ Die Anwendung wird mit folgenden Technologien entwickelt:
 ### 4.3 Entity-Relation-Diagramm (ERD)
 - **Grafische Darstellung**
 - **Entitäten und ihre Rollen:**
-  - **users:** Speichert alle Benutzer (Studenten, Lehrer, Admins) mit Authentifizierungsdaten
-  - **questions:** Alle Fragen mit Metadaten (Typ, Schwierigkeit, Beschreibung)
-  - **question_types:** Kategorisierung von Fragentypen (MC, CLOZE, etc.)
-  - **answer_options:** Für Multiple-Choice-Fragen: verfügbare Antwortoptionen
-  - **cloze_tokens:** Für Lückentext-Fragen: Tokens, die ergänzt werden müssen
-  - **tests:** Test-Definitionen mit Konfiguration
-  - **test_questions:** Verknüpfung zwischen Tests und Fragen (N:M)
-  - **attempts:** Testenträge (Versuche) eines Benutzers
-  - **attempt_answers:** Gespeicherte Antworten eines Benutzers auf Fragen in einem Attempt
-  - **progress:** Fortschrittsinformationen pro Benutzer
+  - **users:** Benutzerkonten inkl. Hash/Salt/Role
+  - **questions:** Fragen (Typ, Prompt, Schwierigkeit, Punkte, Kategorie, Meta)
+  - **question_images:** Binäre Bilddaten (Uploads)
+  - **answers:** Antwortoptionen für Multiple-Choice-Fragen
+  - **cloze_answers:** Erwartete Tokens für Lückentext-Fragen (geordnet)
+  - **attempts:** Abgeschlossene Testversuche (Score, Max-Score, Difficulty, Dauer)
+  - **attempt_answers:** Pro-Frage-Ergebnis/Antwort innerhalb eines Attempts
+  - **config:** Konfiguration (Key/Value), z. B. Thresholds als Placeholder
   
 - **Kardinalitäten:**
   - User (1) → (N) Attempts
-  - Test (1) → (N) Attempts
-  - Question (1) → (N) AnswerOptions
-  - Question (1) → (N) ClozeTokens
-  - Test (N) ← → (M) Question (über test_questions)
+  - User (1) → (N) Questions (created_by, optional)
+  - Question (1) → (N) Answers
+  - Question (1) → (N) ClozeAnswers
   - Attempt (1) → (N) AttemptAnswers
-  - Question (1) → (N) AttemptAnswers
+  - Question (0..1) → (N) AttemptAnswers (question_id kann bei Löschung auf NULL gesetzt werden)
   
-- **Attribute der Entitäten:**
-  - **users:** id, username, password (hashed), role, email, created_at, updated_at
-  - **questions:** id, text, type, difficulty, created_by (User-FK), created_at
-  - **answer_options:** id, question_id (FK), text, is_correct, order
-  - **cloze_tokens:** id, question_id (FK), token_text, original_text
-  - **attempts:** id, user_id (FK), test_id (FK), started_at, completed_at, score, percentage
-  - **attempt_answers:** id, attempt_id (FK), question_id (FK), answer_text, is_correct
+- **Attribute der Entitäten (vereinfachter Auszug):**
+  - **users:** id, username, email, password_hash, password_salt, role, reset_requested, created_at
+  - **questions:** id, type, prompt, difficulty, points, category, image_url, meta, created_by, created_at
+  - **question_images:** id, content_type, data, created_at
+  - **answers:** id, question_id, answer_text, is_correct, partial_value
+  - **cloze_answers:** id, question_id, token_index, expected_text, partial_value
+  - **attempts:** id, user_id, total_points, max_points, difficulty, grade, duration_seconds, created_at
+  - **attempt_answers:** id, attempt_id, question_id, given_answer, points_awarded
+  - **config:** key, value, description
+
+> Hinweis: Es gibt in diesem Projekt **keine persistente Tabelle `tests`** und auch keine `test_questions`-Junction-Table.
+> „Tests“ entstehen dynamisch (z. B. über Difficulty/Filter) und die Ergebnisse werden in `attempts`/`attempt_answers` gespeichert.
 
 ### 4.4 Relationales Modell
 Das relationale Modell definiert die konkrete Datenbankstruktur mit SQL-Typen und Constraints:
 
+Die folgenden Tabellen entsprechen dem aktuellen Stand aus `db/schema.sql` (PostgreSQL):
+
 #### Tabelle: users
 ```
 users (
-  id              SERIAL PRIMARY KEY,
-  username        VARCHAR(255) UNIQUE NOT NULL,
-  password        VARCHAR(255) NOT NULL,  -- SHA-256 Hashing
-  role            VARCHAR(50) NOT NULL,   -- STUDENT, TEACHER, ADMIN
-  email           VARCHAR(255),
-  is_active       BOOLEAN DEFAULT TRUE,
-  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
-  CONSTRAINT chk_role CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN'))
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  password_hash VARCHAR(256) NOT NULL,
+  password_salt VARCHAR(128) NOT NULL,
+  role VARCHAR(32) NOT NULL DEFAULT 'student',
+  reset_requested BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 )
 ```
 
 #### Tabelle: questions
 ```
 questions (
-  id              SERIAL PRIMARY KEY,
-  text            TEXT NOT NULL,
-  type            VARCHAR(50) NOT NULL,   -- MC, CLOZE
-  difficulty      VARCHAR(20),            -- EASY, MEDIUM, HARD
-  created_by      INT NOT NULL,           -- FK users(id)
-  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
-  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT chk_type CHECK (type IN ('MC', 'CLOZE')),
-  CONSTRAINT chk_difficulty CHECK (difficulty IN ('EASY', 'MEDIUM', 'HARD')),
-  
-  INDEX idx_type (type),
-  INDEX idx_difficulty (difficulty),
-  INDEX idx_created_by (created_by)
+  id SERIAL PRIMARY KEY,
+  type VARCHAR(16) NOT NULL CHECK (type IN ('MC','CLOZE','FREE','IMAGE')),
+  prompt TEXT NOT NULL,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  points INTEGER NOT NULL DEFAULT 1,
+  category VARCHAR(64) DEFAULT 'Allgemein',
+  image_url VARCHAR(255),
+  meta JSONB DEFAULT '{}'::jsonb,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 )
 ```
 
-#### Tabelle: answer_options
+#### Tabelle: question_images
 ```
-answer_options (
-  id              SERIAL PRIMARY KEY,
-  question_id     INT NOT NULL,           -- FK questions(id)
-  text            VARCHAR(500) NOT NULL,
-  is_correct      BOOLEAN DEFAULT FALSE,
-  option_order    INT,
-  
-  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
-  INDEX idx_question_id (question_id)
+question_images (
+  id SERIAL PRIMARY KEY,
+  content_type VARCHAR(128) NOT NULL,
+  data BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 )
 ```
 
-#### Tabelle: cloze_tokens
+#### Tabelle: answers (Multiple Choice)
 ```
-cloze_tokens (
-  id              SERIAL PRIMARY KEY,
-  question_id     INT NOT NULL,           -- FK questions(id)
-  token_text      VARCHAR(255) NOT NULL,
-  original_text   VARCHAR(255),
-  position        INT,
-  
-  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
-  INDEX idx_question_id (question_id)
+answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT false,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 0.0 CHECK (partial_value >= 0 AND partial_value <= 1)
 )
 ```
 
-#### Tabelle: tests
+#### Tabelle: cloze_answers (Lückentext)
 ```
-tests (
-  id              SERIAL PRIMARY KEY,
-  title           VARCHAR(255) NOT NULL,
-  description     TEXT,
-  created_by      INT NOT NULL,           -- FK users(id)
-  time_limit      INT DEFAULT 0,          -- in Sekunden, 0 = unbegrenzt
-  passing_score   INT DEFAULT 50,         -- in Prozent
-  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
-  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_created_by (created_by)
-)
-```
-
-#### Tabelle: test_questions (N:M)
-```
-test_questions (
-  test_id         INT NOT NULL,           -- FK tests(id)
-  question_id     INT NOT NULL,           -- FK questions(id)
-  question_order  INT,
-  
-  PRIMARY KEY (test_id, question_id),
-  FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
-  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+cloze_answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  token_index SMALLINT NOT NULL,
+  expected_text TEXT NOT NULL,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 1.0 CHECK (partial_value >= 0 AND partial_value <= 1),
+  UNIQUE(question_id, token_index)
 )
 ```
 
 #### Tabelle: attempts
 ```
 attempts (
-  id              SERIAL PRIMARY KEY,
-  user_id         INT NOT NULL,           -- FK users(id)
-  test_id         INT NOT NULL,           -- FK tests(id)
-  started_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  completed_at    TIMESTAMP,
-  score           INT DEFAULT 0,
-  percentage      DECIMAL(5,2) DEFAULT 0,
-  passed          BOOLEAN DEFAULT FALSE,
-  grade           VARCHAR(2),             -- 1-6 für Schulnoten
-  
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
-  INDEX idx_user_id (user_id),
-  INDEX idx_test_id (test_id),
-  INDEX idx_completed_at (completed_at)
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  max_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  grade VARCHAR(10),
+  duration_seconds INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 )
 ```
 
 #### Tabelle: attempt_answers
 ```
 attempt_answers (
-  id              SERIAL PRIMARY KEY,
-  attempt_id      INT NOT NULL,           -- FK attempts(id)
-  question_id     INT NOT NULL,           -- FK questions(id)
-  answer_text     TEXT,
-  is_correct      BOOLEAN DEFAULT FALSE,
-  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
-  FOREIGN KEY (attempt_id) REFERENCES attempts(id) ON DELETE CASCADE,
-  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
-  INDEX idx_attempt_id (attempt_id),
-  INDEX idx_question_id (question_id)
+  id SERIAL PRIMARY KEY,
+  attempt_id INTEGER NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
+  question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
+  given_answer TEXT,
+  points_awarded NUMERIC(8,4) NOT NULL DEFAULT 0.0
 )
 ```
+
+#### Tabelle: config
+```
+config (
+  key VARCHAR(128) PRIMARY KEY,
+  value VARCHAR(255) NOT NULL,
+  description TEXT
+)
+```
+
+#### Indexe (Auszug)
+- `CREATE INDEX idx_questions_difficulty ON questions(difficulty);`
+- `CREATE INDEX idx_attempts_user ON attempts(user_id);`
 
 #### Datentypen Summary
 | Datentyp | Verwendung |
 |---|---|
 | SERIAL | Auto-incrementing Primary Keys |
-| INT | Zahlenfelder, IDs |
-| VARCHAR(n) | Begrenzte Text-Längen (Benutzernamen, Titel) |
-| TEXT | Unbegrenzte Text-Längen (Fragen, Beschreibungen) |
-| BOOLEAN | Wahrheitswerte (is_active, is_correct) |
-| TIMESTAMP | Datum und Uhrzeit (created_at, completed_at) |
-| DECIMAL(5,2) | Dezimalzahlen (Prozent, Noten) |
+| INTEGER / SMALLINT | Zahlenfelder, IDs, Difficulty |
+| VARCHAR(n) | Begrenzte Text-Längen (Username, Role, Kategorie) |
+| TEXT | Unbegrenzte Text-Längen (Prompt, Antworten) |
+| BOOLEAN | Wahrheitswerte |
+| TIMESTAMP WITH TIME ZONE | Zeitstempel |
+| NUMERIC(p,s) | Punkte/Score mit Dezimalstellen |
+| JSONB | Metadaten-Felder (z. B. learnEnabled) |
 
 ### 4.5 Deployment-Diagramm
 - **Grafische Darstellung der Infrastruktur**
@@ -475,9 +453,9 @@ attempt_answers (
   2. **Web Layer (Servlets/Controller)**
      - AuthServlet: Authentifizierung, Login/Logout
      - TestServlet: Test-Verwaltung und -Durchführung
-     - QuestionServlet: Fragen-Verwaltung
      - AdminServlet: Admin-Panel-Funktionen
-     - ProgressionServlet: Benutzerfortschritt
+      - ImageServlet: Upload/Download von Frage-Bildern
+      - HealthServlet: Health-Check Endpoint
      - Abhängigkeiten: Service-Layer, Session-Management
   
   3. **Business Logic Layer (Services)**
@@ -486,9 +464,9 @@ attempt_answers (
        - Passwort-Validierung und -Hashing
        - Session-Management
      - **TestService:**
-       - Test-CRUD-Operationen
-       - Test-Konfiguration
-       - Test-Validierung
+       - Frageauswahl (z. B. nach Difficulty)
+       - Auswertung/Scoring und Persistierung von `attempts` + `attempt_answers`
+       - Bereitstellen von LearnMode-Daten (ohne Persistierung)
      - **ProgressionService:**
        - Score-Berechnung
        - Noten-Berechnung
@@ -505,7 +483,7 @@ attempt_answers (
      - **JdbcQuestionDao:** Question-Operationen
      - **JdbcAnswerDao:** Answer-Operationen
      - **JdbcAttemptDao:** Attempt-Verwaltung
-     - **JdbcClozeTokenDao:** Cloze-Token-Verwaltung
+    - **JdbcClozeTokenDao:** Lückentext-Tokens (DB-Tabelle: `cloze_answers`)
      - Abhängigkeiten: DbConnectionManager, JDBC
   
   5. **Data Access Layer (Database)**
@@ -516,7 +494,6 @@ attempt_answers (
   6. **Utility Layer**
      - **DbConnectionManager:** Verwaltung von Datenbankverbindungen
      - **PasswordUtils:** Passwort-Hashing und -Verifikation
-     - **Logger:** Logging und Debugging
   
   - **Abhängigkeitsmatrix:**
     ```
@@ -543,9 +520,9 @@ attempt_answers (
            - NEIN → Fehlermeldung, zurück zu 3
            - JA → Weiter
    - NEIN → Überspringen
-4. Test-Liste anzeigen
-5. Benutzer wählt Test
-6. Test starten
+4. Test-Optionen anzeigen (z. B. Difficulty/Kategorie/Auto-Modus)
+5. Benutzer wählt Einstellungen
+6. Test starten (Backend liefert Fragen via /api/test/start)
 7. FOR EACH Frage im Test:
    a) Frage anzeigen
    b) Timer starten (falls aktiviert)
@@ -580,27 +557,27 @@ attempt_answers (
 ```
 1. START (Admin angemeldet)
 2. Admin navigiert zum Admin-Panel
-3. "Test verwalten" wählen
-4. Bestehende Tests anzeigen (Liste)
+3. "Fragen verwalten" wählen
+4. Bestehende Fragen anzeigen (Liste)
 5. Admin wählt eine Option:
-   a) NEUER TEST:
-      - Testformular ausfüllen (Titel, Beschreibung, etc.)
-      - Fragen aussuchen und hinzufügen
-      - Testeinstellungen konfigurieren (Zeitlimit, Bestehensgrenze)
-      - Test speichern
-      - WEITER zu 6
-   b) TEST BEARBEITEN:
-      - Test auswählen
-      - Einstellungen ändern
-      - Fragen ändern
-      - Speichern
-      - WEITER zu 6
-   c) TEST LÖSCHEN:
-      - Test auswählen
+  a) NEUE FRAGE:
+    - Fragetyp wählen (MC/CLOZE/FREE/IMAGE)
+    - Prompt, Difficulty, Punkte, Kategorie, Meta (z. B. learnEnabled) setzen
+    - Optionen/Tokens pflegen
+    - (optional) Bild hochladen (/api/admin/images) und image_url setzen
+    - Frage speichern (/api/admin/questions)
+    - WEITER zu 6
+  b) FRAGE BEARBEITEN:
+    - Frage auswählen
+    - Felder/Optionen/Tokens anpassen
+    - Speichern (/api/admin/questions via PUT)
+    - WEITER zu 6
+  c) FRAGE LÖSCHEN:
+    - Frage auswählen
       - Bestätigung erforderlich?
         - JA → Bestätigen
         - NEIN → Abbrechen
-      - Test löschen
+    - Frage löschen (/api/admin/questions via DELETE)
       - WEITER zu 6
 6. Änderungen validieren
    - Fehler vorhanden?
@@ -660,7 +637,7 @@ Swim Lane 3: DATENBANK (DAO/DB)
 Das Projekt folgt einer **mehrstufigen Schichtenarchitektur** mit klarer Trennung der Verantwortlichkeiten:
 
 #### 5.1.1 Architecture Pattern: MVC (Model-View-Controller)
-- **Model:** Datenklassen (User, Question, Test, Attempt, etc.)
+- **Model:** Datenklassen (User, Question, AnswerOption/ClozeToken, Attempt/AttemptResult, etc.)
 - **View:** JSP-Templates für Präsentation
 - **Controller:** Servlets für Request-Handling und Business-Logik Koordination
 
@@ -674,7 +651,8 @@ Das Projekt folgt einer **mehrstufigen Schichtenarchitektur** mit klarer Trennun
                    │ HTTP Request/Response
 ┌──────────────────▼──────────────────────────┐
 │    Web Layer (Servlets)                     │
-│  (AuthServlet, TestServlet, AdminServlet)   │
+│  (AuthServlet, TestServlet, AdminServlet,   │
+│   ImageServlet, HealthServlet)              │
 └──────────────────┬──────────────────────────┘
                    │ Method Calls
 ┌──────────────────▼──────────────────────────┐
@@ -726,25 +704,40 @@ Das Projekt folgt einer **mehrstufigen Schichtenarchitektur** mit klarer Trennun
 - Alle Beziehungen sind normalisiert
 
 #### 5.2.2 Tabellenbeziehungen und Fremdschlüssel
-- **1:N Beziehungen:** User → Attempts, Test → Attempts, Question → AnswerOptions
-- **N:M Beziehungen:** Test ↔ Question (über test_questions)
-- **ON DELETE CASCADE:** Beim Löschen einer Frage werden auch ihre Antwortoptionen gelöscht
-- **ON DELETE SET NULL:** Beim Löschen eines Benutzers bleibt der Versuch erhalten (created_by = NULL)
+- **1:N Beziehungen:**
+  - User → Attempts
+  - (optional) User → Questions (created_by kann NULL sein)
+  - Question → Answers (MC)
+  - Question → ClozeAnswers (CLOZE)
+  - Attempt → AttemptAnswers
+- **Wichtig:** Es existiert **keine** persistente `tests`-Tabelle und keine `test_questions`-N:M-Verknüpfung.
+- **ON DELETE CASCADE:**
+  - Löschen von `questions` löscht abhängige `answers` / `cloze_answers`
+  - Löschen von `attempts` löscht abhängige `attempt_answers`
+  - Löschen von `users` löscht abhängige `attempts`
+- **ON DELETE SET NULL:**
+  - `questions.created_by` wird bei User-Löschung auf `NULL` gesetzt
+  - `attempt_answers.question_id` wird bei Question-Löschung auf `NULL` gesetzt
 
 #### 5.2.3 Indizierung
 - **Primary Keys:** Automatische B-Tree Indizes
 - **Foreign Keys:** Indizes für schnelle Joins
 - **Performance-Indizes:** 
-  - questions(type) für Filterung nach Fragetyp
-  - attempts(user_id) für schnellen Abruf von Benutzertests
-  - attempts(completed_at) für Zeitbereichsabfragen
-  - questions(difficulty) für Schwierigkeitsfilter
+  - `idx_attempts_user` auf `attempts(user_id)` (History pro Benutzer)
+  - `idx_questions_difficulty` auf `questions(difficulty)` (Schwierigkeitsfilter)
+
+> Hinweis: Weitere Indizes (z. B. auf `questions.type` oder `questions.category`) können bei Bedarf ergänzt werden.
 
 #### 5.2.4 Constraints und Datenintegrität
-- **CHECK Constraints:** role ∈ {STUDENT, TEACHER, ADMIN}, type ∈ {MC, CLOZE}
+- **CHECK Constraints:**
+  - `questions.type` ∈ {MC, CLOZE, FREE, IMAGE}
+  - `questions.difficulty` ∈ {1,2,3}
+  - `attempts.difficulty` ∈ {1,2,3}
+  - `answers.partial_value` und `cloze_answers.partial_value` ∈ [0,1]
 - **UNIQUE Constraints:** username, email
-- **NOT NULL:** Kritische Felder wie password, username
-- **DEFAULT Werte:** created_at, updated_at, is_active
+- **UNIQUE Constraints:** (question_id, token_index) in `cloze_answers`
+- **NOT NULL:** Kritische Felder wie `password_hash`, `password_salt`, `username`, `prompt`
+- **DEFAULT Werte:** `role='student'`, `created_at=now()`, `meta='{}'::jsonb`, `points=1`
 
 ### 5.3 Sicherheitskonzept
 
@@ -762,9 +755,8 @@ Das Projekt folgt einer **mehrstufigen Schichtenarchitektur** mit klarer Trennun
 
 #### 5.3.2 Autorisierung (Rollenbasierte Zugriffskontrolle - RBAC)
 - **Rollen:**
-  - **STUDENT:** Kann Tests durchführen, eigene Ergebnisse ansehen
-  - **TEACHER/ADMIN:** Kann Tests verwalten, Fragen bearbeiten
-  - **ADMIN:** Vollständige Systemverwaltung
+  - **student:** Kann Tests durchführen, eigene Ergebnisse ansehen
+  - **admin:** Darf Admin-Endpunkte nutzen (Fragen/Benutzer/Bilder verwalten)
   
 - **Kontrolle:**
   - Rollen-Check in Servlets/Services
@@ -978,13 +970,17 @@ src/main/java/de/dhsn/wissentest/
 ├── web/
 │   ├── AuthServlet.java          # Login/Logout
 │   ├── TestServlet.java          # Test-Verwaltung/-Durchführung
-│   ├── QuestionServlet.java      # Fragen-Verwaltung
 │   ├── AdminServlet.java         # Admin-Funktionen
-│   └── ProgressionServlet.java   # Fortschritt/Statistiken
+│   ├── ImageServlet.java         # Fragebilder aus DB
+│   ├── HealthServlet.java        # Health-Check
+│   ├── CorsFilter.java           # CORS für /api/*
+│   ├── CharacterEncodingFilter.java # UTF-8
+│   ├── JsonUtil.java             # Gson Helper
+│   └── ServletUtils.java         # Request/Response Utilities
 │
 ├── service/
 │   ├── AuthService.java          # Authentifizierung
-│   ├── TestService.java          # Test-Business-Logik
+│   ├── TestService.java          # Test-Start/Submit/History/LearnMode
 │   ├── ProgressionService.java   # Score/Noten-Berechnung
 │   └── AdminService.java         # Admin-Business-Logik
 │
@@ -993,28 +989,34 @@ src/main/java/de/dhsn/wissentest/
 │   ├── JdbcUserDao.java          # JDBC Implementation
 │   ├── QuestionDao.java (Interface)
 │   ├── JdbcQuestionDao.java      # JDBC Implementation
+│   ├── QuestionRepository.java   # Komplexe Queries
+│   ├── JdbcQuestionRepository.java
 │   ├── AttemptDao.java (Interface)
 │   ├── JdbcAttemptDao.java       # JDBC Implementation
 │   ├── AnswerDao.java (Interface)
 │   ├── JdbcAnswerDao.java        # JDBC Implementation
 │   ├── ClozeTokenDao.java (Interface)
 │   ├── JdbcClozeTokenDao.java    # JDBC Implementation
-│   └── QuestionRepository.java   # Komplexe Queries
+│   ├── QuestionImageDao.java (Interface)
+│   ├── JdbcQuestionImageDao.java
+│   ├── ConfigDao.java (Interface)
+│   └── JdbcConfigDao.java
 │
 ├── model/
 │   ├── User.java                 # Benutzer-Datenklasse
 │   ├── Question.java             # Frage-Datenklasse
 │   ├── QuestionType.java         # Enum für Fragentypen
-│   ├── Test.java                 # Test-Datenklasse
 │   ├── Attempt.java              # Testversuch-Datenklasse
 │   ├── AttemptAnswer.java        # Gespeicherte Antwort
-│   ├── AnswerOption.java         # MC-Antwortoptionen
-│   └── ClozeToken.java           # Lückentext-Token
+│   ├── AttemptResult.java         # Ergebnis/Auswertung
+│   ├── QuestionResultDetail.java  # Detailauswertung
+│   ├── AnswerOption.java          # MC/IMAGE/FREE-Antwortoptionen
+│   ├── ClozeToken.java            # Lückentext-Token
+│   └── QuestionImage.java         # Bilddatensatz
 │
 └── util/
     ├── DbConnectionManager.java   # Connection Pool
-    ├── PasswordUtils.java         # Passwort-Hashing
-    └── Logger.java               # Logging
+  └── PasswordUtils.java         # Passwort-Hashing
 ```
 
 **Wichtige Klassen und deren Funktionen:**
@@ -1045,20 +1047,24 @@ src/main/java/de/dhsn/wissentest/
 
 | Servlet | Path | Methode | Funktion |
 |---|---|---|---|
-| AuthServlet | /login | GET/POST | Login-Formular / Authentifizierung |
-| AuthServlet | /register | GET/POST | Registrierungs-Formular / Registrierung |
-| AuthServlet | /logout | GET | Logout |
-| TestServlet | /test/list | GET | Test-Liste abrufen |
-| TestServlet | /test/start | POST | Test starten |
-| TestServlet | /test/submit | POST | Test-Antworten speichern |
-| TestServlet | /test/result | GET | Test-Ergebnis abrufen |
-| QuestionServlet | /question/list | GET | Fragen-Liste (Admin) |
-| QuestionServlet | /question/create | POST | Neue Frage erstellen |
-| QuestionServlet | /question/update | POST | Frage bearbeiten |
-| AdminServlet | /admin/panel | GET | Admin-Dashboard |
-| AdminServlet | /admin/users | GET | Benutzerliste |
-| AdminServlet | /admin/stats | GET | Statistiken |
-| ProgressionServlet | /progression/stats | GET | Benutzer-Statistiken |
+| AuthServlet | /api/auth/register | POST | Registrierung (JSON) |
+| AuthServlet | /api/auth/login | POST | Login (JSON) |
+| AuthServlet | /api/auth/logout | POST | Logout |
+| AuthServlet | /api/auth/reset-request | POST | Passwort-Reset anfordern |
+| TestServlet | /api/test/start | POST | Test starten (Fragen liefern) |
+| TestServlet | /api/test/submit | POST | Antworten auswerten + Attempt speichern |
+| TestServlet | /api/test/history | GET | Attempt-History des Users |
+| TestServlet | /api/test/categories | GET | verfügbare Kategorien |
+| TestServlet | /api/test/recommend | GET | Difficulty-Empfehlung |
+| TestServlet | /api/test/questions/all | GET | LearnMode-Karten (nur learnEnabled) |
+| AdminServlet | /api/admin/questions | GET/POST/PUT/DELETE | Fragen verwalten |
+| AdminServlet | /api/admin/users | GET/POST/PUT/DELETE | Benutzer verwalten |
+| AdminServlet | /api/admin/users/requests | GET | Passwort-Reset Requests |
+| AdminServlet | /api/admin/stats | GET | Statistiken |
+| AdminServlet | /api/admin/images | POST | Bild-Upload (multipart) |
+| AdminServlet | /api/admin/images/import | POST | Bilder aus Ordner importieren |
+| ImageServlet | /api/images/{id} | GET | Bild aus DB ausliefern |
+| HealthServlet | /health | GET | Health-Check |
 
 **Request/Response-Format:**
 - Request: Multipart Form Data oder JSON
@@ -1132,99 +1138,53 @@ Das Projekt verfolgt eine mehrstufige Test-Strategie:
 ### 7.2 Unit-Tests
 
 #### 7.2.1 AuthService Tests
-**Klasse:** `test/java/de/dhsn/wissentest/service/AuthServiceTest.java`
+**Status:** Derzeit ist im Backend-Quellcode **kein** `AuthServiceTest.java` enthalten (Stand der Abgabe).
 
-| Test-Case | Beschreibung | Erwartung |
-|---|---|---|
-| testAuthenticateValidCredentials | Valide Credentials | Login erfolgreich |
-| testAuthenticateInvalidPassword | Falsches Passwort | AuthenticationException |
-| testAuthenticateNonExistentUser | Nicht existierender Benutzer | AuthenticationException |
-| testRegisterNewUser | Registrierung neuer Benutzer | Benutzer angelegt, Role=STUDENT |
-| testRegisterDuplicateUsername | Duplikater Username | RegistrationException |
-| testHashPassword | Passwort-Hashing | Gehashtes Passwort != Klartext |
-| testVerifyPassword | Passwort-Verifikation | True bei korrektem Passwort |
-
-**Beispiel Test:**
-```java
-@Test
-public void testAuthenticateValidCredentials() {
-    // Arrange
-    String username = "student";
-    String password = "student";
-    
-    // Act
-    User user = authService.authenticate(username, password);
-    
-    // Assert
-    assertNotNull(user);
-    assertEquals("student", user.getUsername());
-    assertEquals(Role.STUDENT, user.getRole());
-}
-```
+**Empfohlene (zukünftige) Testfälle:**
+- Registrierung: User wird angelegt, Hash/Salt gesetzt
+- Login: korrektes Passwort → Erfolg; falsches Passwort → Fehler
+- Reset-Request: Flag `reset_requested` wird gesetzt
+- Validierung: leere Felder / ungültige Daten → HTTP 400 (über Servlet-Ebene)
 
 #### 7.2.2 ProgressionService Tests
 **Klasse:** `test/java/de/dhsn/wissentest/service/ProgressionServiceTest.java`
 
 | Test-Case | Beschreibung | Erwartung |
 |---|---|---|
-| testCalculateScoreAllCorrect | Alle Antworten richtig | Score = 100% |
-| testCalculateScorePartialCorrect | Teilweise richtig | Prozentuale Quote |
-| testCalculateScoreAllIncorrect | Keine richtig | Score = 0% |
-| testCalculateGradeA | Prozent ≥ 90 | Grade = '1' |
-| testCalculateGradeF | Prozent < 50 | Grade = '6' |
-| testCalculatePassedAboveThreshold | Über Bestehensgrenze | passed = true |
-| testCalculateFailedBelowThreshold | Unter Bestehensgrenze | passed = false |
+| promotionAndDemotionThresholds | Threshold-Logik | shouldPromote/shouldDemote korrekt |
+| getWindowSize | Window-Size | Rückgabewert korrekt |
 
 **Beispiel Test:**
 ```java
 @Test
-public void testCalculateScoreAllCorrect() {
-    // Arrange
-    Attempt attempt = new Attempt();
-    attempt.addAnswer(new AttemptAnswer(true));
-    attempt.addAnswer(new AttemptAnswer(true));
-    attempt.addAnswer(new AttemptAnswer(true));
-    
-    // Act
-    int percentage = progressionService.calculatePercentage(attempt);
-    
-    // Assert
-    assertEquals(100, percentage);
+void promotionAndDemotionThresholds() {
+  ProgressionService service = new ProgressionService(0.7, 0.4, 3);
+
+  assertTrue(service.shouldPromote(0.7));
+  assertTrue(service.shouldPromote(0.9));
+  assertFalse(service.shouldPromote(0.69));
+
+  assertTrue(service.shouldDemote(0.4));
+  assertTrue(service.shouldDemote(0.2));
+  assertFalse(service.shouldDemote(0.41));
+
+  assertEquals(3, service.getWindowSize());
 }
 ```
 
 #### 7.2.3 Weitere Unit-Tests
-- **TestService Tests:** Test-CRUD, Validierung
-- **PasswordUtils Tests:** Hashing, Verification
-- **DbConnectionManager Tests:** Connection Pool Management
+- **TestService Tests:** Start/Submit/History (geplant)
+- **PasswordUtils Tests:** Hashing/Verify (geplant)
+- **DbConnectionManager Tests:** Pool-Konfiguration (geplant)
+- **TestUtils:** Hilfsfunktionen für Tests sind in `test/java/de/dhsn/wissentest/util/TestUtils.java` vorhanden
 
 ### 7.3 Integration-Tests
 
-#### 7.3.1 DAO Integration
-- Test der JDBC-Queries mit Test-Datenbank
-- Verwendung von Transactions für Rollback
-- Überprüfung der Datenbank-State
+**Status:** Aktuell sind keine dedizierten Integrationstests (DB/Servlet) im Repository enthalten.
 
-**Beispiel:**
-```java
-@Test
-@Transactional
-public void testCreateAndRetrieveUser() {
-    // Arrange & Act
-    User user = new User("testuser", "password123", Role.STUDENT);
-    userDao.create(user);
-    
-    // Assert
-    User retrieved = userDao.findByUsername("testuser");
-    assertNotNull(retrieved);
-    assertEquals("testuser", retrieved.getUsername());
-}
-```
-
-#### 7.3.2 Service Integration
-- Test der Service-Methoden mit DAOs
-- Überprüfung der Business-Logik-Koordination
-- Exception-Handling
+**Option (zukünftig):**
+- DAO-Integrationstests gegen eine lokale PostgreSQL-Instanz (z. B. über ein separates Test-Schema)
+- E2E-Tests gegen Tomcat (z. B. per Playwright) für Login → Start → Submit → Result
 
 ### 7.4 End-to-End Tests (E2E)
 
@@ -1369,9 +1329,9 @@ Das PowerShell-Skript `startup/start_project.ps1` führt folgende Schritte durch
    - Testdaten laden (seeds.sql)
    ```sql
    -- Beispiel aus seeds.sql:
-   INSERT INTO users (username, password, role) VALUES
-   ('student', <hashed_password>, 'STUDENT'),
-   ('lehrer', <hashed_password>, 'ADMIN');
+  INSERT INTO users (username, email, password_hash, password_salt, role) VALUES
+  ('student', 'student@example.com', <password_hash_hex>, <password_salt_hex>, 'student'),
+  ('lehrer',  'lehrer@example.com',  <password_hash_hex>, <password_salt_hex>, 'admin');
    ```
 
 3. **Backend-Build:**
@@ -1399,7 +1359,7 @@ Das PowerShell-Skript `startup/start_project.ps1` führt folgende Schritte durch
 | Rolle | Benutzername | Passwort | Beschreibung |
 |---|---|---|---|
 | **Student** | student | student | Kann Tests durchführen |
-| **Lehrer/Admin** | lehrer | student | Kann Tests verwalten |
+| **Admin** | lehrer | student | Kann Fragen/Benutzer/Bilder verwalten |
 
 #### 8.3.3 Datenbank-Zugang
 | Parameter | Wert |
@@ -1723,28 +1683,32 @@ Die Quellcode-Anlagen werden folgendermaßen strukturiert:
 
 #### 10.2.2 Service-Klassen
 - **AuthService.java:** Authentifizierung, Session-Management
-- **TestService.java:** Test-Management-Logik
+- **TestService.java:** Test-Start/Submit/History/LearnMode, Scoring & Persistierung von Attempts
 - **ProgressionService.java:** Score- und Noten-Berechnung
 - **AdminService.java:** Admin-Panel Logik
 
 #### 10.2.3 Model-Klassen
 - **User.java:** Benutzer-Datenmodell
 - **Question.java:** Frage-Datenmodell
-- **Test.java:** Test-Datenmodell
 - **Attempt.java:** Versuch-Datenmodell
-- **Answer.java:** Antwort-Datenmodell
 - **QuestionType.java:** Enum für Fragentypen
+- **AnswerOption.java:** Antwortoptionen (MC/IMAGE/FREE)
+- **ClozeToken.java:** Lückentext-Token
+- **AttemptAnswer.java:** Antwort innerhalb eines Attempts
+- **AttemptResult.java:** Auswertungsergebnis
+- **QuestionResultDetail.java:** Detailauswertung pro Frage
+- **QuestionImage.java:** Bilddatensatz
 
 #### 10.2.4 Servlet-Klassen
 - **AuthServlet.java:** Login/Logout Handling
 - **TestServlet.java:** Test-Verwaltung Endpoints
 - **AdminServlet.java:** Admin-Panel Endpoints
-- **ProgressionServlet.java:** Statistik-Endpoints
+- **ImageServlet.java:** Bild-Auslieferung (/api/images/{id})
+- **HealthServlet.java:** Health-Check (/health)
 
 #### 10.2.5 Utility-Klassen
 - **DbConnectionManager.java:** Connection Pool Management mit HikariCP
 - **PasswordUtils.java:** Passwort-Hashing und Verifikation
-- **Logger.java:** Logging-Utility
 
 ### 10.3 JSP-Seiten
 
@@ -1771,318 +1735,340 @@ Die Quellcode-Anlagen werden folgendermaßen strukturiert:
 
 #### 10.4.1 Maven - pom.xml
 ```xml
-<project>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>de.dhsn</groupId>
-    <artifactId>wissentest</artifactId>
-    <version>1.0.0</version>
-    <packaging>war</packaging>
-    
-    <name>Wissenstest - Web-basierte Lernplattform</name>
-    <description>UML Wissenstest Platform</description>
-    
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    
-    <dependencies>
-        <!-- Jakarta Servlet API -->
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <!-- PostgreSQL JDBC Driver -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
-        </dependency>
-        
-        <!-- HikariCP Connection Pool -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
-        </dependency>
-        
-        <!-- JUnit 5 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- SLF4J Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.6</version>
-        </dependency>
-    </dependencies>
-    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <warName>wissentest</warName>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.dhsn</groupId>
+  <artifactId>wissentest</artifactId>
+  <version>1.0.0</version>
+  <packaging>war</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
+  </properties>
+
+  <dependencies>
+    <!-- Servlet API (Tomcat 8.5/9: Servlet 4.0) -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JDBC + Connection Pooling -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>5.1.0</version>
+    </dependency>
+
+    <!-- JSON -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>wissentest</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 ```
 
 #### 10.4.2 Deployment Descriptor - web.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-         version="5.0">
-    
-    <display-name>Wissenstest</display-name>
-    <description>Web-basierte Lernplattform für UML-Wissenstests</description>
-    
-    <!-- Session Configuration -->
-    <session-config>
-        <tracking-mode>COOKIE</tracking-mode>
-        <cookie-config>
-            <http-only>true</http-only>
-            <secure>false</secure>
-        </cookie-config>
-        <timeout>30</timeout>
-    </session-config>
-    
-    <!-- Servlet Mappings -->
-    <servlet>
-        <servlet-name>AuthServlet</servlet-name>
-        <servlet-class>de.dhsn.wissentest.web.AuthServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AuthServlet</servlet-name>
-        <url-pattern>/auth/*</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>TestServlet</servlet-name>
-        <servlet-class>de.dhsn.wissentest.web.TestServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TestServlet</servlet-name>
-        <url-pattern>/test/*</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>AdminServlet</servlet-name>
-        <servlet-class>de.dhsn.wissentest.web.AdminServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AdminServlet</servlet-name>
-        <url-pattern>/admin/*</url-pattern>
-    </servlet-mapping>
-    
-    <!-- Error Pages -->
-    <error-page>
-        <error-code>404</error-code>
-        <location>/jsp_native/error404.jsp</location>
-    </error-page>
-    
-    <error-page>
-        <error-code>500</error-code>
-        <location>/jsp_native/error500.jsp</location>
-    </error-page>
-    
-    <!-- Welcome Files -->
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+  <display-name>Wissenstest UML</display-name>
+
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>de.dhsn.wissentest.web.CharacterEncodingFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>de.dhsn.wissentest.web.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
+  <servlet>
+    <servlet-name>AuthServlet</servlet-name>
+    <servlet-class>de.dhsn.wissentest.web.AuthServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AuthServlet</servlet-name>
+    <url-pattern>/api/auth/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>AdminServlet</servlet-name>
+    <servlet-class>de.dhsn.wissentest.web.AdminServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AdminServlet</servlet-name>
+    <url-pattern>/api/admin/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TestServlet</servlet-name>
+    <servlet-class>de.dhsn.wissentest.web.TestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TestServlet</servlet-name>
+    <url-pattern>/api/test/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ImageServlet</servlet-name>
+    <servlet-class>de.dhsn.wissentest.web.ImageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ImageServlet</servlet-name>
+    <url-pattern>/api/images/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>HealthServlet</servlet-name>
+    <servlet-class>de.dhsn.wissentest.web.HealthServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HealthServlet</servlet-name>
+    <url-pattern>/health</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
 </web-app>
 ```
 
 #### 10.4.3 Datenbank-Konfiguration - db.properties
 ```properties
-# PostgreSQL Connection
 db.url=jdbc:postgresql://localhost:5433/wissentest
-db.driver=org.postgresql.Driver
+
 db.user=student
 db.password=student
 
-# Connection Pool Settings
-db.pool.size=10
-db.pool.max.idle.time=300
-db.pool.max.lifetime=1200
-
-# Logging
-logging.level=INFO
-sql.debug=false
+db.pool.maxSize=10
 ```
 
 ### 10.5 Datenbankschema und SQL-Scripts
 
 #### 10.5.1 schema.sql
 ```sql
--- Users Table
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL 
-        CHECK (role IN ('STUDENT', 'TEACHER', 'ADMIN')),
-    email VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_username (username)
+-- Datei: db/schema.sql
+-- Dieses SQL-Skript legt die Tabellen für Benutzer, Fragen, Antworten und Testversuche an.
+-- Es ist die Grundlage für alle JDBC-Zugriffe im Backend.
+
+DROP TABLE IF EXISTS attempt_answers CASCADE;
+DROP TABLE IF EXISTS attempts CASCADE;
+DROP TABLE IF EXISTS cloze_answers CASCADE;
+DROP TABLE IF EXISTS answers CASCADE;
+DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS question_images CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS config CASCADE;
+
+-- Users
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  email VARCHAR(255) UNIQUE,
+  password_hash VARCHAR(256) NOT NULL,
+  password_salt VARCHAR(128) NOT NULL,
+  role VARCHAR(32) NOT NULL DEFAULT 'student',
+  reset_requested BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Questions Table
-CREATE TABLE IF NOT EXISTS questions (
-    id SERIAL PRIMARY KEY,
-    text TEXT NOT NULL,
-    type VARCHAR(50) NOT NULL 
-        CHECK (type IN ('MC', 'CLOZE')),
-    difficulty VARCHAR(20) 
-        CHECK (difficulty IN ('EASY', 'MEDIUM', 'HARD')),
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-    INDEX idx_type (type),
-    INDEX idx_difficulty (difficulty)
+-- Questions
+CREATE TABLE questions (
+  id SERIAL PRIMARY KEY,
+  type VARCHAR(16) NOT NULL CHECK (type IN ('MC','CLOZE','FREE','IMAGE')),
+  prompt TEXT NOT NULL,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)), -- 1=easy,2=medium,3=hard
+  points INTEGER NOT NULL DEFAULT 1,
+  category VARCHAR(64) DEFAULT 'Allgemein',
+  image_url VARCHAR(255),
+  meta JSONB DEFAULT '{}'::jsonb,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Tests Table
-CREATE TABLE IF NOT EXISTS tests (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    created_by INT NOT NULL,
-    time_limit INT DEFAULT 0,
-    passing_score INT DEFAULT 50,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+-- Stored images (uploaded via admin UI)
+CREATE TABLE question_images (
+  id SERIAL PRIMARY KEY,
+  content_type VARCHAR(128) NOT NULL,
+  data BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Test_Questions Junction Table
-CREATE TABLE IF NOT EXISTS test_questions (
-    test_id INT NOT NULL,
-    question_id INT NOT NULL,
-    question_order INT,
-    PRIMARY KEY (test_id, question_id),
-    FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
-    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+-- Multiple choice answers
+CREATE TABLE answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT false,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 0.0 CHECK (partial_value >= 0 AND partial_value <= 1)
 );
 
--- Attempts Table
-CREATE TABLE IF NOT EXISTS attempts (
-    id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    test_id INT NOT NULL,
-    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completed_at TIMESTAMP,
-    score INT DEFAULT 0,
-    percentage DECIMAL(5,2) DEFAULT 0,
-    passed BOOLEAN DEFAULT FALSE,
-    grade VARCHAR(2),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_test_id (test_id)
+-- Cloze expected tokens (order matters)
+CREATE TABLE cloze_answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  token_index SMALLINT NOT NULL,
+  expected_text TEXT NOT NULL,
+  partial_value NUMERIC(5,4) NOT NULL DEFAULT 1.0 CHECK (partial_value >= 0 AND partial_value <= 1),
+  UNIQUE(question_id, token_index)
 );
 
--- Answer_Options Table (für MC-Fragen)
-CREATE TABLE IF NOT EXISTS answer_options (
-    id SERIAL PRIMARY KEY,
-    question_id INT NOT NULL,
-    text VARCHAR(500) NOT NULL,
-    is_correct BOOLEAN DEFAULT FALSE,
-    option_order INT,
-    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+-- Test attempts (one row per finished attempt)
+CREATE TABLE attempts (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  max_points NUMERIC(8,4) NOT NULL DEFAULT 0.0,
+  difficulty SMALLINT NOT NULL CHECK (difficulty IN (1,2,3)),
+  grade VARCHAR(10),
+  duration_seconds INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Cloze_Tokens Table (für Lückentext-Fragen)
-CREATE TABLE IF NOT EXISTS cloze_tokens (
-    id SERIAL PRIMARY KEY,
-    question_id INT NOT NULL,
-    token_text VARCHAR(255) NOT NULL,
-    original_text VARCHAR(255),
-    position INT,
-    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+-- Per-question results for each attempt
+CREATE TABLE attempt_answers (
+  id SERIAL PRIMARY KEY,
+  attempt_id INTEGER NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
+  question_id INTEGER REFERENCES questions(id) ON DELETE SET NULL,
+  given_answer TEXT,
+  points_awarded NUMERIC(8,4) NOT NULL DEFAULT 0.0
 );
 
--- Attempt_Answers Table
-CREATE TABLE IF NOT EXISTS attempt_answers (
-    id SERIAL PRIMARY KEY,
-    attempt_id INT NOT NULL,
-    question_id INT NOT NULL,
-    answer_text TEXT,
-    is_correct BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (attempt_id) REFERENCES attempts(id) ON DELETE CASCADE,
-    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+-- Configuration
+CREATE TABLE config (
+  key VARCHAR(128) PRIMARY KEY,
+  value VARCHAR(255) NOT NULL,
+  description TEXT
 );
+
+-- Useful indexes
+CREATE INDEX idx_questions_difficulty ON questions(difficulty);
+CREATE INDEX idx_attempts_user ON attempts(user_id);
+
+-- Example config placeholders
+INSERT INTO config (key, value, description) VALUES
+('progress.promote_threshold', '0.70', 'Promote to next difficulty if last test score >= 70% (placeholder)'),
+('progress.demote_threshold',  '0.40', 'Demote if average of last N attempts <= 40% (placeholder)'),
+('progress.window_size',      '3',    'Number of recent attempts used to calculate demotion (placeholder)');
 ```
 
 #### 10.5.2 seeds.sql (Beispieldaten)
 ```sql
--- Testbenutzer
-INSERT INTO users (username, password, role, email) VALUES
-('student', 'hashed_password_student', 'STUDENT', 'student@example.com'),
-('lehrer', 'hashed_password_lehrer', 'ADMIN', 'lehrer@example.com'),
-('admin', 'hashed_password_admin', 'ADMIN', 'admin@example.com');
+-- Datei: db/seeds.sql
+-- Hinweis: Das echte Projekt-Seed enthält einen großen Fragenpool. Hier nur ein kurzer Auszug,
+-- der zur Struktur aus `db/schema.sql` passt.
 
--- Beispiel MC-Frage
-INSERT INTO questions (text, type, difficulty, created_by) VALUES
-('Was ist UML?', 'MC', 'EASY', 2);
+-- Student user (student / student)
+INSERT INTO users (username, email, password_hash, password_salt, role)
+VALUES (
+  'student',
+  'student@example.com',
+  '97ef5ea559b44566e403ee1c0b4b9352b32cda56a6117eb9205999e2a8802896',
+  '00000000000000000000000000000000',
+  'student'
+)
+ON CONFLICT (username) DO NOTHING;
 
--- Antwortoptionen
-INSERT INTO answer_options (question_id, text, is_correct, option_order) VALUES
-(1, 'Unified Modeling Language', TRUE, 1),
-(1, 'Universal Markup Language', FALSE, 2),
-(1, 'United Modelling Logic', FALSE, 3);
+-- Admin user (lehrer / student)
+INSERT INTO users (username, email, password_hash, password_salt, role)
+VALUES (
+  'lehrer',
+  'lehrer@example.com',
+  '97ef5ea559b44566e403ee1c0b4b9352b32cda56a6117eb9205999e2a8802896',
+  '00000000000000000000000000000000',
+  'admin'
+)
+ON CONFLICT (username) DO NOTHING;
 
--- Beispiel Lückentext-Frage
-INSERT INTO questions (text, type, difficulty, created_by) VALUES
-('UML steht für [___] Modeling Language', 'CLOZE', 'EASY', 2);
-
--- Cloze Tokens
-INSERT INTO cloze_tokens (question_id, token_text, original_text, position) VALUES
-(2, 'Unified', 'Unified', 1);
-
--- Test
-INSERT INTO tests (title, description, created_by, time_limit, passing_score) VALUES
-('UML Grundlagen Test', 'Überprüfung von UML-Grundkenntnissen', 2, 1800, 60);
-
--- Test-Fragen Zuordnung
-INSERT INTO test_questions (test_id, question_id, question_order) VALUES
-(1, 1, 1),
-(1, 2, 2);
+-- Beispiel MC-Frage + Antworten
+WITH q AS (
+  INSERT INTO questions (type, prompt, difficulty, points, meta, category)
+  SELECT 'MC', 'Was ist UML?', 1, 2, '{"topic":"uml"}', 'Multiple Choice'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM questions
+    WHERE type = 'MC' AND prompt = 'Was ist UML?' AND difficulty = 1 AND category = 'Multiple Choice'
+  )
+  RETURNING id
+),
+q_id AS (
+  SELECT id FROM q
+  UNION ALL
+  SELECT id FROM questions
+  WHERE type = 'MC' AND prompt = 'Was ist UML?' AND difficulty = 1 AND category = 'Multiple Choice'
+  ORDER BY id DESC
+  LIMIT 1
+)
+INSERT INTO answers (question_id, answer_text, is_correct, partial_value)
+SELECT q_id.id, a.answer_text, a.is_correct, a.partial_value
+FROM q_id,
+  (VALUES
+    ('Unified Modeling Language', true, 1.0),
+    ('Universal Markup Language', false, 0.0),
+    ('United Modelling Logic', false, 0.0)
+  ) AS a(answer_text, is_correct, partial_value)
+WHERE NOT EXISTS (
+  SELECT 1 FROM answers a2
+  WHERE a2.question_id = q_id.id AND a2.answer_text = a.answer_text
+);
 ```
 
 ---

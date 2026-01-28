@@ -2,9 +2,8 @@
 
 title Deployment-Diagramm - Projekt Wissenstest
 
-!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
-!include AWSPUML/General/GeneralSymbols.puml
-!include AWSPUML/Database/Database.puml
+' NOTE: External icon libraries removed to ensure offline rendering.
+' (Previous AWS icon includes caused HTTP 404 during generation.)
 
 package "Client Schicht" {
     node "Browser (Student/Admin)" as CLIENT {
@@ -30,7 +29,8 @@ package "Backend Anwendung (in Tomcat)" {
         artifact "LoginServlet" as LOGIN_SERVLET
         artifact "TestServlet" as TEST_SERVLET
         artifact "AdminServlet" as ADMIN_SERVLET
-        artifact "LearnModeServlet" as LEARN_SERVLET
+        artifact "ImageServlet" as IMAGE_SERVLET
+        artifact "HealthServlet" as HEALTH_SERVLET
     }
     
     component "Service Layer" as SERVICE {
@@ -115,7 +115,7 @@ note right of TOMCAT
   
   - Port: 8080 (HTTP)
   - Port: 8443 (HTTPS)
-  - Context Root: /wiskentest
+    - Context Root: /wissentest
   - WAR-Datei: wissentest.war
   - JVM: Java 17
   - Memory: -Xmx512m -Xms256m
@@ -148,22 +148,25 @@ end note
 
 note right of WEB
   **Servlet-basierte API:**
-  
-  POST /login
-  - Credentials validieren
-  - Session erstellen
-  
-  POST /test/start
-  - Test initialisieren
-  - Fragen laden
-  
-  POST /answer/submit
-  - Antwort speichern
-  - Punkte berechnen
-  
-  GET /admin/panel
-  - Admin-Dashboard
-  - Fragen verwalten
+
+    POST /api/auth/login
+    - Credentials validieren
+    - Session erstellen
+
+    POST /api/test/start
+    - Test initialisieren
+    - Fragen laden
+
+    POST /api/test/submit
+    - Antworten auswerten
+    - Attempt speichern
+    - Punkte/Empfehlung berechnen
+
+    GET /api/test/questions/all
+    - LearnMode: Karten laden (read-only)
+
+    GET /api/admin/stats
+    - Admin-Statistiken
 end note
 
 note right of CLIENT

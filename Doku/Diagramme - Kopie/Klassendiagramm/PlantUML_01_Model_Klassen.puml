@@ -1,0 +1,157 @@
+@startuml Wissenstest_01_Model_Klassen
+!theme plain
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #0066CC
+skinparam classArrowColor #0066CC
+skinparam fontSize 11
+skinparam linetype ortho
+
+title Wissenstest - Klassendiagramm Teil 1: Model-Klassen
+
+' ==================== ENUM ====================
+enum QuestionType {
+  MC
+  CLOZE
+  FREE
+  IMAGE
+}
+
+' ==================== MODEL CLASSES ====================
+class User {
+  -id: int
+  -username: String
+  -email: String
+  -passwordHash: String
+  -passwordSalt: String
+  -role: String
+  -resetRequested: boolean
+  --
+  +getId(): int
+  +setId(int): void
+  +getUsername(): String
+  +setUsername(String): void
+  +getEmail(): String
+  +setEmail(String): void
+  +getPasswordHash(): String
+  +setPasswordHash(String): void
+  +getPasswordSalt(): String
+  +setPasswordSalt(String): void
+  +getRole(): String
+  +setRole(String): void
+  +isResetRequested(): boolean
+  +setResetRequested(boolean): void
+}
+
+class Question {
+  -id: int
+  -type: QuestionType
+  -prompt: String
+  -difficulty: int
+  -points: int
+  -metaJson: String
+  -imageUrl: String
+  -category: String
+  --
+  +getId(): int
+  +setId(int): void
+  +getType(): QuestionType
+  +setType(QuestionType): void
+  +getPrompt(): String
+  +setPrompt(String): void
+  +getDifficulty(): int
+  +setDifficulty(int): void
+  +getPoints(): int
+  +setPoints(int): void
+  +getMetaJson(): String
+  +setMetaJson(String): void
+  +getImageUrl(): String
+  +setImageUrl(String): void
+  +getCategory(): String
+  +setCategory(String): void
+}
+
+class AnswerOption {
+  -id: int
+  -questionId: int
+  -answerText: String
+  -correct: boolean
+  -partialValue: double
+  --
+  +getId(): int
+  +getQuestionId(): int
+  +getAnswerText(): String
+  +isCorrect(): boolean
+  +getPartialValue(): double
+}
+
+class ClozeToken {
+  -id: int
+  -questionId: int
+  -tokenIndex: int
+  -expectedText: String
+  -partialValue: double
+  --
+  +getId(): int
+  +getQuestionId(): int
+  +getTokenIndex(): int
+  +getExpectedText(): String
+  +getPartialValue(): double
+}
+
+class Attempt {
+  -id: int
+  -userId: int
+  -totalPoints: double
+  -maxPoints: double
+  -difficulty: int
+  -createdAt: OffsetDateTime
+  -grade: String
+  -durationSeconds: int
+  --
+  +getId(): int
+  +getUserId(): int
+  +getTotalPoints(): double
+  +getMaxPoints(): double
+  +getDifficulty(): int
+  +getCreatedAt(): OffsetDateTime
+  +getGrade(): String
+  +getDurationSeconds(): int
+}
+
+class AttemptAnswer {
+  -id: int
+  -attemptId: int
+  -questionId: int
+  -givenAnswer: String
+  -pointsAwarded: double
+  --
+  +getId(): int
+  +getAttemptId(): int
+  +getQuestionId(): int
+  +getGivenAnswer(): String
+  +getPointsAwarded(): double
+}
+
+' ==================== RELATIONSHIPS ====================
+Question --> QuestionType : type
+Question "1" --o "*" AnswerOption : hat (MC/IMAGE)
+Question "1" --o "*" ClozeToken : hat (CLOZE)
+User "1" --o "*" Attempt : macht
+Attempt "1" --o "*" AttemptAnswer : enthält
+
+note right of User
+  **Hinweis:**
+  - role ist String: "student" | "admin"
+  - Kein Role-Enum vorhanden
+  - SHA-256 mit 10.000 Iterationen
+end note
+
+note right of Question
+  **Hinweis:**
+  - difficulty: 1=Leicht, 2=Mittel, 3=Schwer
+  - metaJson: clozeAlternatives etc.
+  - **KEINE Test-Entity!**
+    Tests werden dynamisch generiert
+end note
+
+@enduml
