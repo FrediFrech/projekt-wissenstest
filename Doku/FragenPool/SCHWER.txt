@@ -1,0 +1,316 @@
+SCHWER
+
+-------------------------------------------------------------------------------------------------
+
+MULTIPLE CHOICE:
+
+
+
+S-MC-1✅
+
+„Welches Entwurfsmuster gehört NICHT zu den GoF-Mustern?“
+(Diese Frage ist bereits enthalten) (6. Frage in der Liste)
+
+
+
+S-MC-2✅
+
+Welche UML-Diagrammkombination eignet sich am besten, um sowohl funktionale Anforderungen als auch den technischen Ablauf eines Systems zu beschreiben?
+
+A) Klassendiagramm und Deployment-Diagramm
+B) Use-Case-Diagramm und Sequenzdiagramm
+C) Aktivitätsdiagramm und Zustandsdiagramm
+D) Klassendiagramm und ER-Diagramm
+
+✅ Richtige Antwort: B
+
+
+
+S-MC-3✅
+
+Warum ist ein Klassendiagramm allein nicht ausreichend, um das Laufzeitverhalten eines Systems zu beschreiben?
+
+A) Es enthält keine Methoden
+B) Es zeigt keine zeitlichen Abläufe oder Objektinteraktionen
+C) Es kann keine Beziehungen darstellen
+D) Es ist nur für Datenbanken gedacht
+
+✅ Richtige Antwort: B
+
+
+
+S-MC-4✅
+
+Welche Aussage zur Komposition im Vergleich zur Aggregation ist korrekt?
+
+A) Bei beiden Beziehungen können Teile unabhängig existieren
+B) Komposition ist eine schwächere Form der Aggregation
+C) Bei einer Komposition sind die Teile vom Lebenszyklus des Ganzen abhängig
+D) Aggregation und Komposition sind in UML identisch
+
+✅ Richtige Antwort: C
+
+
+
+S-MC-5✅
+
+Welches UML-Diagramm eignet sich am besten, um Fehlerzustände und Übergänge eines Systems zu analysieren?
+
+A) Aktivitätsdiagramm
+B) Klassendiagramm
+C) Zustandsdiagramm
+D) Deployment-Diagramm
+
+✅ Richtige Antwort: C
+
+
+
+S-MC-6✅
+
+Welche Konsequenz hat es, wenn ein Use Case fälschlicherweise interne Systemlogik beschreibt?
+
+A) Das Diagramm wird automatisch ungültig
+B) Die funktionalen Anforderungen werden aus Benutzersicht unklar
+C) Das Diagramm kann nicht mehr implementiert werden
+D) Die Performance des Systems sinkt
+
+✅ Richtige Antwort: B
+
+
+
+S-MC-7✅
+
+Welche Aussage beschreibt den Unterschied zwischen einem Aktivitätsdiagramm und einem Sequenzdiagramm am treffendsten?
+
+A) Aktivitätsdiagramme sind detaillierter als Sequenzdiagramme
+B) Sequenzdiagramme zeigen Klassen, Aktivitätsdiagramme Prozesse
+C) Aktivitätsdiagramme modellieren Kontrollflüsse, Sequenzdiagramme Objektinteraktionen
+D) Beide Diagrammarten sind funktional identisch
+
+✅ Richtige Antwort: C
+
+
+
+S-MC-8✅
+
+Welche Information lässt sich nicht direkt aus einem Deployment-Diagramm ableiten?
+
+A) Auf welchem Knoten eine Anwendung ausgeführt wird
+B) Welche Hardware-Komponenten beteiligt sind
+C) Welche Methoden innerhalb einer Klasse aufgerufen werden
+D) Wie Softwareartefakte verteilt sind
+
+✅ Richtige Antwort: C
+
+-------------------------------------------------------------------------------------------------
+
+LÜCKENTEXT:
+
+
+
+S-LT-1✅
+
+Ein Sequenzdiagramm stellt die ___ zwischen mehreren Objekten dar. Die vertikale Achse repräsentiert ___, während die horizontale Achse die ___ darstellt. Die ___ werden durch Pfeile dargestellt.
+(Diese Frage ist bereits enthalten) (9. Frage in der Liste)
+
+
+
+S-LT-2✅
+
+Ein Use-Case-Diagramm beschreibt bewusst nicht die ___ Implementierung eines Systems.
+
+✅ Lösung: technische
+
+
+
+S-LT-3✅
+
+Ein Sequenzdiagramm stellt die ___ zwischen Objekten dar, wobei die zeitliche Reihenfolge entlang der ___ Achse verläuft und durch ___ visualisiert wird.
+
+✅ Lösungen: Interaktionen / vertikalen / Nachrichten
+
+
+
+S-LT-4✅
+
+Bei einer Komposition sind die ___ Objekte fest an den ___ des übergeordneten Objekts gebunden.
+
+✅ Lösungen: untergeordneten / Lebenszyklus
+
+
+
+S-LT-5✅
+
+Ein Aktivitätsdiagramm besteht unter anderem aus Aktionen, Kontrollflüssen, ___-Knoten zur Parallelisierung sowie ___-Knoten zur Zusammenführung der Abläufe und einem ___- sowie ___-Knoten.
+
+✅ Lösungen: Fork / Join / Start / End
+
+
+
+S-LT-6✅
+
+Die Multiplizität „0..1“ in einem Klassendiagramm beschreibt eine ___ Beziehung.
+
+✅ Lösung: optionale
+
+
+
+S-LT-7✅
+
+Ein Deployment-Diagramm modelliert die Zuordnung von ___ zu ___, welche auf physischen oder ___ Knoten ausgeführt werden.
+
+✅ Lösungen: Softwareartefakten / Hardware / virtuellen
+
+
+
+S-LT-8✅
+
+Ein Zustandsdiagramm fokussiert sich auf Zustände und ___, während ein Aktivitätsdiagramm primär ___ modelliert.
+
+✅ Lösungen: Übergänge / Abläufe
+
+------------------------------------------------------------------------------------------------
+
+BILD MIT FRAGE:
+
+
+
+S-B-1✅
+
+Welche konzeptionelle Aussage lässt sich aus dem dargestellten Diagramm korrekt ableiten?
+
+📝 Bild-Notiz:
+Ein Klassendiagramm mit drei Klassen.
+Eine Oberklasse, zwei Unterklassen (offenes Dreieck).
+Die Oberklasse besitzt eine Methode, die Unterklassen überschreiben diese nicht.
+
+A) Die Unterklassen erben Attribute und Methoden der Oberklasse
+B) Die Unterklassen sind unabhängig von der Oberklasse
+C) Die Klassen sind über eine Aggregation verbunden
+D) Die Klassen interagieren zeitlich miteinander
+
+✅ Richtige Antwort: A
+
+
+
+S-B-2✅
+
+Welche Eigenschaft der dargestellten Beziehung ist korrekt?
+
+📝 Bild-Notiz:
+Klassendiagramm mit zwei Klassen.
+Gefüllte Raute an der Seite der übergeordneten Klasse.
+Untergeordnete Klasse hat keine eigenständige Existenz außerhalb der Beziehung.
+
+A) Die Beziehung ist eine Assoziation
+B) Die Beziehung ist eine Aggregation
+C) Die Beziehung ist eine Komposition
+D) Die Beziehung ist eine Abhängigkeit
+
+✅ Richtige Antwort: C
+
+
+
+S-B-3✅
+
+Welche Information wird durch das dargestellte Diagramm explizit modelliert?
+
+📝 Bild-Notiz:
+Sequenzdiagramm mit vier Objekten.
+Synchroner Methodenaufruf, Aktivierungsbalken, Rückgabepfeil.
+Keine Klassenattribute sichtbar.
+
+A) Die interne Datenstruktur der Klassen
+B) Die zeitliche Reihenfolge der Objektinteraktionen
+C) Die physische Verteilung der Software
+D) Die funktionalen Anforderungen des Systems
+
+✅ Richtige Antwort: B
+
+
+
+S-B-4✅
+
+Welche Schlussfolgerung lässt sich aus dem dargestellten Aktivitätsdiagramm ziehen?
+
+📝 Bild-Notiz:
+Aktivitätsdiagramm mit Startknoten, mehreren Aktionen,
+Fork-Knoten → zwei parallele Abläufe → Join-Knoten → Endknoten.
+
+A) Die Aktivitäten werden strikt sequenziell ausgeführt
+B) Der Prozess enthält parallele Ausführungspfade
+C) Das Diagramm beschreibt Zustandswechsel
+D) Das Diagramm stellt Objektinteraktionen dar
+
+✅ Richtige Antwort: B
+
+
+
+S-B-5✅
+
+Welche Aussage beschreibt den Zweck des dargestellten Diagramms am treffendsten?
+
+📝 Bild-Notiz:
+Use-Case-Diagramm mit zwei Akteuren.
+Ein Use Case inkludiert (<<include>>) einen weiteren Use Case.
+Keine internen Systemdetails sichtbar.
+
+A) Darstellung der technischen Systemarchitektur
+B) Modellierung funktionaler Anforderungen aus Benutzersicht
+C) Beschreibung der zeitlichen Ausführung von Methoden
+D) Abbildung der Klassenhierarchie
+
+✅ Richtige Antwort: B
+
+
+
+S-B-6✅
+
+Welche Information kann aus dem dargestellten Diagramm nicht direkt abgeleitet werden?
+
+📝 Bild-Notiz:
+Deployment-Diagramm mit Client, Application Server und Datenbank.
+Artefakte sind klar Nodes zugeordnet.
+
+A) Auf welchem Knoten ein Artefakt ausgeführt wird
+B) Welche Hardware-Komponenten beteiligt sind
+C) Welche Methoden innerhalb einer Klasse existieren
+D) Wie die Software physisch verteilt ist
+
+✅ Richtige Antwort: C
+
+
+
+S-B-7✅
+
+Welche UML-Diagrammart ist für die dargestellte Modellierung am besten geeignet?
+
+📝 Bild-Notiz:
+Diagramm mit Zuständen, Übergängen, Ereignisbezeichnungen
+und einem initialen Startzustand.
+
+A) Aktivitätsdiagramm
+B) Sequenzdiagramm
+C) Zustandsdiagramm
+D) Use-Case-Diagramm
+
+✅ Richtige Antwort: C
+
+
+
+S-B-8✅
+
+Welche Modellierungsentscheidung wird im dargestellten Diagramm getroffen?
+
+📝 Bild-Notiz:
+Klassendiagramm mit Multiplizitäten (z. B. 1, 0..*).
+Normale Assoziationslinie, keine Raute, keine Vererbung.
+
+A) Die Lebenszyklen der Objekte sind voneinander abhängig
+B) Die Beziehung ist eine lose strukturelle Verbindung
+C) Die Klassen stehen in einer Vererbungsbeziehung
+D) Die Objekte existieren nur innerhalb des Ganzen
+
+✅ Richtige Antwort: B
+
+------------------------------------------------------------------------------------------------

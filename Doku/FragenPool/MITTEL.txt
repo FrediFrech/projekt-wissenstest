@@ -1,0 +1,283 @@
+MITTEL:
+
+-------------------------------------------------------------------------------------------------
+
+MULTIPLE CHOICE:
+
+
+
+M-MC-1
+
+„Welche Aussage trifft auf ein Use-Case-Diagramm zu?“
+(Diese Frage ist bereits enthalten) (3. Frage in der Liste)
+
+
+
+M-MC-2
+
+„Was beschreibt ein Sequenzdiagramm am genauesten?“
+(Diese Frage ist bereits enthalten) (5. Frage in der Liste)
+
+
+
+M-MC-3
+
+Welche Information wird typischerweise nicht in einem Klassendiagramm dargestellt?
+
+A) Attribute einer Klasse
+B) Methoden einer Klasse
+C) Zustandsübergänge eines Objekts
+D) Beziehungen zwischen Klassen
+
+✅ Richtige Antwort: C
+
+
+
+M-MC-4
+
+Worin liegt der Hauptunterschied zwischen einem Sequenzdiagramm und einem Aktivitätsdiagramm?
+
+A) Sequenzdiagramme zeigen Klassen, Aktivitätsdiagramme nicht
+B) Sequenzdiagramme stellen zeitliche Interaktionen dar, Aktivitätsdiagramme den Ablauf von Aktionen
+C) Aktivitätsdiagramme werden nur für Datenbanken verwendet
+D) Sequenzdiagramme ersetzen Use-Case-Diagramme
+
+✅ Richtige Antwort: B
+
+
+
+M-MC-5
+
+Welche Beziehung im Klassendiagramm beschreibt, dass ein Objekt zwar zu einem anderen gehört, aber auch unabhängig existieren kann?
+
+A) Vererbung
+B) Komposition
+C) Aggregation
+D) Abhängigkeit
+
+✅ Richtige Antwort: C
+
+
+
+M-MC-6
+
+Welche Aussage zu Use-Case-Diagrammen ist korrekt?
+
+A) Sie beschreiben die interne Programmlogik
+B) Sie modellieren den zeitlichen Ablauf von Methoden
+C) Sie zeigen funktionale Anforderungen aus Benutzersicht
+D) Sie stellen Datenbankstrukturen dar
+
+✅ Richtige Antwort: C
+
+
+
+M-MC-7
+
+Welches UML-Diagramm eignet sich am besten, um parallele Abläufe darzustellen?
+
+A) Klassendiagramm
+B) Aktivitätsdiagramm
+C) Deployment-Diagramm
+D) Use-Case-Diagramm
+
+✅ Richtige Antwort: B
+
+
+
+M-MC-8
+
+Was beschreibt ein Deployment-Diagramm auf konzeptioneller Ebene?
+
+A) Die Abfolge von Benutzerinteraktionen
+B) Die Struktur von Klassen und Paketen
+C) Die Verteilung von Softwareartefakten auf Hardwareknoten
+D) Den Lebenszyklus einzelner Objekte
+
+✅ Richtige Antwort: C
+
+-------------------------------------------------------------------------------------------------
+
+LÜCKENTEXT:
+
+
+
+M-LT-1
+
+In einem Sequenzdiagramm repräsentiert die gestrichelte Linie unter einem Objekt die sogenannte ___.
+
+✅ Lösung: Lifeline
+
+
+
+M-LT-2
+
+Ein Use-Case-Diagramm beschreibt die ___ Anforderungen eines Systems aus der Sicht der ___.
+
+✅ Lösungen: funktionalen / Akteure
+
+
+
+M-LT-3
+
+In einem Klassendiagramm wird die Vererbung durch eine Linie mit einem ___ ___ dargestellt.
+
+✅ Lösungen: offenen Dreieck
+
+
+
+M-LT-4
+
+Ein Sequenzdiagramm stellt die Interaktionen zwischen Objekten entlang einer ___ ___ dar.
+
+✅ Lösungen: zeitlichen Achse
+
+
+
+M-LT-5
+
+Ein Aktivitätsdiagramm kann mithilfe von ___ die Aufteilung in parallele Abläufe darstellen.
+
+✅ Lösung: Forks
+
+
+
+M-LT-6
+
+Ein Deployment-Diagramm zeigt die Zuordnung von ___ zu ___.
+
+✅ Lösungen: Softwareartefakten / Hardwareknoten
+
+
+
+M-LT-7
+
+Eine Aggregation beschreibt eine ___-___-Beziehung zwischen Klassen.
+
+✅ Lösungen: Ganzes Teil
+
+
+
+M-LT-8
+
+Zustandsdiagramme bestehen aus Zuständen und ___, die den Wechsel zwischen diesen beschreiben.
+
+✅ Lösung: Übergängen
+
+-------------------------------------------------------------------------------------------------
+
+BILD MIT FRAGE:
+
+
+
+M-B-1
+
+Welche Beziehung zwischen den Klassen ist in der Abbildung dargestellt?
+📝 Bild-Notiz:
+Ein Klassendiagramm mit zwei Klassen, verbunden durch eine Linie mit gefüllter Raute an einer Seite (Komposition). Klassen besitzen jeweils Attribute.
+A) Assoziation
+B) Aggregation
+C) Komposition
+D) Abhängigkeit
+
+✅ Richtige Antwort: C
+
+
+
+M-B-2
+
+Welche UML-Diagrammart eignet sich am besten zur Darstellung des gezeigten Szenarios?
+📝 Bild-Notiz:
+Ein Diagramm mit mehreren Aktionen, Entscheidungsknoten (Raute), mindestens einem Fork/Join zur Parallelisierung und Start-/Endknoten.
+A) Klassendiagramm
+B) Use-Case-Diagramm
+C) Aktivitätsdiagramm
+D) Deployment-Diagramm
+
+✅ Richtige Antwort: C
+
+
+
+M-B-3
+
+Welche Rolle übernimmt das in der Abbildung dargestellte Element im Diagramm?
+📝 Bild-Notiz:
+Ein Use-Case-Diagramm, in dem ein Use Case mit <<include>> oder <<extend>> zu einem anderen verbunden ist.
+A) Generalisierung
+B) Include- oder Extend-Beziehung
+C) Assoziation
+D) Abhängigkeit
+
+✅ Richtige Antwort: B
+
+
+
+M-B-4
+
+Welche Aussage beschreibt den Ablauf im dargestellten Diagramm korrekt?
+📝 Bild-Notiz:
+Ein Sequenzdiagramm mit drei Objekten, bei dem Nachrichten zeitlich von oben nach unten verlaufen, inkl. Rückgabepfeil.
+A) Die Struktur von Klassen
+B) Die Verteilung von Softwarekomponenten
+C) Die zeitliche Abfolge von Nachrichten zwischen Objekten
+D) Den Lebenszyklus eines Objekts
+
+✅ Richtige Antwort: C
+
+
+
+M-B-5
+
+Welche UML-Diagrammart wird verwendet, um den dargestellten Zustandwechsel zu modellieren?
+📝 Bild-Notiz:
+Ein Zustandsdiagramm mit mindestens drei Zuständen, beschrifteten Übergängen und einem Startzustand.
+A) Aktivitätsdiagramm
+B) Zustandsdiagramm
+C) Sequenzdiagramm
+D) Use-Case-Diagramm
+
+✅ Richtige Antwort: B
+
+
+
+M-B-6
+
+Welche Art von Beziehung besteht zwischen den dargestellten Klassen?
+📝 Bild-Notiz:
+Klassendiagramm mit zwei Klassen, verbunden durch eine normale Linie ohne Raute oder Pfeil, evtl. mit Multiplizitäten (z. B. 1..*).
+A) Vererbung
+B) Komposition
+C) Aggregation
+D) Assoziation
+
+✅ Richtige Antwort: D
+
+
+
+M-B-7
+
+Welche Komponente ist in der Abbildung für die Ausführung der dargestellten Software verantwortlich?
+📝 Bild-Notiz:
+Ein Deployment-Diagramm mit mehreren Nodes (z. B. Client, Application Server), auf denen Artefakte deployt sind (z. B. Web-App).
+A) Client
+B) Datenbank
+C) Server-Knoten
+D) Benutzer
+
+✅ Richtige Antwort: C
+
+
+
+M-B-8
+
+Welche Information lässt sich aus der Abbildung direkt ablesen?
+📝 Bild-Notiz:
+Ein Klassendiagramm mit Vererbung (offenes Dreieck), bei dem eine Oberklasse mehrere Unterklassen besitzt, jeweils mit eigenen Attributen.
+A) Assoziation
+B) Vererbung
+C) Aggregation
+D) Abhängigkeit
+
+✅ Richtige Antwort: B
+
+-------------------------------------------------------------------------------------------------
