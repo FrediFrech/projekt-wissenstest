@@ -83,8 +83,8 @@ public class JdbcAttemptDao implements AttemptDao {
                     a.setDifficulty(rs.getInt("difficulty"));
                     a.setGrade(rs.getString("grade"));
                     a.setDurationSeconds(rs.getInt("duration_seconds"));
-                    // created_at is default now() in DB, but we want to read it back
-                    // Assuming created_at is TIMESTAMP WITH TIME ZONE
+                    // created_at aus DB lesen
+                    // Typ: TIMESTAMP WITH TIME ZONE
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     if (ts != null) {
                         a.setCreatedAt(ts.toInstant().atOffset(java.time.ZoneOffset.UTC)); 

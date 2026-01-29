@@ -87,8 +87,8 @@ public class TestServlet extends HttpServlet {
                 ServletUtils.writeJson(resp, cards);
                 return;
             }
-             if (path.equals("/admin/stats")) {
-                // Return simple stats map
+                 if (path.equals("/admin/stats")) {
+                     // Einfache Statistik
                 Map<String, Integer> stats = testService.getAdminStats();
                 ServletUtils.writeJson(resp, stats);
                 return;
@@ -194,7 +194,7 @@ public class TestServlet extends HttpServlet {
             try {
                 result.put(Integer.parseInt(entry.getKey()), entry.getValue());
             } catch (NumberFormatException ex) {
-                // ignore invalid keys
+                // ungültige Keys ignorieren
             }
         }
         return result;
@@ -310,8 +310,8 @@ public class TestServlet extends HttpServlet {
                  return byPartial;
              }
              return opts.stream().map(o -> o.getAnswerText()).findFirst().orElse("Keine Antwort");
-        } else {
-             // Cloze
+           } else {
+               // Lückentext
              List<ClozeToken> tokens = clozeTokenDao.findByQuestion(q.getId());
              if (tokens == null || tokens.isEmpty()) {
                  return "Keine Musterlösung hinterlegt";
@@ -326,9 +326,9 @@ public class TestServlet extends HttpServlet {
     }
 
     /**
-     * LearnMode should only show questions that are explicitly enabled.
-     * Stored in questions.meta JSON as {"learnEnabled": true/false}.
-     * Default: enabled (so legacy data still shows up).
+     * LearnMode zeigt nur aktivierte Fragen.
+     * metaJson: {"learnEnabled": true/false}
+     * Standard: true.
      */
     private boolean isLearnEnabled(Question q) {
         if (q == null) {

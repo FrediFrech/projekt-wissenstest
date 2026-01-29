@@ -16,7 +16,7 @@ import java.io.IOException;
 public class CharacterEncodingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) {
-        // no-op
+        // leer
     }
 
     @Override
@@ -28,6 +28,6 @@ public class CharacterEncodingFilter implements Filter {
 
     @Override
     public void destroy() {
-        // no-op
+        // leer
     }
 }

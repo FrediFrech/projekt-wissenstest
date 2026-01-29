@@ -142,11 +142,11 @@ public class AdminServlet extends HttpServlet {
             return;
         }
         if (path.equals("/users")) {
-            // Handle both role toggle (via query params) AND full editing (via JSON body)
+            // Rollenwechsel per Query oder Voll-Update per JSON
             String idStr = req.getParameter("id");
             String roleParam = req.getParameter("role");
             if (idStr != null && roleParam != null) {
-                // Quick role toggle
+                // Rollenwechsel
                 User u = userDao.findById(Integer.parseInt(idStr))
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 u.setRole(roleParam);
@@ -155,7 +155,7 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
             
-            // Full update via Body
+            // Voll-Update per Body
             String body = ServletUtils.readBody(req);
             if (body != null && !body.isEmpty()) {
                 UserPayload p = JsonUtil.gson().fromJson(body, UserPayload.class);
@@ -163,7 +163,7 @@ public class AdminServlet extends HttpServlet {
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 
                 if (p.username != null && !p.username.isEmpty()) u.setUsername(p.username);
-                if (p.email != null) u.setEmail(p.email); // allow empty?
+                if (p.email != null) u.setEmail(p.email); // leer erlaubt
                 if (p.role != null && !p.role.isEmpty()) u.setRole(p.role);
                 if (p.password != null && !p.password.isEmpty()) {
                     String salt = PasswordUtils.generateSaltHex();
@@ -294,14 +294,14 @@ public class AdminServlet extends HttpServlet {
         try (Stream<Path> stream = Files.list(dir)) {
             files = stream
                     .filter(Files::isRegularFile)
-                    .filter(this::isImageFile)
+                    .filter(ImageUploadUtils::isImageFile)
                     .sorted(Comparator.comparing(p -> p.getFileName().toString().toLowerCase(Locale.ROOT)))
                     .collect(Collectors.toList());
         }
 
         List<ImportImageResponse> imported = new ArrayList<>();
         for (Path file : files) {
-            String contentType = guessContentType(file);
+            String contentType = ImageUploadUtils.guessContentType(file);
             if (contentType == null) {
                 continue;
             }
@@ -312,28 +312,6 @@ public class AdminServlet extends HttpServlet {
         }
 
         ServletUtils.writeJson(resp, new ImportResponse(imported));
-    }
-
-    private boolean isImageFile(Path file) {
-        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
-        return name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg")
-                || name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp")
-                || name.endsWith(".svg");
-    }
-
-    private String guessContentType(Path file) throws IOException {
-        String contentType = Files.probeContentType(file);
-        if (contentType != null && contentType.startsWith("image/")) {
-            return contentType;
-        }
-        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
-        if (name.endsWith(".png")) return "image/png";
-        if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
-        if (name.endsWith(".gif")) return "image/gif";
-        if (name.endsWith(".webp")) return "image/webp";
-        if (name.endsWith(".bmp")) return "image/bmp";
-        if (name.endsWith(".svg")) return "image/svg+xml";
-        return null;
     }
 
     private static class QuestionView {

@@ -29,7 +29,7 @@ public class AdminService {
     }
 
     public int createMultipleChoiceQuestion(Question question, List<AnswerOption> answers) {
-        // Type is already set in 'question'
+        // Typ ist schon gesetzt
         int questionId = questionDao.create(question);
         if (answers != null) {
             for (AnswerOption option : answers) {
@@ -41,7 +41,7 @@ public class AdminService {
     }
 
     public void updateMultipleChoiceQuestion(Question question, List<AnswerOption> answers) {
-        // Type is already set in 'question'
+        // Typ ist schon gesetzt
         questionDao.update(question);
         answerDao.deleteByQuestion(question.getId());
         if (answers != null) {

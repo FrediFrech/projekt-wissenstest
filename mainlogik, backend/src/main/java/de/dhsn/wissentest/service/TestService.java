@@ -146,7 +146,6 @@ public class TestService {
         Set<Integer> selectedIds = new HashSet<>();
         List<Question> result = new ArrayList<>();
 
-        // 1. Process explicit segments
         for (ExamSegment seg : segments) {
             if (seg.percent <= 0) continue;
             int countEx = (int) Math.round((seg.percent / 100.0) * totalLimit);
@@ -156,15 +155,15 @@ public class TestService {
             for (Question q : allQuestions) {
                 if (selectedIds.contains(q.getId())) continue;
                 
-                // Difficulty Filter (0 or null means 'Any' in some models, but usually 1-3)
+                // Schwierigkeit filtern (0 = egal)
                 if (seg.difficulty > 0 && q.getDifficulty() != seg.difficulty) continue;
                 
-                // Category Filter
+                // Kategorie filtern
                 boolean catMatch = (seg.category == null || seg.category.equals("All") || seg.category.isBlank()) 
                                    || seg.category.equals(q.getCategory());
                 if (!catMatch) continue;
 
-                // Type Filter
+                // Typ filtern
                 boolean typeMatch = (seg.type == null || seg.type.equals("All") || seg.type.isBlank())
                                     || (q.getType() != null && q.getType().name().equals(seg.type));
                 if (!typeMatch) continue;
@@ -180,11 +179,7 @@ public class TestService {
             }
         }
 
-        // 2. Fill remainder if needed (randomly from remaining pool, or just stop?)
-        // Usually, if segments sum to 100%, we might miss a few due to rounding or lack of questions.
-        // Let's fill up to totalLimit with ANY non-selected question if we are under the limit.
-        // Or should we strict? The user requested specific percentages. 
-        // Best effort: fill randomly to meet limit.
+        // Rest auffüllen bis totalLimit
         if (result.size() < totalLimit) {
              List<Question> remainingPool = new ArrayList<>();
              for (Question q : allQuestions) {
@@ -200,10 +195,9 @@ public class TestService {
              }
         }
 
-        // Shuffle the final mix so segments aren't clumped
         Collections.shuffle(result);
         
-        // Hard limit check (in case rounding went over, though logic above shouldn't)
+        // Auf Limit begrenzen
         if (result.size() > totalLimit) {
             return result.subList(0, totalLimit);
         }
@@ -225,23 +219,22 @@ public class TestService {
                     .orElseThrow(() -> new IllegalArgumentException("Question not found: " + qId));
             
             Object answerPayload = answers.get(q.getId());
-            double earned = scoreQuestion(q, answerPayload); // scoreQuestion handles max points for q
-            
-            // Re-calculate max points for this question to be sure
+            double earned = scoreQuestion(q, answerPayload); 
+            // Max-Punkte je Frage
             double qMax = q.getPoints();
             maxPoints += qMax;
             totalPoints += earned;
             
             attemptAnswers.add(new AttemptAnswer(0, 0, q.getId(), String.valueOf(answerPayload), earned));
 
-            // Create Detail
+            
             QuestionResultDetail detail = new QuestionResultDetail();
             detail.questionId = q.getId();
             detail.prompt = q.getPrompt();
             detail.imageUrl = q.getImageUrl();
             detail.userAnswer = toUserAnswerText(q, answerPayload);
             detail.correctAnswer = determineCorrectAnswerText(q);
-            // Mark as correct only if full points achieved (partial credit is not "fully correct")
+            // Nur volle Punkte = korrekt
             detail.isCorrect = earned >= (qMax - 1e-9);
             detail.pointsObtained = earned;
             detail.maxPoints = qMax;
@@ -291,12 +284,12 @@ public class TestService {
             return "";
         }
 
-        // FREE text: keep as-is
+        // Freitext
         if (q.getType() == QuestionType.FREE) {
             return String.valueOf(answerPayload);
         }
 
-        // CLOZE: expect list of strings (from JSON)
+        // Cloze: Liste aus JSON
         if (q.getType() == QuestionType.CLOZE) {
             if (answerPayload instanceof List) {
                 @SuppressWarnings("unchecked")
@@ -311,7 +304,7 @@ public class TestService {
             return String.valueOf(answerPayload);
         }
 
-        // MC / IMAGE: payload is option-id (often parsed as Double)
+        // MC/IMAGE: Options-ID
         if (q.getType() == QuestionType.MC || q.getType() == QuestionType.IMAGE) {
             Integer selectedId = null;
             if (answerPayload instanceof Number) {
@@ -324,7 +317,7 @@ public class TestService {
                     }
                     selectedId = Integer.parseInt(s);
                 } catch (Exception ignored) {
-                    // fall through
+                    // einfach weiter
                 }
             }
 
@@ -347,7 +340,7 @@ public class TestService {
             List<AnswerOption> opts = answerDao.findByQuestion(q.getId());
             StringBuilder sb = new StringBuilder();
             for(AnswerOption o : opts) {
-                // Some seed data uses partial_value instead of is_correct
+                // Seeds nutzen partial_value
                 if(o.isCorrect() || o.getPartialValue() > 0) {
                     if(sb.length() > 0) sb.append(", ");
                     sb.append(o.getAnswerText());
@@ -372,9 +365,9 @@ public class TestService {
         if (max <= 0) return "N/A";
         double percent = (total / max) * 100.0;
         
-        // Difficulty 1 = Leicht (Basis: 10er Scale -> 90%, 70%, 50%, 30%, 10%)
-        // Difficulty 2 = Mittel (Basis: 15er Scale -> ~93%, ~73%, ~53%, ~33%, ~13%)
-        // Difficulty 3 = Schwer (Basis: 20er Scale -> 90%, 70%, 50%, 30%, 15%)
+        // Schwierigkeit 1: 90/70/50/30/10 %
+        // Schwierigkeit 2: 93/73/53/33/13 %
+        // Schwierigkeit 3: 90/70/50/30/15 %
         
         if (difficulty == 1) {
             if (percent >= 90) return "1";
@@ -492,7 +485,7 @@ public class TestService {
         List<AnswerOption> options = answerDao.findByQuestion(questionId);
         for(AnswerOption opt : options) {
             if(opt.getAnswerText().trim().equalsIgnoreCase(given)) {
-                 // Assuming partial value 1.0 for correct free text, or we can use the partial value from DB
+                 // Teilpunkte aus DB
                  return maxPoints * opt.getPartialValue();
             }
         }
