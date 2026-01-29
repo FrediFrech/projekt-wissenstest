@@ -1,0 +1,16 @@
+@startuml Deployment_Simple_02_BackendFlow
+
+title Vereinfachtes Deployment-Diagramm - Backend Schichten
+
+[Request von Browser]
+[Request von Browser] --> [Servlet\n(empfängt Request)]
+[Servlet\n(empfängt Request)] --> [Service\n(Geschäftslogik)]
+[Service\n(Geschäftslogik)] --> [DAO\n(Datenzugriff)]
+[DAO\n(Datenzugriff)] --> [Datenbank]
+
+[Datenbank] --> [DAO\n(Datenzugriff)] : Daten
+[DAO\n(Datenzugriff)] --> [Service\n(Geschäftslogik)] : Daten
+[Service\n(Geschäftslogik)] --> [Servlet\n(empfängt Request)] : Ergebnis
+[Servlet\n(empfängt Request)] --> [Response zu Browser]
+
+@enduml

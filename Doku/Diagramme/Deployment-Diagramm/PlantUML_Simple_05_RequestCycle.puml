@@ -1,0 +1,31 @@
+@startuml Deployment_Simple_05_RequestCycle
+
+title Vereinfachtes Deployment-Diagramm - Request-Zyklus
+
+participant Browser
+participant Tomcat
+participant Database
+
+== Student startet Test ==
+Browser ->> Tomcat: Test-Request\n(POST /test/start)
+Tomcat ->> Tomcat: Verarbeite Request
+Tomcat ->> Database: Hole Fragen\n(SELECT)
+Database -->> Tomcat: Fragen-Daten
+Tomcat -->> Browser: HTML mit Frage
+
+== Student antwortet ==
+Browser ->> Tomcat: Antwort\n(POST /answer)
+Tomcat ->> Tomcat: Validiere Antwort
+Tomcat ->> Tomcat: Berechne Punkte
+Tomcat ->> Database: Speichere Antwort\n(INSERT)
+Database -->> Tomcat: OK
+Tomcat -->> Browser: Nächste Frage
+
+== Test beenden ==
+Browser ->> Tomcat: Test ende\n(POST /end)
+Tomcat ->> Tomcat: Berechne Gesamtpunkte
+Tomcat ->> Tomcat: Berechne Note
+Tomcat ->> Database: Speichere Versuch\n(INSERT)
+Tomcat -->> Browser: Ergebnisse
+
+@enduml
