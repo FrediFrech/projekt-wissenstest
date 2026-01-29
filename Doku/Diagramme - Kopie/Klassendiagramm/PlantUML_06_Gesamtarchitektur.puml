@@ -1,0 +1,192 @@
+@startuml Wissenstest_06_Architektur_Gesamt
+!theme plain
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333333
+skinparam classArrowColor #333333
+skinparam fontSize 12
+skinparam linetype ortho
+
+title Wissenstest - Klassendiagramm Teil 6: Gesamt-Architektur und Komponenten-Übersicht
+
+' ==================== ARCHITECTURE LAYERS ====================
+
+package "1. Presentation Layer (Client)" {
+  component [Web Browser] as WebBrowser
+  
+  note left of WebBrowser
+    - HTML5 / CSS3
+    - Vanilla JavaScript
+    - Responsive Design
+    - HTTP Communication
+  end note
+}
+
+package "2. Web Layer (Request Handler)" {
+  component [AuthServlet] as AuthServlet
+  component [TestServlet] as TestServlet
+  component [AdminServlet] as AdminServlet
+  component [ImageServlet] as ImageServlet
+  component [HealthServlet] as HealthServlet
+  
+  note right of AuthServlet
+    HTTP POST/GET Handling
+    Session Management
+  end note
+}
+
+package "3. Business Logic Layer (Services)" {
+  component [AuthService] as AuthService
+  component [TestService] as TestService
+  component [ProgressionService] as ProgressionService
+  component [AdminService] as AdminService
+  
+  note bottom of TestService
+    Dynamic Test Generation
+    Test-Execution
+    Complex Business Logic
+  end note
+}
+
+package "4. Data Access Layer (DAO)" {
+  component [JdbcUserDao] as UserDAO
+  component [JdbcQuestionDao] as QuestionDAO
+  component [JdbcAnswerDao] as AnswerDAO
+  component [JdbcClozeTokenDao] as ClozeDAO
+  component [JdbcAttemptDao] as AttemptDAO
+  component [JdbcQuestionRepository] as QRepo
+  component [JdbcQuestionImageDao] as ImageDAO
+  
+  note right of UserDAO
+    PreparedStatements
+    ResultSet Mapping
+  end note
+}
+
+package "5. Data Layer (Database)" {
+  database "PostgreSQL\n(Port 5433)" as PostgreSQL
+  
+  note right of PostgreSQL
+    - users, questions, answers
+    - attempts, attempt_answers
+    - cloze_answers, question_images
+  end note
+}
+
+package "6. Utility & Infrastructure" {
+  component [DbConnectionManager] as DBConnMgr
+  component [PasswordUtils] as PwdUtils
+  
+  note bottom of DBConnMgr
+    HikariCP Connection Pool
+    Statische Utility-Klasse
+  end note
+}
+
+' ==================== REQUEST FLOW ====================
+
+WebBrowser --> AuthServlet : HTTP Request
+AuthServlet --> AuthService : Authenticate (Check Session)
+AuthService --> WebBrowser : Response (JSP Rendered)
+
+WebBrowser --> TestServlet : POST/GET (Test Actions)
+TestServlet --> TestService : Call Business Logic
+TestService --> QuestionDAO : Query Data
+QuestionDAO --> DBConnMgr : Get Connection
+DBConnMgr --> PostgreSQL : Execute SQL
+PostgreSQL --> QuestionDAO : Return ResultSet
+QuestionDAO --> TestService : Return Mapped Objects
+TestService --> ProgressionService : Calculate Grade/Difficulty Logic
+ProgressionService --> TestService : Return Grade
+TestService --> AttemptDAO : Save Result
+AttemptDAO --> PostgreSQL : Insert Data
+PostgreSQL --> AttemptDAO : Confirm
+AttemptDAO --> TestService : Return Attempt
+TestService --> TestServlet : Return AttemptResult
+TestServlet --> WebBrowser : Result Page (JSP Rendering)
+
+' ==================== UTILITY USAGE ====================
+
+AuthService -.-> PwdUtils : Security (Hash/Verify)
+
+' ==================== DATA MODELS ====================
+note right of PostgreSQL
+  **Primary Model Classes:**
+  
+  - User (id, username, email, passwordHash, passwordSalt, role)
+  - Question (id, type, prompt, difficulty, points, metaJson, imageUrl, category)
+  - Attempt (id, userId, totalPoints, maxPoints, difficulty, createdAt, grade, durationSeconds)
+  - AttemptAnswer (id, attemptId, questionId, givenAnswer, pointsAwarded)
+  
+  **Supporting Tables:**
+  - AnswerOption (id, questionId, answerText, correct, partialValue)
+  - ClozeToken (id, questionId, tokenIndex, expectedText, partialValue)
+  - QuestionImage (für Bilder zu Fragen)
+  
+  **KEINE Test-Tabelle:**
+  - Tests werden dynamisch generiert
+  - Fragen werden zufällig ausgewählt
+  
+  **Indices:** 
+  - On Foreign Keys
+  - On type, difficulty
+  - On created_at for pagination
+end note
+
+' ==================== SECURITY MEASURES ====================
+note bottom of AuthServlet
+  **Security Layers:**
+  
+  1. Session Authentication
+     - HttpSession Management
+     - Timeout handling
+  
+  2. Authorization
+     - Role-based Access Control
+     - role = "student" | "admin"
+  
+  3. Password Security
+     - SHA-256 Hashing mit Salt
+     - Iteratives Hashing (10.000x)
+     - PasswordUtils Klasse
+  
+  4. SQL Injection Prevention
+     - PreparedStatements
+     - Parameter binding
+end note
+
+' ==================== DEPLOYMENT ====================
+note bottom
+  **Deployment Stack:**
+  
+  - Java 17 (Runtime)
+  - Apache Tomcat 9.0.85 (App Server)
+  - PostgreSQL 16 (Database)
+  - Maven 3.9.6 (Build Tool)
+  - HikariCP 5.1 (Connection Pool)
+  
+  **Startup Script:** start_project.ps1
+  - Automated tool setup
+  - Database initialization
+  - Tomcat deployment
+  
+  **NICHT EXISTIERENDE Komponenten:**
+  - QuestionServlet
+  - ProgressionServlet
+  - FilterAuthenticator
+  - Logger (eigene Klasse)
+  - ConfigManager
+  - ValidationUtils
+  - ExceptionHandler
+end note
+
+' ==================== LEGEND ====================
+note left of WebBrowser
+  **Legend:**
+  
+  → Synchrone Calls
+  ..→ Utility Calls
+  | HTTP Communication
+  [SQL] Database Access
+end note
+
+@enduml

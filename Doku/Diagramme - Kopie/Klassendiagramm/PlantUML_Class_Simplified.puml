@@ -1,0 +1,81 @@
+@startuml Class_Simplified
+
+title Vereinfachtes Klassendiagramm - Wissenstest
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam packageBackgroundColor #f8f8f8
+
+package "Model Layer" <<Rectangle>> {
+    
+    class User {
+        -id: int
+        -username: String
+        -email: String
+        -passwordHash: String
+        -passwordSalt: String
+        -role: String
+        -resetRequested: boolean
+    }
+    
+    enum QuestionType {
+        MC
+        CLOZE
+        FREE
+        IMAGE
+    }
+    
+    class Question {
+        -id: int
+        -type: QuestionType
+        -prompt: String
+        -difficulty: int
+        -points: int
+        -metaJson: String
+        -imageUrl: String
+        -category: String
+    }
+    
+    class AnswerOption {
+        -id: int
+        -questionId: int
+        -answerText: String
+        -correct: boolean
+        -partialValue: double
+    }
+    
+    class ClozeToken {
+        -id: int
+        -questionId: int
+        -tokenIndex: int
+        -expectedText: String
+        -partialValue: double
+    }
+    
+    class Attempt {
+        -id: int
+        -userId: int
+        -totalPoints: double
+        -maxPoints: double
+        -difficulty: int
+        -createdAt: OffsetDateTime
+        -grade: String
+        -durationSeconds: int
+    }
+    
+    class AttemptAnswer {
+        -id: int
+        -attemptId: int
+        -questionId: int
+        -givenAnswer: String
+        -pointsAwarded: double
+    }
+}
+
+Question --> QuestionType
+Question "1" *-- "*" AnswerOption : hat
+Question "1" *-- "*" ClozeToken : hat
+User "1" *-- "*" Attempt : macht
+Attempt "1" *-- "*" AttemptAnswer : enthält
+
+@enduml

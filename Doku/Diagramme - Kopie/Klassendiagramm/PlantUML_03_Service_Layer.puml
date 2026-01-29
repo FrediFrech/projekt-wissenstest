@@ -1,0 +1,142 @@
+@startuml Wissenstest_03_Service_Layer
+!theme plain
+skinparam classBackgroundColor #F8F4E8
+skinparam classBorderColor #CC6600
+skinparam classArrowColor #CC6600
+skinparam fontSize 11
+skinparam linetype ortho
+
+title Wissenstest - Klassendiagramm Teil 3: Service Layer
+
+' ==================== SERVICE CLASSES ====================
+class AuthService {
+  -userDao: UserDao
+  --
+  +register(String, String, String): User
+  +login(String, String): User
+  +requestPasswordReset(String): void
+  -validateLoginInput(String, String): void
+}
+
+class TestService {
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -attemptDao: AttemptDao
+  -userDao: UserDao
+  -configDao: ConfigDao
+  --
+  +startTest(int, int): List<Question>
+  +startTest(int, int, String): List<Question>
+  +startTest(int, int, String, List<String>): List<Question>
+  +startSegmentedTest(List<ExamSegment>, int): List<Question>
+  +submitAttempt(int, int, List<Integer>, Map, int): AttemptResult
+  +resolveAutoDifficulty(int): int
+  +getHistory(int): List<Attempt>
+  +getAllQuestions(): List<Question>
+  +getAvailableCategories(): List<String>
+  +getAdminStats(): Map<String, Integer>
+  -scoreQuestion(Question, Object): double
+  -scoreFreeText(int, Object, int): double
+  -scoreMultipleChoice(int, Object, int): double
+  -scoreCloze(int, Object, int): double
+  -calculateGrade(double, double, int): String
+  -createProgressionService(): ProgressionService
+  -getConfigDouble(String, double): double
+  -getConfigInt(String, int): int
+}
+
+class ProgressionService {
+  -promoteThreshold: double
+  -demoteThreshold: double
+  -windowSize: int
+  --
+  +ProgressionService()
+  +ProgressionService(double, double, int)
+  +shouldPromote(double): boolean
+  +shouldDemote(double): boolean
+  +getWindowSize(): int
+}
+
+class AdminService {
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  --
+  +createMultipleChoiceQuestion(Question, List<AnswerOption>): int
+  +updateMultipleChoiceQuestion(Question, List<AnswerOption>): void
+  +createClozeQuestion(Question, List<ClozeToken>): int
+  +updateClozeQuestion(Question, List<ClozeToken>): void
+}
+
+' ==================== UTILITY CLASS ====================
+class PasswordUtils <<utility>> {
+  +{static} generateSaltHex(): String
+  +{static} hashPassword(String, String): String
+  +{static} verifyPassword(String, String, String): boolean
+}
+
+' ==================== DAO INTERFACES (Reference) ====================
+hide members
+
+together {
+  interface UserDao <<DAO>>
+  interface QuestionRepository <<DAO>>
+  interface AnswerDao <<DAO>>
+  interface ClozeTokenDao <<DAO>>
+  interface AttemptDao <<DAO>>
+  interface ConfigDao <<DAO>>
+}
+
+note bottom of UserDao
+  **Hinweis (Darstellung):**
+  Die DAO-Interfaces sind hier bewusst nur als Referenz dargestellt,
+  damit das Diagramm den Fokus auf die Service-Schicht behält.
+
+  Die vollständigen DAO-Methoden stehen im DAO-Layer-Diagramm:
+  - PlantUML_02_DAO_Layer.puml
+end note
+
+' ==================== RELATIONSHIPS ====================
+AuthService --> UserDao : uses
+AuthService --> PasswordUtils : uses
+
+TestService --> QuestionRepository : uses
+TestService --> AnswerDao : uses
+TestService --> ClozeTokenDao : uses
+TestService --> AttemptDao : uses
+TestService --> ConfigDao : uses
+TestService ..> ProgressionService : creates
+
+AdminService --> QuestionRepository : uses
+AdminService --> AnswerDao : uses
+AdminService --> ClozeTokenDao : uses
+
+note right of AuthService
+  **Authentifizierung**
+  - Login mit SHA-256 Hashing
+  - Registrierung mit Salt
+  - Password Reset Anfragen
+  
+  **Keine Email-Funktionalität!**
+  Reset erfolgt durch Admin
+end note
+
+note right of ProgressionService
+  **Einfache Threshold-Logik**
+  - promoteThreshold: 0.70 (70%)
+  - demoteThreshold: 0.40 (40%)
+  - windowSize: 3 (letzte N Tests)
+  
+  Wird in TestService.resolveAutoDifficulty() genutzt
+end note
+
+note bottom of TestService
+  **Zentrale Test-Logik**
+  - Keine Test-Entity! Tests werden
+    dynamisch aus Fragen generiert
+  - Scoring mit Teilpunkten
+  - Auto-Modus mit Progression
+end note
+
+@enduml

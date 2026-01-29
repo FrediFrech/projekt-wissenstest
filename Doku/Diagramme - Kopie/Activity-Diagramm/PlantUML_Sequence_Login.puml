@@ -1,0 +1,56 @@
+@startuml Sequence_Login
+
+title Sequenzdiagramm - Login-Flow
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Benutzer" as User
+participant "Frontend\n(JSP/JS)" as FE
+participant "AuthServlet" as Auth
+participant "AuthService" as AS
+participant "UserDao" as UD
+database "PostgreSQL" as DB
+
+User -> FE : Credentials eingeben
+FE -> Auth : POST /api/auth/login\n{username, password}
+
+Auth -> AS : login(username, password)
+
+AS -> AS : validateLoginInput()
+note right : Min 3 Zeichen\nMax 50 Zeichen\nAlphanumerisch
+
+AS -> UD : findByUsername(username)
+UD -> DB : SELECT * FROM users\nWHERE username = ?
+DB --> UD : User oder null
+
+alt Benutzer nicht gefunden
+    UD --> AS : Optional.empty()
+    AS --> Auth : IllegalArgumentException
+    Auth --> FE : 400 "Invalid credentials"
+    FE --> User : Fehlermeldung
+else Benutzer gefunden
+    UD --> AS : Optional<User>
+    
+    AS -> AS : PasswordUtils.verifyPassword()
+    note right
+      1. Hash = SHA-256(password + salt)
+      2. 10.000 Iterationen
+      3. Vergleich mit DB-Hash
+    end note
+    
+    alt Passwort falsch
+        AS --> Auth : IllegalArgumentException
+        Auth --> FE : 400 "Invalid credentials"
+        FE --> User : Fehlermeldung
+    else Passwort korrekt
+        AS --> Auth : User
+        Auth -> Auth : session.setAttribute("userId", id)
+        Auth -> Auth : session.setAttribute("role", role)
+        Auth --> FE : 200 {id, username, role}
+        FE -> FE : sessionStorage.setItem()
+        FE --> User : Redirect zu Dashboard
+    end
+end
+
+@enduml

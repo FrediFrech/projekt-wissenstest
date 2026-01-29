@@ -1,0 +1,158 @@
+@startuml Wissenstest_02_DAO_Layer
+!theme plain
+skinparam classBackgroundColor #F0E8F8
+skinparam classBorderColor #6600CC
+skinparam classArrowColor #6600CC
+skinparam fontSize 11
+skinparam linetype ortho
+
+title Wissenstest - Klassendiagramm Teil 2: Data Access Object (DAO) Layer
+
+' ==================== DAO INTERFACES ====================
+interface UserDao {
+  +create(User): int
+  +findByUsername(String): Optional<User>
+  +findById(int): Optional<User>
+  +findAll(): List<User>
+  +delete(int): boolean
+  +update(User): void
+  +setPasswordResetRequested(int, boolean): void
+  +findPasswordResetRequests(): List<User>
+}
+
+interface QuestionRepository <<primary>> {
+  +create(Question): int
+  +update(Question): boolean
+  +delete(int): boolean
+  +findById(int): Optional<Question>
+  +findByDifficulty(int, int): List<Question>
+  +findByDifficultyAndCategory(int, int, String): List<Question>
+  +findAll(): List<Question>
+  +findAllCategories(): List<String>
+}
+
+interface AnswerDao {
+  +create(AnswerOption): int
+  +findByQuestion(int): List<AnswerOption>
+  +deleteByQuestion(int): boolean
+}
+
+interface ClozeTokenDao {
+  +create(ClozeToken): int
+  +findByQuestion(int): List<ClozeToken>
+  +deleteByQuestion(int): boolean
+}
+
+interface AttemptDao {
+  +createAttempt(Attempt): int
+  +saveAttemptAnswers(int, List<AttemptAnswer>): void
+  +findByUser(int): List<Attempt>
+  +findRecentByUser(int, int): List<Attempt>
+  +countAll(): int
+}
+
+interface ConfigDao {
+  +findValue(String): Optional<String>
+}
+
+interface QuestionImageDao {
+  +create(byte[], String): int
+  +findById(int): Optional<QuestionImage>
+  +delete(int): boolean
+}
+
+' ==================== JDBC IMPLEMENTATIONS ====================
+class JdbcUserDao {
+  -dataSource: DataSource
+  --
+  +create(User): int
+  +findByUsername(String): Optional<User>
+  +findById(int): Optional<User>
+  +findAll(): List<User>
+  +delete(int): boolean
+  +update(User): void
+  +setPasswordResetRequested(int, boolean): void
+  +findPasswordResetRequests(): List<User>
+}
+
+class JdbcQuestionRepository {
+  -dataSource: DataSource
+  --
+  +create(Question): int
+  +update(Question): boolean
+  +delete(int): boolean
+  +findById(int): Optional<Question>
+  +findByDifficulty(int, int): List<Question>
+  +findByDifficultyAndCategory(int, int, String): List<Question>
+  +findAll(): List<Question>
+  +findAllCategories(): List<String>
+}
+
+class JdbcAnswerDao {
+  -dataSource: DataSource
+  --
+  +create(AnswerOption): int
+  +findByQuestion(int): List<AnswerOption>
+  +deleteByQuestion(int): boolean
+}
+
+class JdbcClozeTokenDao {
+  -dataSource: DataSource
+  --
+  +create(ClozeToken): int
+  +findByQuestion(int): List<ClozeToken>
+  +deleteByQuestion(int): boolean
+}
+
+class JdbcAttemptDao {
+  -dataSource: DataSource
+  --
+  +createAttempt(Attempt): int
+  +saveAttemptAnswers(int, List<AttemptAnswer>): void
+  +findByUser(int): List<Attempt>
+  +findRecentByUser(int, int): List<Attempt>
+  +countAll(): int
+}
+
+class JdbcConfigDao {
+  -dataSource: DataSource
+  --
+  +findValue(String): Optional<String>
+}
+
+class JdbcQuestionImageDao {
+  -dataSource: DataSource
+  --
+  +create(byte[], String): int
+  +findById(int): Optional<QuestionImage>
+  +delete(int): boolean
+}
+
+' ==================== RELATIONSHIPS ====================
+JdbcUserDao ..|> UserDao : implements
+JdbcQuestionRepository ..|> QuestionRepository : implements
+JdbcAnswerDao ..|> AnswerDao : implements
+JdbcClozeTokenDao ..|> ClozeTokenDao : implements
+JdbcAttemptDao ..|> AttemptDao : implements
+JdbcConfigDao ..|> ConfigDao : implements
+JdbcQuestionImageDao ..|> QuestionImageDao : implements
+
+note right of QuestionRepository
+  **Primary Question Interface**
+  - Wird in Services verwendet
+  - findByDifficulty für Tests
+  - findAllCategories für Filter
+  
+  **KEIN TestDao vorhanden!**
+  Tests werden dynamisch generiert
+end note
+
+note right of ConfigDao
+  **Neu für Auto-Modus**
+  - Lädt Schwellenwerte
+  - progress.promote_threshold
+  - progress.demote_threshold
+  - progress.window_size
+end note
+
+@enduml

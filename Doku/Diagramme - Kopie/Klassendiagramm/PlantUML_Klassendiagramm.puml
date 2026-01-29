@@ -1,0 +1,455 @@
+@startuml Wissenstest_Klassendiagramm
+!theme plain
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333333
+skinparam classArrowColor #333333
+skinparam fontSize 11
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+hide members
+
+' ==================== ENUMS ====================
+enum QuestionType {
+  MC
+  CLOZE
+  FREE
+  IMAGE
+}
+
+note bottom of QuestionType
+  4 Fragetypen:
+  - MC: Multiple Choice
+  - CLOZE: Lückentext
+  - FREE: Freitext
+  - IMAGE: Bild-basiert
+end note
+
+' ==================== MODEL CLASSES ====================
+class User {
+  -id: int
+  -username: String
+  -email: String
+  -passwordHash: String
+  -passwordSalt: String
+  -role: String
+  -resetRequested: boolean
+  --
+  +getId(): int
+  +setId(int): void
+  +getUsername(): String
+  +setUsername(String): void
+  +getEmail(): String
+  +setEmail(String): void
+  +getPasswordHash(): String
+  +setPasswordHash(String): void
+  +getPasswordSalt(): String
+  +setPasswordSalt(String): void
+  +getRole(): String
+  +setRole(String): void
+  +isResetRequested(): boolean
+  +setResetRequested(boolean): void
+}
+
+class Question {
+  -id: int
+  -type: QuestionType
+  -prompt: String
+  -difficulty: int
+  -points: int
+  -metaJson: String
+  -imageUrl: String
+  -category: String
+  --
+  +getId(): int
+  +setId(int): void
+  +getType(): QuestionType
+  +setType(QuestionType): void
+  +getPrompt(): String
+  +setPrompt(String): void
+  +getDifficulty(): int
+  +setDifficulty(int): void
+  +getPoints(): int
+  +setPoints(int): void
+  +getMetaJson(): String
+  +setMetaJson(String): void
+  +getImageUrl(): String
+  +setImageUrl(String): void
+  +getCategory(): String
+  +setCategory(String): void
+}
+
+class AnswerOption {
+  -id: int
+  -questionId: int
+  -answerText: String
+  -correct: boolean
+  -partialValue: double
+  --
+  +getId(): int
+  +setId(int): void
+  +getQuestionId(): int
+  +setQuestionId(int): void
+  +getAnswerText(): String
+  +setAnswerText(String): void
+  +isCorrect(): boolean
+  +setCorrect(boolean): void
+  +getPartialValue(): double
+  +setPartialValue(double): void
+}
+
+class ClozeToken {
+  -id: int
+  -questionId: int
+  -tokenIndex: int
+  -expectedText: String
+  -partialValue: double
+  --
+  +getId(): int
+  +setId(int): void
+  +getQuestionId(): int
+  +setQuestionId(int): void
+  +getTokenIndex(): int
+  +setTokenIndex(int): void
+  +getExpectedText(): String
+  +setExpectedText(String): void
+  +getPartialValue(): double
+  +setPartialValue(double): void
+}
+
+class Attempt {
+  -id: int
+  -userId: int
+  -totalPoints: double
+  -maxPoints: double
+  -difficulty: int
+  -createdAt: OffsetDateTime
+  -grade: String
+  -durationSeconds: int
+  --
+  +getId(): int
+  +setId(int): void
+  +getUserId(): int
+  +setUserId(int): void
+  +getTotalPoints(): double
+  +setTotalPoints(double): void
+  +getMaxPoints(): double
+  +setMaxPoints(double): void
+  +getDifficulty(): int
+  +setDifficulty(int): void
+  +getCreatedAt(): OffsetDateTime
+  +setCreatedAt(OffsetDateTime): void
+  +getGrade(): String
+  +setGrade(String): void
+  +getDurationSeconds(): int
+  +setDurationSeconds(int): void
+}
+
+class AttemptAnswer {
+  -id: int
+  -attemptId: int
+  -questionId: int
+  -givenAnswer: String
+  -pointsAwarded: double
+  --
+  +getId(): int
+  +setId(int): void
+  +getAttemptId(): int
+  +setAttemptId(int): void
+  +getQuestionId(): int
+  +setQuestionId(int): void
+  +getGivenAnswer(): String
+  +setGivenAnswer(String): void
+  +getPointsAwarded(): double
+  +setPointsAwarded(double): void
+}
+
+class QuestionImage {
+  -id: int
+  -contentType: String
+  -data: byte[]
+  --
+  +getId(): int
+  +setId(int): void
+  +getContentType(): String
+  +setContentType(String): void
+  +getData(): byte[]
+  +setData(byte[]): void
+}
+
+' ==================== DAO INTERFACES ====================
+interface UserDao {
+  +create(User): int
+  +findByUsername(String): Optional<User>
+  +findById(int): Optional<User>
+  +findAll(): List<User>
+  +delete(int): boolean
+  +update(User): void
+  +setPasswordResetRequested(int, boolean): void
+  +findPasswordResetRequests(): List<User>
+}
+
+interface AnswerDao {
+  +create(AnswerOption): int
+  +findByQuestion(int): List<AnswerOption>
+  +deleteByQuestion(int): boolean
+}
+
+interface ClozeTokenDao {
+  +create(ClozeToken): int
+  +findByQuestion(int): List<ClozeToken>
+  +deleteByQuestion(int): boolean
+}
+
+interface AttemptDao {
+  +createAttempt(Attempt): int
+  +saveAttemptAnswers(int, List<AttemptAnswer>): void
+  +findByUser(int): List<Attempt>
+  +findRecentByUser(int, int): List<Attempt>
+  +countAll(): int
+}
+
+interface QuestionRepository {
+  +create(Question): int
+  +update(Question): boolean
+  +delete(int): boolean
+  +findById(int): Optional<Question>
+  +findByDifficulty(int, int): List<Question>
+  +findByDifficultyAndCategory(int, int, String): List<Question>
+  +findAll(): List<Question>
+  +findAllCategories(): List<String>
+}
+
+interface QuestionImageDao {
+  +create(byte[], String): int
+  +findById(int): Optional<QuestionImage>
+  +delete(int): boolean
+}
+
+interface ConfigDao {
+  +findValue(String key): Optional<String>
+}
+
+' ==================== DAO IMPLEMENTATIONS ====================
+' (Für Übersicht/Druck bewusst ausgelassen – Details siehe "PlantUML_02_DAO_Layer.puml")
+
+' ==================== SERVICE CLASSES ====================
+class AuthService {
+  -userDao: UserDao
+  --
+  +AuthService(UserDao)
+  +register(String username, String email, String password): User
+  +login(String username, String password): User
+  +requestPasswordReset(String username): void
+  -validateLoginInput(String username, String password): void
+}
+
+class TestService {
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -attemptDao: AttemptDao
+  -userDao: UserDao
+  -configDao: ConfigDao
+  --
+  +TestService(QuestionRepository, AnswerDao, ClozeTokenDao, AttemptDao, UserDao, ConfigDao)
+  +startTest(int difficulty, int limit): List<Question>
+  +startTest(int difficulty, int limit, String category): List<Question>
+  +startTest(int difficulty, int limit, String category, List<String> categories): List<Question>
+  +startSegmentedTest(List<ExamSegment>, int): List<Question>
+  +submitAttempt(int userId, int difficulty, List<Integer> questionIds, Map<Integer, Object> answers, int durationSeconds): AttemptResult
+  +resolveAutoDifficulty(int userId): int
+  +getHistory(int userId): List<Attempt>
+  +getAllQuestions(): List<Question>
+  +getAvailableCategories(): List<String>
+  +getAdminStats(): Map<String, Integer>
+}
+
+class ProgressionService {
+  -promoteThreshold: double
+  -demoteThreshold: double
+  -windowSize: int
+  --
+  +ProgressionService()
+  +ProgressionService(double promoteThreshold, double demoteThreshold, int windowSize)
+  +shouldPromote(double lastScoreRatio): boolean
+  +shouldDemote(double averageRecentRatio): boolean
+  +getWindowSize(): int
+}
+
+class AdminService {
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  --
+  +AdminService(QuestionRepository, AnswerDao, ClozeTokenDao)
+  +createMultipleChoiceQuestion(Question, List<AnswerOption>): int
+  +updateMultipleChoiceQuestion(Question, List<AnswerOption>): void
+  +createClozeQuestion(Question, List<ClozeToken>): int
+  +updateClozeQuestion(Question, List<ClozeToken>): void
+}
+
+' ==================== SERVLET CLASSES ====================
+class AuthServlet {
+  -authService: AuthService
+  --
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -setSession(HttpSession, User): void
+}
+
+class TestServlet {
+  -testService: TestService
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -userDao: UserDao
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  -getUserId(HttpServletRequest): int
+  -buildQuestionView(List<Question>): List<QuestionView>
+}
+
+class AdminServlet {
+  -userDao: UserDao
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -attemptDao: AttemptDao
+  -imageDao: QuestionImageDao
+  -adminService: AdminService
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  #doPut(HttpServletRequest, HttpServletResponse): void
+  #doDelete(HttpServletRequest, HttpServletResponse): void
+  -isAdmin(HttpServletRequest): boolean
+}
+
+class ImageServlet {
+  -imageDao: QuestionImageDao
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+}
+
+class HealthServlet {
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+}
+
+' ==================== UTILITY CLASSES ====================
+class DbConnectionManager {
+  <<utility>>
+  -{static} PROPERTIES_FILE: String
+  -{static} dataSource: HikariDataSource
+  --
+  -DbConnectionManager()
+  +{static} getDataSource(): DataSource
+}
+
+class PasswordUtils {
+  <<utility>>
+  -{static} DEFAULT_ITERATIONS: int
+  --
+  -PasswordUtils()
+  +{static} generateSaltHex(): String
+  +{static} hashPassword(String password, String saltHex): String
+  +{static} hashPassword(String password, String saltHex, int iterations): String
+  +{static} verifyPassword(String password, String saltHex, String expectedHashHex): boolean
+  -{static} toHex(byte[] bytes): String
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Enums
+QuestionType --* Question : type
+
+' Question relationships
+Question --o "*" AnswerOption : has (for MC)
+Question --o "*" ClozeToken : has (for CLOZE)
+
+' Attempt relationships
+Attempt --o "*" AttemptAnswer : records
+
+' DAO relationships
+UserDao ..> User : uses
+QuestionRepository ..> Question : returns
+AttemptDao ..> Attempt : returns
+
+' Service relationships
+AuthService --> UserDao : uses
+AuthService --> PasswordUtils : uses
+TestService --> QuestionRepository : uses
+TestService --> AnswerDao : uses
+TestService --> ClozeTokenDao : uses
+TestService --> AttemptDao : uses
+TestService --> UserDao : uses
+TestService --> ConfigDao : uses
+TestService ..> ProgressionService : creates
+AdminService --> QuestionRepository : uses
+AdminService --> AnswerDao : uses
+AdminService --> ClozeTokenDao : uses
+
+' Servlet relationships
+AuthServlet --> AuthService : uses
+TestServlet --> TestService : uses
+TestServlet --> AnswerDao : uses
+TestServlet --> ClozeTokenDao : uses
+TestServlet --> UserDao : uses
+AdminServlet --> AdminService : uses
+AdminServlet --> UserDao : uses
+AdminServlet --> QuestionRepository : uses
+AdminServlet --> AnswerDao : uses
+AdminServlet --> ClozeTokenDao : uses
+AdminServlet --> AttemptDao : uses
+AdminServlet --> QuestionImageDao : uses
+ImageServlet --> QuestionImageDao : uses
+
+note bottom of User
+  **User-Klasse:**
+  - role ist ein String ("student", "admin")
+  - KEIN Enum für Role
+  - resetRequested für Passwort-Reset
+end note
+
+note bottom of Question
+  **Question-Klasse:**
+  - prompt (NICHT text!)
+  - difficulty ist int (1, 2, 3)
+  - 4 Fragetypen: MC, CLOZE, FREE, IMAGE
+end note
+
+note bottom of Attempt
+  **Attempt-Klasse:**
+  - KEINE Referenz zu Test (kein Test-Entity)
+  - Tests werden dynamisch generiert
+  - userId statt User-Objekt
+end note
+
+note bottom of AuthService
+  **AuthService:**
+  - Passwort-Hashing über PasswordUtils
+  - PasswordUtils ist separate Utility-Klasse
+end note
+
+note bottom of DbConnectionManager
+  **DbConnectionManager:**
+  - Utility-Klasse (kein Singleton-Pattern)
+  - Nur statische Methode: getDataSource()
+  - HikariCP Connection Pool
+end note
+
+note bottom
+  **NICHT EXISTIERENDE Klassen:**
+  - Test / TestDao / JdbcTestDao
+  - QuestionServlet
+  - ProgressionServlet
+  - FilterAuthenticator
+  - Logger (eigene Klasse)
+  - ConfigManager
+  - ValidationUtils
+  - ExceptionHandler
+  - Role (Enum)
+end note
+
+@enduml

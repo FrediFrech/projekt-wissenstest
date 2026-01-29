@@ -19,6 +19,10 @@
                <div id="gradeTextLabel" style="font-size: 1.5rem; color: var(--text-main); margin-top: -0.5rem; margin-bottom: 1rem;"></div>
              <div id="gradeInfo" style="font-size: 1.1rem; font-style:italic; color: var(--text-muted);">...</div>
         </div>
+
+                <div id="recommendedDifficultyWrap" style="margin-top: 1.5rem; font-size: 1rem; color: var(--text-main); display: none;">
+                        Empfohlene nächste Schwierigkeit: <strong id="recommendedDifficultyValue">-</strong>
+                </div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px; margin: 0 auto 2rem auto;">
@@ -81,6 +85,19 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    }
+
+    function difficultyLabel(difficulty) {
+        switch (Number(difficulty)) {
+            case 1:
+                return 'Leicht';
+            case 2:
+                return 'Mittel';
+            case 3:
+                return 'Schwer';
+            default:
+                return null;
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -162,6 +179,15 @@
                      gradeEl.style.color = "var(--text-main)";
                 }
                 document.getElementById('gradeInfo').innerText = "";
+            }
+
+            const recommendedDifficulty = resultObj.recommendedDifficulty;
+            const recommendedLabel = difficultyLabel(recommendedDifficulty);
+            const recommendedWrap = document.getElementById('recommendedDifficultyWrap');
+            const recommendedValue = document.getElementById('recommendedDifficultyValue');
+            if (recommendedWrap && recommendedValue && recommendedLabel) {
+                recommendedValue.innerText = recommendedLabel;
+                recommendedWrap.style.display = 'block';
             }
 
             // Populate Details

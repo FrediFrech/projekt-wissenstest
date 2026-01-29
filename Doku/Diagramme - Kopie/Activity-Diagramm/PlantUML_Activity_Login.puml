@@ -1,0 +1,90 @@
+@startuml Activity_Login
+
+title Aktivitätsdiagramm - Login-Prozess
+
+skinparam activityBackgroundColor #f0f0f0
+skinparam activityBorderColor #333333
+
+|Student|
+start
+
+:Login.jsp öffnen;
+:Username eingeben;
+:Passwort eingeben;
+:Login-Button klicken;
+
+|#LightBlue|AuthServlet|
+:POST /api/auth/login empfangen;
+:JSON Body parsen: {username, password};
+:AuthService.login() aufrufen;
+
+|#LightGreen|AuthService|
+:Login-Daten validieren;
+
+if (Username leer?) then (ja)
+  :IllegalArgumentException;
+  |#LightBlue|AuthServlet|
+  :HTTP 400 senden;
+  |Student|
+  :Fehlermeldung\n"Invalid credentials";
+  stop
+else (nein)
+endif
+
+:UserDao.findByUsername() aufrufen;
+
+|#LightYellow|UserDao|
+:SQL Query ausführen;
+note right
+  SELECT * FROM users
+  WHERE username = ?
+end note
+
+if (User gefunden?) then (nein)
+  |#LightGreen|AuthService|
+  :IllegalArgumentException;
+  |#LightBlue|AuthServlet|
+  :HTTP 400 senden;
+  |Student|
+  :Fehlermeldung\n"Invalid credentials";
+  stop
+else (ja)
+  :User-Objekt zurückgeben;
+endif
+
+|#LightGreen|AuthService|
+:Passwort-Hash berechnen;
+note right
+  SHA-256(password + salt)
+end note
+
+:Hash vergleichen;
+
+if (Hashes stimmen überein?) then (nein)
+  :IllegalArgumentException;
+  |#LightBlue|AuthServlet|
+  :HTTP 400 senden;
+  |Student|
+  :Fehlermeldung\n"Invalid credentials";
+  stop
+else (ja)
+  :User-Objekt zurückgeben;
+endif
+
+|#LightBlue|AuthServlet|
+:Session erstellen;
+:User in Session speichern;
+:Erfolgs-Response senden;
+
+|Student|
+:Login erfolgreich;
+
+if (User.role == "admin"?) then (ja)
+  :Redirect zu AdminPanel.jsp;
+else (nein)
+  :Redirect zu TestList.jsp;
+endif
+
+stop
+
+@enduml

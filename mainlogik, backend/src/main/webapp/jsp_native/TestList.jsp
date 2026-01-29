@@ -21,6 +21,10 @@
             <h3>Tests bestanden</h3>
             <div id="dashboardPassedCount" style="font-size: 2rem; color: var(--secondary);">0</div>
         </div>
+        <div class="glass-card" style="background: white;">
+            <h3>Empfohlene Schwierigkeit</h3>
+            <div id="dashboardRecommendedDifficulty" style="font-size: 2rem; color: var(--primary-dark);">-</div>
+        </div>
     </div>
 
     <h3>Verfügbare Tests</h3>
@@ -45,6 +49,7 @@
             <div class="form-group">
                 <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:0.4rem;">Schwierigkeit</label>
                 <select id="customDifficulty" class="form-input" style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                    <option value="auto">Auto (Empfohlen)</option>
                     <option value="1">Leicht</option>
                     <option value="2" selected>Mittel</option>
                     <option value="3">Schwer</option>

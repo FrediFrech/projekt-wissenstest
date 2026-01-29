@@ -100,6 +100,40 @@ public class JdbcAttemptDao implements AttemptDao {
     }
 
     @Override
+    public List<Attempt> findRecentByUser(int userId, int limit) {
+        if (limit <= 0) {
+            return new java.util.ArrayList<>();
+        }
+        List<Attempt> list = new java.util.ArrayList<>();
+        String sql = "SELECT id, user_id, total_points, max_points, difficulty, created_at, grade, duration_seconds FROM attempts WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Attempt a = new Attempt();
+                    a.setId(rs.getInt("id"));
+                    a.setUserId(rs.getInt("user_id"));
+                    a.setTotalPoints(rs.getDouble("total_points"));
+                    a.setMaxPoints(rs.getDouble("max_points"));
+                    a.setDifficulty(rs.getInt("difficulty"));
+                    a.setGrade(rs.getString("grade"));
+                    a.setDurationSeconds(rs.getInt("duration_seconds"));
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        a.setCreatedAt(ts.toInstant().atOffset(java.time.ZoneOffset.UTC));
+                    }
+                    list.add(a);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load recent user attempts", e);
+        }
+        return list;
+    }
+
+    @Override
     public int countAll() {
         String sql = "SELECT COUNT(*) FROM attempts";
         try (Connection con = dataSource.getConnection();

@@ -1,0 +1,154 @@
+@startuml Wissenstest_04_Web_Servlet_Layer
+!theme plain
+skinparam classBackgroundColor #E8F8E8
+skinparam classBorderColor #00AA00
+skinparam classArrowColor #00AA00
+skinparam fontSize 11
+skinparam linetype ortho
+
+title Wissenstest - Klassendiagramm Teil 4: Servlet Layer (Controller)
+
+' ==================== SERVLET PARENT ====================
+abstract class HttpServlet {
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  #doPut(HttpServletRequest, HttpServletResponse): void
+  #doDelete(HttpServletRequest, HttpServletResponse): void
+}
+
+' ==================== SERVLET CLASSES ====================
+class AuthServlet {
+  -authService: AuthService
+  --
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  ..Endpoints (POST)..
+  /api/auth/register
+  /api/auth/login
+  /api/auth/logout
+  /api/auth/reset-request
+  --
+  -setSession(HttpSession, User): void
+}
+
+class TestServlet {
+  -testService: TestService
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -userDao: UserDao
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  ..Endpoints (GET)..
+  /api/test/history
+  /api/test/categories
+  /api/test/recommend
+  /api/test/questions/all
+  /api/test/admin/stats
+  ..Endpoints (POST)..
+  /api/test/start
+  /api/test/submit
+  --
+  -getUserId(HttpServletRequest): int
+  -buildQuestionView(List<Question>): List<QuestionView>
+}
+
+class AdminServlet {
+  -userDao: UserDao
+  -questionDao: QuestionRepository
+  -answerDao: AnswerDao
+  -clozeTokenDao: ClozeTokenDao
+  -attemptDao: AttemptDao
+  -imageDao: QuestionImageDao
+  -adminService: AdminService
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  #doPost(HttpServletRequest, HttpServletResponse): void
+  #doPut(HttpServletRequest, HttpServletResponse): void
+  #doDelete(HttpServletRequest, HttpServletResponse): void
+  ..Endpoints (GET)..
+  /api/admin/questions
+  /api/admin/users
+  /api/admin/users/requests
+  /api/admin/stats
+  ..Endpoints (POST)..
+  /api/admin/questions (create)
+  /api/admin/images
+  /api/admin/images/import
+  ..Endpoints (PUT)..
+  /api/admin/questions (update)
+  /api/admin/users (update)
+  ..Endpoints (DELETE)..
+  /api/admin/questions?id=
+  /api/admin/users?id=
+  --
+  -isAdmin(HttpServletRequest): boolean
+}
+
+class ImageServlet {
+  -imageDao: QuestionImageDao
+  --
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  ..Endpoints (GET)..
+  /api/images/{id}
+}
+
+class HealthServlet {
+  #doGet(HttpServletRequest, HttpServletResponse): void
+  ..Endpoints (GET)..
+  /health
+}
+
+' ==================== FILTER ====================
+class CorsFilter <<filter>> {
+  +doFilter(ServletRequest, ServletResponse, FilterChain): void
+}
+
+class CharacterEncodingFilter <<filter>> {
+  +doFilter(ServletRequest, ServletResponse, FilterChain): void
+}
+
+' ==================== SERVICE REFERENCES ====================
+class AuthService
+class TestService
+class AdminService
+
+' ==================== RELATIONSHIPS ====================
+AuthServlet --|> HttpServlet
+TestServlet --|> HttpServlet
+AdminServlet --|> HttpServlet
+ImageServlet --|> HttpServlet
+HealthServlet --|> HttpServlet
+
+AuthServlet --> AuthService : uses
+TestServlet --> TestService : uses
+AdminServlet --> AdminService : uses
+
+note right of AuthServlet
+  **Auth Endpoints**
+  - POST /api/auth/register
+  - POST /api/auth/login
+  - POST /api/auth/logout
+  - POST /api/auth/reset-request
+  
+  Setzt Session: userId, role
+end note
+
+note right of TestServlet
+  **Test Endpoints**
+  - GET /api/test/recommend (Auto-Modus)
+  - POST /api/test/start (mit autoMode Flag)
+  - POST /api/test/submit
+  
+  **KEINE QuestionServlet!**
+  **KEINE ProgressionServlet!**
+end note
+
+note bottom of AdminServlet
+  **Admin-Only (role="admin")**
+  - Fragen CRUD
+  - User-Verwaltung
+  - Password-Reset bearbeiten
+  - Bilder-Import
+end note
+
+@enduml

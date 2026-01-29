@@ -1,0 +1,58 @@
+@startuml Sequence_Register
+
+title Sequenzdiagramm - Benutzer-Registrierung
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Neuer Benutzer" as User
+participant "Frontend\n(Register.jsp)" as FE
+participant "AuthServlet" as AS
+participant "AuthService" as Auth
+participant "UserDao" as DAO
+database "PostgreSQL" as DB
+
+== Registrierung ==
+
+User -> FE : Registrierungsformular öffnen
+FE --> User : Register.jsp anzeigen
+
+User -> FE : Formulardaten eingeben:\nusername, email, password
+FE -> FE : Client-Validierung\n(Pflichtfelder prüfen)
+
+FE -> AS : POST /api/auth/register\n{username, email, password}
+
+AS -> Auth : register(username, email, password)
+
+Auth -> DAO : findByUsername(username)
+DAO -> DB : SELECT * FROM users\nWHERE username = ?
+DB --> DAO : null oder User
+
+alt Username existiert bereits
+    DAO --> Auth : User (nicht null)
+    Auth --> AS : throw Exception\n"Username bereits vergeben"
+    AS --> FE : HTTP 400\n{error: "Username existiert"}
+    FE --> User : Fehlermeldung anzeigen
+else Username verfügbar
+    DAO --> Auth : null
+
+    Auth -> Auth : generateSalt()
+    note right: SecureRandom\n32 Bytes
+    
+    Auth -> Auth : hashPassword(password, salt)
+    note right: SHA-256\npassword + salt
+    
+    Auth -> Auth : User erstellen:\nrole = "student"\nresetRequested = false
+    
+    Auth -> DAO : create(user)
+    DAO -> DB : INSERT INTO users\n(username, email, password_hash,\n password_salt, role, reset_requested)\nVALUES (?, ?, ?, ?, 'student', false)
+    DB --> DAO : generatedId
+    
+    DAO --> Auth : User (mit ID)
+    Auth --> AS : User
+    AS -> AS : session.setAttribute("userId", id)\nsession.setAttribute("role", role)
+    AS --> FE : HTTP 200\n{id, username, role}
+    FE --> User : "Registrierung erfolgreich (eingeloggt)."
+end
+
+@enduml

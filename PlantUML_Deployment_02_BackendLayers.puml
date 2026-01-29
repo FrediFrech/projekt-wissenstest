@@ -1,0 +1,95 @@
+@startuml Deployment_02_BackendLayers
+
+title Deployment-Diagramm Teil 2 - Backend Application Layers
+
+package "Web Layer (JSP & Servlets)" {
+  component "AuthServlet\n/api/auth/*" as AUTH_SRVLT
+  component "TestServlet\n/api/test/*" as TEST
+  component "AdminServlet\n/api/admin/*" as ADMIN
+  component "ImageServlet\n/api/images/*" as IMAGES
+  component "HealthServlet\n/health" as HEALTH
+}
+
+package "Service Layer (Business Logic)" {
+    component "AuthService" as AUTH
+    component "TestService" as TEST_SVC
+    component "ProgressionService" as PROG
+    component "AdminService" as ADMIN_SVC
+}
+
+package "DAO Layer (Data Access)" {
+    component "UserDao" as USER_DAO
+  component "QuestionRepository" as QUESTION_REPO
+    component "AttemptDao" as ATTEMPT_DAO
+    component "AnswerDao" as ANSWER_DAO
+    component "ClozeTokenDao" as CLOZE_DAO
+  component "ConfigDao" as CONFIG_DAO
+  component "QuestionImageDao" as IMAGE_DAO
+}
+
+package "Model Layer (Data Objects)" {
+    component "User" as USER_MODEL
+    component "Question" as QUESTION_MODEL
+    component "Attempt" as ATTEMPT_MODEL
+  component "AttemptResult" as ATTEMPT_RESULT_MODEL
+  component "AnswerOption" as ANSWER_MODEL
+    component "AttemptAnswer" as ATTEMPT_ANSWER_MODEL
+  component "ClozeToken" as CLOZE_MODEL
+}
+
+' Verbindungen
+AUTH_SRVLT --> AUTH : "login()\nregister()\nresetRequest()"
+TEST --> TEST_SVC : "startTest()\nsubmitAttempt()\ngetAllQuestions()"
+ADMIN --> ADMIN_SVC : "create/update/delete question"
+IMAGES --> IMAGE_DAO : "find/save images"
+
+AUTH --> USER_DAO : "findByUsername()\ncreate()\nupdate()"
+TEST_SVC --> QUESTION_REPO : "findByDifficulty(...)\nfindAll()"
+TEST_SVC --> ANSWER_DAO : "findByQuestion(...)"
+TEST_SVC --> CLOZE_DAO : "findByQuestion(...)"
+TEST_SVC --> ATTEMPT_DAO : "createAttempt()\nsaveAttemptAnswers()"
+TEST_SVC --> CONFIG_DAO : "read thresholds"
+ADMIN_SVC --> QUESTION_REPO : "create/update/delete"
+ADMIN_SVC --> ANSWER_DAO : "save answers"
+ADMIN_SVC --> CLOZE_DAO : "save cloze answers"
+
+USER_DAO --> USER_MODEL : "returns"
+QUESTION_REPO --> QUESTION_MODEL : "returns"
+ATTEMPT_DAO --> ATTEMPT_MODEL : "returns"
+ANSWER_DAO --> ANSWER_MODEL : "returns"
+CLOZE_DAO --> CLOZE_MODEL : "returns"
+
+note top of AUTH_SRVLT
+  **Servlet Handler:**
+  - HTTP Request verarbeiten
+  - JSON Body lesen/validieren
+  - Service aufrufen
+  - JSON Response schreiben
+end note
+
+note top of AUTH
+  **Auth Service:**
+  - Passwort validieren
+  - Session erstellen
+  - Rollen prüfen
+end note
+
+note top of USER_DAO
+  **DAO Implementierungen:**
+  - JDBC-Zugriff
+  - SQL-Ausführung
+  - ResultSet zu Objekten
+  - Connection Management
+end note
+
+note bottom
+  **Layered Architecture Pattern:**
+  
+  Requests fließen von oben nach unten:
+  Servlet → Service → DAO → DB
+  
+  Responses fließen von unten nach oben:
+  DB → DAO → Service → Servlet → JSP → Browser
+end note
+
+@enduml
