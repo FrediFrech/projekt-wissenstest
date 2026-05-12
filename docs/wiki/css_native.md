@@ -1,7 +1,7 @@
 # css_native/style.css
 
 ## Einfache Erklärung
-Dies ist das globale CSS für die JSP-Native-Variante. Es definiert das moderne "High-End" Look: Glasmorphism-Effekt (durchscheinende Karten), schöne Farbgradienten, Animationen, responsive Layouts – alles mit reinem CSS3, ohne externe Libraries.
+Dies ist das globale CSS für die JSP-Native-Variante. Es ermöglicht ein Glasmorphism-Effekt (durchscheinende Karten), schöne Farbgradienten, Animationen, responsive Layouts auch ohne ein React framework mit MUIv7 mit reinem CSS3, ohne externe Libraries.
 
 ## Zweck
 **Globales Styling** für alle JSP-Seiten: Layout, Farben, Animationen, Responsivität.
@@ -198,7 +198,7 @@ Oder direkt per `<link>` im Kopf aller JSP-Seiten.
 - ✅ Firefox 88+
 - ✅ Safari 15+
 - ✅ Edge 90+
-- ⚠️ IE 11: Nicht unterstützt (Variablen, Backdrop-Filter fallen zurück)
+- ⚠️ IE 11: Nicht unterstützt (Variablen, Backdrop-Filter fallen zurück), aber wer benutzt das schon noch?
 
 ## Performance-Tipps
 
