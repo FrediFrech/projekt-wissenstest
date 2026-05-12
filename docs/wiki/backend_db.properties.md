@@ -1,6 +1,6 @@
 # backend/src/main/resources/db.properties
 
-Einfache Erklärung: Das ist die Konfigurationsdatei für die Datenbank. Wenn du Benutzername, Passwort oder Host änderst, machst du das hier – der Code bleibt gleich.
+Einfache Erklärung für euch beide..: Das ist die Konfigurationsdatei für die Datenbank. Wenn du Benutzername, Passwort oder Host änderst, machst du das hier der Code bleibt gleich.
 
 ## Zweck
 Zentrale Konfiguration der Datenbankverbindung (JDBC). Diese Datei erlaubt Anpassung je Deployment, ohne Code zu ändern.
