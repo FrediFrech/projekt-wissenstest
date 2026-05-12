@@ -29,7 +29,7 @@ Entwicklung einer umfangreichen Webanwendung im Rahmen des Moduls Softwareprojek
 
 ## 3. Installation & Start
 
-### 📚 Dokumentation (WICHTIG!)
+###  Dokumentation 
 
  **START HIER für Übersicht:**
 - **[Projekt-Übersicht & Funktionalität](docs/PROJECT_OVERVIEW.md)** – Alles auf einen Blick!
@@ -74,14 +74,13 @@ cd "mainlogik, backend"
 projekt-wissenstest/
 ├── docs/
 │   ├── PROJECT_OVERVIEW.md           ⭐ START HERE!
-│   ├── JSP_COMPLIANCE_ANALYSIS.md    ⚠️ Compliance?
 │   ├── ARCHITECTURE_DIAGRAMS.md      Backend Klassen
 │   ├── JSP_NATIVE_GUIDE.md           JSP Frontend-Architektur
 │   ├── DATABASE_EXPLORER.md          ER-Diagramm
 │   ├── POSTGRES_SETUP.md             DB Setup
 │   └── wiki/                         Komponenten-Doku (60+ Dateien)
 │
-├── mainlogik, backend/               ☕ Java Backend
+├── mainlogik, backend/                Java Backend
 │   ├── src/main/java/.../web        Servlets (9 Dateien)
 │   ├── src/main/java/.../service    Business-Logik (4 Dateien)
 │   ├── src/main/java/.../dao        JDBC DAOs (14 Dateien)
@@ -89,26 +88,15 @@ projekt-wissenstest/
 │   ├── src/main/webapp/jsp_native   JSP Komponenten (11 Dateien)
 │   └── src/test/java/               JUnit Tests
 │
-├── startup/                          🚀 Start-Skripte
+├── startup/                           Start-Skripte
 │   └── start_project.ps1            One-Click Setup
 │
-├── db/                               🗄️ Datenbank
+├── db/                                Datenbank
 │   ├── schema.sql                   Tabellen
 │   └── seeds.sql                    Test-Daten
 │
-├── Doku/                             📄 Formelle Dokumentation
+├── Doku/                              Formelle Dokumentation
 │   ├── Diagramme/                   PlantUML Diagramme
 │   └── FragenPool/                  Fragen-Vorlagen
 ```
-
----
-
-## 5. Tech-Stack
-
-| Layer | Technologie | Konformität |
-|-------|-------------|-------------|
-| **Frontend** | JSP (Java Server Pages), Vanilla JS, CSS3 | ✅ Konform |
-| **Backend** | Java 17, Servlets, JDBC | ✅ Konform |
-| **Datenbank** | PostgreSQL 15 | ✅ Konform |
-| **Testing** | JUnit 5 | ✅ Konform |
 
