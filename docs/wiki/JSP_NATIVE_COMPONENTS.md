@@ -4,7 +4,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die a
 
 ---
 
-## 📋 Komponenten-Verzeichnis
+## Komponenten-Verzeichnis
 
 | Komponente | Typ | Beschreibung | Wiki-Link |
 |-----------|-----|-------------|-----------|
@@ -23,7 +23,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die a
 
 ---
 
-## 🔧 JavaScript & CSS
+##  JavaScript & CSS
 
 | Datei | Zweck | Wiki-Link |
 |------|-------|-----------|
@@ -32,7 +32,7 @@ Diese Dokumentation beschreibt alle Komponenten der **JSP‑Variante** – die a
 
 ---
 
-## 🏗️ Architektur-Übersicht
+##  Architektur-Übersicht
 
 ```
 index.jsp (Start)
@@ -70,7 +70,7 @@ Backend (Java Servlets)
 
 ---
 
-## 🚀 Navigation Flow
+##  Navigation Flow
 
 ```
 Landing Page
@@ -98,7 +98,7 @@ Navigation Bar
 
 ---
 
-## 🔐 Sicherheit
+##  Sicherheit
 
 ### Session-Handling
 - **Server-Side Sessions** in JSP (nicht localStorage)
@@ -116,31 +116,22 @@ Navigation Bar
 
 ---
 
-## 📱 Responsive Design
+## Features & Highlights
 
-Alle Komponenten sind **Mobile-First** designt:
-- CSS Grid/Flexbox für responsive Layouts
-- Meta-Viewport in `native.jsp`
-- Breakpoints für Tablet & Desktop
-
----
-
-## ✨ Features & Highlights
-
-### 🎨 Design
+### Design
 - **Glasmorphism:** Durchscheinende Cards mit Blur-Effekt
 - **Gradients:** Farbübergänge (Blau → Lila)
-- **Animationen:** CSS3 Transitions & Keyframes (keine JS-Libraries)
-- **Icons:** Emojis für Schnelligkeit
+- **Animationen:** CSS3 Transitions & Keyframes (keine JS-Libraries!)
+- **Icons:** Emojis für Schnelligkeit :)
 
-### ⚡ Performance
+### Performance
 - **Vanilla JS:** Minimal Overhead (keine Framework-Größe)
 - **CSS3 Native:** Hardwarebeschleunigung
 - **AJAX:** Nur Daten-Transfer, keine Page-Reloads
 - **localStorage:** Test‑Konfiguration
 - **sessionStorage:** Ergebnisdaten
 
-### 🔄 Interaktivität
+### Interaktivität
 - **3D-Flip-Cards:** CSS perspective + rotateY
 - **Progress-Bar:** Animierte Breiten-Änderung
 - **Form-Feedback:** Inline Error-Messages
@@ -148,7 +139,7 @@ Alle Komponenten sind **Mobile-First** designt:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Manuelles Testing
 1. Backend bauen: `mvn clean package`
@@ -161,7 +152,7 @@ Alle Komponenten sind **Mobile-First** designt:
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 ### Code-Stil
 - **JSP:** Klare Kommentare, minimale Java-Logik
@@ -170,7 +161,6 @@ Alle Komponenten sind **Mobile-First** designt:
 
 ### Fehlerbehandlung
 - Try-Catch in JavaScript um API-Calls
-- Error-Messages für Benutzer (nicht Technical Jargon)
 - Logging zum Browser-Console für Debugging
 
 ### Wartbarkeit
@@ -179,14 +169,7 @@ Alle Komponenten sind **Mobile-First** designt:
 
 ---
 
-## 💡 Häufig Gestellte Fragen
-
-**F: Wo starte ich die JSP‑Version?**  
-A: `http://localhost:8080/wissentest/` (Backend muss laufen)
-
----
-
-## 📚 Weitere Ressourcen
+## Weitere Ressourcen
 
 - [JSP Native Guide](JSP_NATIVE_GUIDE.md) – Quick-Start & Architektur
 - [Komponenten-Connections](verbindungen_uebersicht.md) – Wie alles zusammenhängt
