@@ -2,7 +2,7 @@
 ## Was ist das?
 Das Frontend nutzt nur:
 - **JSP** (JavaServer Pages) für die Struktur
-- **CSS3** (modernes Flexbox/Grid, Animations) für das "High-End" Design
+- **CSS3** (modernes Flexbox/Grid, Animations) damit ein moderner Look auch ohne React MUI libaries möglich sind.
 - **Vanilla JavaScript** (keine Frameworks) für die Logik
 
 ##  Komponenten-Struktur (JSP)
