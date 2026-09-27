@@ -1,0 +1,80 @@
+site_name: Projekt Wissenstest
+site_description: Handbuch zur Lernplattform für UML-Wissenstests (JSP, Java-Servlets, PostgreSQL)
+site_url: https://fredifrech.github.io/projekt-wissenstest/
+repo_url: https://github.com/FrediFrech/projekt-wissenstest
+repo_name: FrediFrech/projekt-wissenstest
+edit_uri: edit/main/handbuch/
+
+docs_dir: handbuch
+strict: true
+
+theme:
+  name: material
+  language: de
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Dunkles Design
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Helles Design
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search:
+      lang: de
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.blocks.caption
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Start: index.md
+  - Nutzung:
+      - Für Lernende: nutzung/lernende.md
+      - Für Lehrende: nutzung/lehrende.md
+  - Architektur:
+      - Überblick: architektur/ueberblick.md
+      - Backend: architektur/backend.md
+      - REST-API: architektur/api.md
+      - Frontend: architektur/frontend.md
+      - Datenbank: architektur/datenbank.md
+      - Auto-Modus und Bewertung: architektur/auto-modus.md
+  - Betrieb:
+      - Lokale Installation: betrieb/installation.md
+      - Deployment auf Tomcat: betrieb/deployment.md
+      - Tests: betrieb/tests.md
+  - Über diese Doku: ueber-diese-doku.md
+
+copyright: Projekt Wissenstest · DHSN Bautzen
