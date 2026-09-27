@@ -1,0 +1,59 @@
+name: Dokumentation veröffentlichen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "handbuch/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "handbuch/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements-docs.txt
+      - name: Seite bauen (bricht bei Warnungen ab)
+        run: mkdocs build --strict
+      - name: Pages-Artefakt hochladen
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    # Pull Requests werden nur gebaut und geprüft, nicht veröffentlicht
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,5 @@
+# Abhängigkeiten für die Dokumentation (MkDocs-Handbuch unter handbuch/)
+# Bewusst fest gepinnt: MkDocs 2.0 ist nicht kompatibel mit Material for MkDocs,
+# Material befindet sich seit Nov. 2025 im Wartungsmodus.
+mkdocs==1.6.1
+mkdocs-material==9.7.6
