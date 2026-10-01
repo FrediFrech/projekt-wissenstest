@@ -1,5 +1,9 @@
 # Projekt Wissenstest
 
+> **Live-Demo:** Diese Dokumentation wird automatisch mit GitHub Actions veröffentlicht.
+
+![Backend-Schichten](assets/diagramme/backend-schichten.png){ width="360" loading=lazy }
+
 Projekt Wissenstest ist eine webbasierte Lernplattform, mit der Studierende ihr Wissen zu UML prüfen und trainieren können. Die Anwendung entstand im Modul Software Engineering an der Staatlichen Studienakademie Bautzen (DHSN). Sie wird serverseitig mit JSP gerendert, die Logik liegt in Java-Servlets, die Daten in PostgreSQL.
 
 Dieses Handbuch beschreibt die Nutzung, die Architektur und den Betrieb der Anwendung.
